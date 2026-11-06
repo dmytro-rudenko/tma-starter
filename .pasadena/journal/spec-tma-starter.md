@@ -14,10 +14,10 @@ started: 2026-11-06
 який проходить свої тести й стартує локально.
 
 ## Now
-Хвилі 0–6 закриті, групове рев'ю 4–6 закрито. Хвиля 7: Task 8 (payments B: refund/admin/cancel/reconcile/audience filter/card) — закриває 6 червоних кейсів payments.acceptance.
-GROUP_BASE: (нова група 7–9 від HEAD перед хвилею 7)
-Контекст Task 13: pnpm.overrides для tma-*, .dockerignore. На Finish: prettier --write.
-Перевірка хвилі 7: pnpm --filter @dmytro-rudenko/tma-nest-payments test — усе зелене.
+Хвилі 0–7 закриті (8a5cc63): усі 5 пакетів зелені разом з acceptance. Хвиля 8: Tasks 13 (template root+api), 14 (template web), 16 (repo CI/manifest).
+GROUP_BASE: 5ba6476
+Шаблон тестується через scaffold у тимчасову теку з TMA_PLUGIN_ROOT (plugin.json з'являється в Task 16 цієї ж хвилі).
+Контекст Task 13: pnpm.overrides для tma-* у template/package.json, template/.dockerignore. На Finish: prettier --write.
 
 ## Timeline
 
@@ -68,3 +68,11 @@ GROUP_BASE: (нова група 7–9 від HEAD перед хвилею 7)
 - 22:05 ● 24561c8 fix(testing): waitFor resolves NonNullable<T>
 - 22:05 ● cafd260 fix(web): add BROADCAST_NOT_FOUND to TMA_ERROR_CODES
 - 22:25 ✎ Хвиля 6 і групове рев'ю 4–6: розсилки на lease, settled_at для onRefund, backoff refund-retry
+- 22:25 ● 0689dc4 fix(testing): fingerprint migration bodies in template DB name
+- 22:25 ● 7cb3fd3 fix(nest-bot): lease-based broadcast worker and input limits
+- 22:25 ● 4b042e8 fix(nest-payments): refund hooks only for accepted payments, retry backoff
+- 22:25 ● 80c6ee5 docs(plan): tick wave 6
+- 22:25 ● 5ba6476 chore(journal): wave 6 and group 4-6 review closed
+- 22:35 ● f59f5aa feat(nest-payments): refunds, subscription cancel, admin API and reconcile
+- 22:35 ● 8a5cc63 docs(plan): tick wave 7
+- 22:35 ✎ Хвиля 7: nest-payments B, усі пакети та їхні acceptance зелені
