@@ -14,10 +14,9 @@ started: 2026-11-06
 який проходить свої тести й стартує локально.
 
 ## Now
-Building. План docs/sdd/plans/2026-11-06-tma-starter.md схвалено: 18 задач (0–17), 11 хвиль.
-Наступне: Wave 0 — Task 0 (acceptance-тести), далі Wave 1 — Task 1 (скелет монорепо).
-Перевірка: pnpm -r build && pnpm -r typecheck && pnpm -r test && bash skills/new/scaffold.test.sh && bash scripts/smoke-template.sh shop → `smoke OK: shop`.
-Не змінювати: без e2e і без прототипу; реліз 0.1.0 лише після merge PR #1 і з NPM_TOKEN від власника.
+Хвиля 0/10 закрита (0e48580): acceptance-тести червоні за задумом. Хвиля 1 — Task 1 (скелет монорепо, лише implementer).
+Рішення для наступних задач: FakeBotApi порт 0 за замовчуванням; blockedByUser липкий; TmaBotModule і TmaPaymentsModule @Global; `test` у пакетах спершу будує; jest moduleNameMapper/vitest alias на src пакетів.
+Перевірка хвилі 1: pnpm install && pnpm -r build && pnpm -r typecheck.
 
 ## Timeline
 
@@ -31,3 +30,7 @@ Building. План docs/sdd/plans/2026-11-06-tma-starter.md схвалено: 18
 - 20:18 ✎ Spec розширено на частину B: skill-опитування empty|shop, scaffold.sh з плейсхолдерами й маркерами, шаблон на пакетах, без e2e і без прототипу; builder-check B закрито рішеннями білдера; один реліз 0.1.0
 - 20:18 ● e4d6bca docs(spec): extend design with part B (template, scaffold, skill)
 - 20:32 ✎ План схвалено: 18 задач у 11 хвилях; паралельно йдуть testing/scaffold/SKILL, core/web/deploy, bot-broadcast/payments, template api/web/CI
+- 20:32 ● fc09e4b docs(plan): tma-starter implementation plan
+- 20:55 ● 0e48580 test: acceptance tests for tma-* packages and scaffold
+- 20:55 ● b4fa31d docs(plan): tick wave 0
+- 20:55 ✎ Хвиля 0: acceptance-тести написано й переглянуто; додано тести на Review Focus 1–4
