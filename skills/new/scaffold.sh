@@ -54,8 +54,11 @@ while [ $# -gt 0 ]; do
 done
 
 [ -n "$DIR" ] || die "--dir is required"
+case "$DIR" in -*) DIR="./$DIR" ;; esac
+case "$PRODUCTS" in -*) PRODUCTS="./$PRODUCTS" ;; esac
+case "$TMA_SOURCE" in -*) TMA_SOURCE="./$TMA_SOURCE" ;; esac
 [[ "$SLUG" =~ ^[a-z][a-z0-9-]{1,30}$ ]] || die "invalid --slug '$SLUG': expected ^[a-z][a-z0-9-]{1,30}\$"
-perl -CSA -e 'exit($ARGV[0] =~ /\A[\p{L}\p{N} .,\-!?:\x{2019}]{2,32}\z/ ? 0 : 1)' "$TITLE" ||
+perl -CSA -e 'exit($ARGV[0] =~ /\A[\p{L}\p{N} .,\-!?:\x{2019}]{2,32}\z/ ? 0 : 1)' -- "$TITLE" ||
   die "invalid --title '$TITLE': 2-32 letters, digits, spaces or . , - ! ? : ’"
 [[ "$BOT_USERNAME" =~ ^[A-Za-z0-9_]{5,32}$ ]] || die "invalid --bot-username '$BOT_USERNAME': expected ^[A-Za-z0-9_]{5,32}\$"
 [[ "$DOMAIN" =~ ^[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?$ ]] || die "invalid --domain '$DOMAIN': expected a host name without scheme or /"
@@ -115,13 +118,13 @@ if [ -n "$PRODUCTS" ]; then
       text(p.description, 255, p.id + ".description");
     });
     if (list.filter((p) => p.id === "premium" && p.kind === "subscription").length !== 1) fail("exactly one product premium with kind subscription is required");
-  ' "$PRODUCTS"
+  ' -- "$PRODUCTS"
 fi
 
 mkdir -p "$DIR"
 cp -R "$TEMPLATE/." "$DIR/"
-find "$DIR" -depth \( -name node_modules -o -name dist \) -type d -exec rm -rf {} +
-find "$DIR" -name .env -type f -exec rm -f {} +
+find "$DIR" -mindepth 1 -depth \( -name node_modules -o -name dist \) -type d -exec rm -rf {} +
+find "$DIR" -mindepth 1 -name .env -type f -exec rm -f {} +
 
 MARKER_FILES=()
 while IFS= read -r -d '' f; do
@@ -160,7 +163,7 @@ if [ "$VARIANT" = shop ] && [ -n "$PRODUCTS" ]; then
     }
     lines.push("];", "");
     fs.writeFileSync(process.argv[2], lines.join("\n"));
-  ' "$PRODUCTS" "$DIR/apps/api/src/products.ts"
+  ' -- "$PRODUCTS" "$DIR/apps/api/src/products.ts"
 fi
 
 export TMA_PH_APP_SLUG="$SLUG"
