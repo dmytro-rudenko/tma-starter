@@ -279,10 +279,10 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
     - `GET /api/admin/audit?actorId&targetType&targetId&cursor`, 50 per page.
 - Consumes: `UsersService`, `AdminRightsService` and the module (Task 3).
 
-- [ ] Step 1: unit specs: `app-settings.service.spec.ts` (cache with a fake clock, parse, unknown key; port of plivka's 121 lines), `audit.service.spec.ts` (truncate meta, prune), `realtime.gateway.spec.ts` (valid, invalid and expired initData — Review Focus 4).
-- [ ] Step 2: red.
-- [ ] Step 3: implement.
-- [ ] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-core test`. The whole of `core.acceptance.spec.ts` must be green.
+- [x] Step 1: unit specs: `app-settings.service.spec.ts` (cache with a fake clock, parse, unknown key; port of plivka's 121 lines), `audit.service.spec.ts` (truncate meta, prune), `realtime.gateway.spec.ts` (valid, invalid and expired initData — Review Focus 4).
+- [x] Step 2: red.
+- [x] Step 3: implement.
+- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-core test`. The whole of `core.acceptance.spec.ts` must be green.
 
 ### Task 5: tma-nest-bot — module, webhook, middleware, commands, i18n, notifications, prepared messages
 **Writes:** `packages/nest-bot/src/{index.ts,bot.module.ts,options.ts,bot.service.ts,bot.controller.ts,start-param.router.ts,copy.ts,lang.ts,notifications.service.ts,prepared-messages.service.ts}`, `src/migrations/{index.ts,tma_bot_001_users_bot_blocked_at.ts}`, and the matching `*.spec.ts`
