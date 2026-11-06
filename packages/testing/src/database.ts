@@ -47,16 +47,19 @@ const readyTemplates = new Map<string, Promise<string>>();
 async function buildTemplate(client: PgClient, name: string, source: Knex.MigrationSource<unknown>) {
   const exists = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [name]);
   if (exists.rowCount) return;
-  await client.query(`CREATE DATABASE "${name}"`);
-  const knex = createKnex({ client: 'pg', connection: urlForDb(name), pool: { min: 0, max: 1 } });
+  const build = `${name}_build`;
+  await client.query(`DROP DATABASE IF EXISTS "${build}" WITH (FORCE)`);
+  await client.query(`CREATE DATABASE "${build}"`);
+  const knex = createKnex({ client: 'pg', connection: urlForDb(build), pool: { min: 0, max: 1 } });
   try {
     await knex.migrate.latest({ migrationSource: source });
   } catch (err) {
     await knex.destroy();
-    await client.query(`DROP DATABASE IF EXISTS "${name}" WITH (FORCE)`);
+    await client.query(`DROP DATABASE IF EXISTS "${build}" WITH (FORCE)`);
     throw err;
   }
   await knex.destroy();
+  await client.query(`ALTER DATABASE "${build}" RENAME TO "${name}"`);
 }
 
 function ensureTemplate(source: Knex.MigrationSource<unknown>): Promise<string> {
