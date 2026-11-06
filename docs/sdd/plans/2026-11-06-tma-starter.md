@@ -245,10 +245,10 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 - Consumes: `createTestApp` and `signInitData` (Task 2).
 - In this task block/grant do not write audit yet. Task 4 adds audit inside the same transactions.
 
-- [ ] Step 1: unit specs: `init-data.spec.ts` (port of plivka's 47 lines), `admin-rights.service.spec.ts` (the matrix), `compose.spec.ts` (order of names).
-- [ ] Step 2: run → red.
-- [ ] Step 3: implement by porting plivka. Remove the `hasGrantColumn`/`hasBlockedColumn` checks.
-- [ ] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-core test`. Unit tests and the listed acceptance cases must be green. The audit, settings, realtime and cards cases stay red.
+- [x] Step 1: unit specs: `init-data.spec.ts` (port of plivka's 47 lines), `admin-rights.service.spec.ts` (the matrix), `compose.spec.ts` (order of names).
+- [x] Step 2: run → red.
+- [x] Step 3: implement by porting plivka. Remove the `hasGrantColumn`/`hasBlockedColumn` checks.
+- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-core test`. Unit tests and the listed acceptance cases must be green. The audit, settings, realtime and cards cases stay red.
 
 ### Task 4: tma-nest-core — audit, app settings, realtime, admin/me API, card registry
 **Writes:** `packages/nest-core/src/audit/audit.service.ts`, `src/app-settings/{app-settings.service.ts,registry.ts,define-setting.ts}`, `src/realtime/{realtime.gateway.ts,realtime.service.ts}`, `src/admin/{admin-users.controller.ts,admin-settings.controller.ts,admin-audit.controller.ts,admin-user-card.registry.ts}`, `src/me/me.controller.ts`, `src/core.module.ts`, `src/index.ts`, `src/users/users.service.ts`, `src/admin-rights/admin-rights.service.ts`, and the matching `*.spec.ts`
@@ -427,10 +427,10 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - `tmaApi(client)` exposes the methods `me`, `updateMe`, `products`, `createInvoice`, `entitlements`, `cancelSubscription`, `resumeSubscription`, `admin.users.{list,get,block,unblock,grant,revoke}`, `admin.settings.{list,set}`, `admin.audit.list`, `admin.broadcasts.{list,get,create,preview,estimate,audienceFilters,cancel}`, `admin.payments.{list,refund,reconcile}`, `admin.entitlements.{grant,revoke}`. Each takes paths and DTOs exactly as in the HTTP tables of spec §3.3–3.5.
 - Consumes: `installFakeWebApp` (Task 2, `./dom`).
 
-- [ ] Step 1: unit tests `tg.test.ts`, `api.test.ts`, `i18n.test.ts`, `react/use-purchase.test.tsx`.
-- [ ] Step 2: red.
-- [ ] Step 3: implement by porting plivka.
-- [ ] Step 4: `pnpm --filter @dmytro-rudenko/tma-web test`. `web.acceptance.test.tsx` must be green.
+- [x] Step 1: unit tests `tg.test.ts`, `api.test.ts`, `i18n.test.ts`, `react/use-purchase.test.tsx`.
+- [x] Step 2: red.
+- [x] Step 3: implement by porting plivka.
+- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-web test`. `web.acceptance.test.tsx` must be green.
 
 ### Task 10: `scaffold.sh` and smoke of the template
 **Writes:** `skills/new/scaffold.sh`, `scripts/smoke-template.sh`
@@ -525,10 +525,10 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 - `deploy.yml` from plivka, `--filter @plivka/shared` removed.
 - The `README.md` "Deploy" checklist has the six steps from spec §3.9. The "Оновлення пакетів" section: `pnpm up -r '@dmytro-rudenko/tma-*@latest'` + `pnpm db:migrate`.
 - `CLAUDE.md` and rules follow spec §3.9, including the rule "infrastructure lives in `@dmytro-rudenko/tma-*`; extend it through `forRoot`/registries/`copy`".
-- [ ] Step 1: adapt `deploy.test.sh` (port of plivka) to the new order.
-- [ ] Step 2: copy into a temporary directory with `sed` substitution of the placeholders, run `bash deploy/deploy.test.sh` → it must fail on the old order (before the edits).
-- [ ] Step 3: edit the files.
-- [ ] Step 4: same run → `deploy.test.sh` and `server-setup.test.sh` are green.
+- [x] Step 1: adapt `deploy.test.sh` (port of plivka) to the new order.
+- [x] Step 2: copy into a temporary directory with `sed` substitution of the placeholders, run `bash deploy/deploy.test.sh` → it must fail on the old order (before the edits).
+- [x] Step 3: edit the files.
+- [x] Step 4: same run → `deploy.test.sh` and `server-setup.test.sh` are green.
 
 ### Task 13: template — root and `apps/api`
 **Writes:** `template/{package.json,pnpm-workspace.yaml,tsconfig.base.json,.nvmrc,.prettierrc,.editorconfig,.gitignore,.env.example}`, `template/scripts/{dev.mjs,db-create.mjs}`, `template/apps/api/{package.json,tsconfig.json,tsconfig.build.json,nest-cli.json,jest.config.js}`, `template/apps/api/src/{main.ts,app.module.ts,products.ts}`, `template/apps/api/src/config/{env.ts,config.module.ts}`, `template/apps/api/src/database/{database.module.ts,migrate.ts,migrations/.gitkeep}`, `template/apps/api/src/features/example/{example.module.ts,example.controller.ts}`, `template/apps/api/bot/profile.json`, `template/apps/api/test/{app.acceptance.spec.ts,env.spec.ts}`
