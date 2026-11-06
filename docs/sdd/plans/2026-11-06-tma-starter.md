@@ -173,9 +173,9 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - every package → devDependency `testing`.
   - Peer dependencies are installed as devDependencies so packages build in the workspace.
 
-- [ ] Step 1: create the files with the values above. `src/index.ts` is `export {}`. `LICENSE` is MIT, `Copyright (c) 2026 Dmytro Rudenko`.
-- [ ] Step 2: `pnpm install && pnpm -r build && pnpm -r typecheck`. Expect exit 0.
-- [ ] Step 3: `pnpm -r test`. Expect the Task 0 acceptance specs to fail on imports (they are still red).
+- [x] Step 1: create the files with the values above. `src/index.ts` is `export {}`. `LICENSE` is MIT, `Copyright (c) 2026 Dmytro Rudenko`.
+- [x] Step 2: `pnpm install && pnpm -r build && pnpm -r typecheck`. Expect exit 0.
+- [x] Step 3: `pnpm -r test`. Expect the Task 0 acceptance specs to fail on imports (they are still red).
 
 ### Task 2: `@dmytro-rudenko/tma-testing`
 **Writes:** `packages/testing/src/{index.ts,init-data.ts,updates.ts,webhook.ts,fake-bot-api.ts,database.ts,test-app.ts,wait-for.ts,dev-url.ts}`, `packages/testing/src/dom/index.ts`, `packages/testing/src/bin/tma-test-pg.ts`, `packages/testing/src/*.spec.ts`, `packages/testing/package.json`
