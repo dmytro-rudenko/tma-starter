@@ -313,10 +313,10 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - `TMA_BOT_ERROR_CODES` = `[]`. The bot has no HTTP errors of its own beyond core's; the array exists so Task 16 has a uniform aggregation.
 - Consumes: `UsersService`, `AdminRightsService`, `AdminUserCardRegistry` (Tasks 3–4), `FakeBotApi` (Task 2).
 
-- [ ] Step 1: unit specs: `lang.spec.ts`, `start-param.router.spec.ts`, `notifications.service.spec.ts` (403/429 through `FakeBotApi`).
-- [ ] Step 2: red.
-- [ ] Step 3: implement by porting plivka. Generalize `isPaymentUpdate` into the critical filters.
-- [ ] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-bot test`. The listed acceptance cases must be green.
+- [x] Step 1: unit specs: `lang.spec.ts`, `start-param.router.spec.ts`, `notifications.service.spec.ts` (403/429 through `FakeBotApi`).
+- [x] Step 2: red.
+- [x] Step 3: implement by porting plivka. Generalize `isPaymentUpdate` into the critical filters.
+- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-bot test`. The listed acceptance cases must be green.
 
 ### Task 6: tma-nest-bot — broadcast and `tma-bot setup`
 **Writes:** `packages/nest-bot/src/broadcast/{broadcast.service.ts,broadcast.worker.ts,broadcast-admin.controller.ts,audience.registry.ts}`, `src/migrations/tma_bot_002_broadcasts.ts`, `src/migrations/index.ts`, `src/bin/tma-bot.ts`, `src/setup/sync-bot-profile.ts`, `src/bot.module.ts`, `src/index.ts`, `packages/nest-bot/package.json`, and the matching `*.spec.ts`
