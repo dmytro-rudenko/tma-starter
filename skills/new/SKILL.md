@@ -42,36 +42,48 @@ version: 0.0.0
 
 ## Генерація
 
-Для `shop` запиши JSON продуктів у тимчасовий файл. Стандартні продукти:
+Shell не зберігається між викликами Bash, тому запис JSON продуктів, запуск скрипта й видалення файла роби одним викликом. Для `shop` це такий блок (стандартні продукти):
 
 ```bash
 PRODUCTS="$(mktemp "${TMPDIR:-/tmp}/tma-products.XXXXXX")"
 cat > "$PRODUCTS" <<'JSON'
 [{"id":"premium","kind":"subscription","priceStars":250,"title":{"uk":"Преміум","en":"Premium"},"description":{"uk":"Доступ до преміум-контенту на 30 днів","en":"Access to premium content for 30 days"}},{"id":"coffee","kind":"one_time","priceStars":50,"repeatable":true,"title":{"uk":"Кава для автора","en":"Coffee for the author"},"description":{"uk":"Разова підтримка проєкту","en":"One-time support for the project"}}]
 JSON
-```
-
-Для власних продуктів запиши в цей самий файл свій масив, екрануючи лапки за правилами JSON.
-
-Запусти скрипт:
-
-```bash
 bash "${CLAUDE_PLUGIN_ROOT}/skills/new/scaffold.sh" \
   --dir "<dir>" \
   --slug "<slug>" \
   --title "<title>" \
   --bot-username "<bot>" \
   --domain "<domain>" \
-  --variant <empty|shop> \
+  --variant shop \
   --default-lang <uk|en> \
   --accent "<#rrggbb>" \
   --admin-ids "<1,2>" \
   --api-port 3200 \
   --products "$PRODUCTS"
+status=$?
+rm -f "$PRODUCTS"
+exit $status
 ```
 
-- `--admin-ids` пропусти, якщо користувач не назвав id. `--products` передавай лише для `shop`. `--tma-source` не використовуй: це прапорець для CI плагіна.
-- Після скрипта видали `"$PRODUCTS"`.
+- Для власних продуктів заміни рядок з масивом усередині heredoc на свій масив, екрануючи лапки за правилами JSON.
+- Для `empty` файл продуктів не потрібен:
+
+  ```bash
+  bash "${CLAUDE_PLUGIN_ROOT}/skills/new/scaffold.sh" \
+    --dir "<dir>" \
+    --slug "<slug>" \
+    --title "<title>" \
+    --bot-username "<bot>" \
+    --domain "<domain>" \
+    --variant empty \
+    --default-lang <uk|en> \
+    --accent "<#rrggbb>" \
+    --admin-ids "<1,2>" \
+    --api-port 3200
+  ```
+
+- `--admin-ids` пропусти, якщо користувач не назвав id. `--tma-source` не використовуй: це прапорець для CI плагіна.
 - Успіх друкує `scaffolded <dir> (<variant>)`.
 - Exit 2: невалідний аргумент. Покажи повідомлення скрипта, перепитай лише проблемне значення через `AskUserQuestion` і запусти знову. Якщо проблема в `--dir`, це непорожня тека.
 - Exit 3: у згенерованому проєкті лишились плейсхолдери чи маркери магазину. Це баг плагіна: покажи вивід, нічого не латай, запропонуй повідомити на `https://github.com/dmytro-rudenko/tma-starter/issues`.
