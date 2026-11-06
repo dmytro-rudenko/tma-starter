@@ -14,9 +14,10 @@ started: 2026-11-06
 який проходить свої тести й стартує локально.
 
 ## Now
-Хвиля 0/10 закрита (0e48580): acceptance-тести червоні за задумом. Хвиля 1 — Task 1 (скелет монорепо, лише implementer).
-Рішення для наступних задач: FakeBotApi порт 0 за замовчуванням; blockedByUser липкий; TmaBotModule і TmaPaymentsModule @Global; `test` у пакетах спершу будує; jest moduleNameMapper/vitest alias на src пакетів.
-Перевірка хвилі 1: pnpm install && pnpm -r build && pnpm -r typecheck.
+Хвилі 0–2 закриті (c9c2d87). Хвиля 3: Tasks 3 (core A), 9 (web), 12 (template deploy). Group base для рев'ю хвиль 1–3: 454cc5a.
+GROUP_BASE: 454cc5a
+Тести працюють проти PG 16 на 127.0.0.1:54329 (контейнер plivka-test-pg), локальних бінарників PG 16 немає.
+Далі: після хвилі 3 — групове рев'ю 1–3.
 
 ## Timeline
 
@@ -34,3 +35,11 @@ started: 2026-11-06
 - 20:55 ● 0e48580 test: acceptance tests for tma-* packages and scaffold
 - 20:55 ● b4fa31d docs(plan): tick wave 0
 - 20:55 ✎ Хвиля 0: acceptance-тести написано й переглянуто; додано тести на Review Focus 1–4
+- 20:55 ● 454cc5a chore(journal): wave 0 closed
+- 20:59 ● 1232bed chore: pnpm monorepo skeleton for tma-* packages
+- 20:59 ● 59add99 docs(plan): tick wave 1
+- 21:07 ● 99c1f59 feat(testing): tma-testing helpers for Telegram apps
+- 21:07 ● 27c0b1f feat(skill): scaffold.sh and template smoke script
+- 21:07 ● 90c1a70 feat(skill): /tma-starter:new skill instructions
+- 21:07 ● c9c2d87 docs(plan): tick wave 2
+- 21:07 ✎ Хвиля 2: tma-testing зелений (36 тестів), scaffold.sh і SKILL.md готові
