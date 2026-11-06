@@ -1,8 +1,10 @@
-# Пакети `@dmytro-rudenko/tma-*` (частина A tma-starter) — design
+# tma-starter: пакети `@dmytro-rudenko/tma-*` і плагін-шаблон Telegram Mini App — design
 
 **Date:** 2026-11-06
 **Status:** agreed
-**Prototype:** — (частина A не має UI; екрани й прототип — частина B)
+**Prototype:** — (без прототипу за рішенням користувача: нові екрани частини B будуються на перевірених патернах адмінки plivka й описані функціонально)
+
+Spec має дві частини. **Частина A** (3.1–3.7) — npm-пакети. **Частина B** (3.8–3.12) — шаблон застосунку, `scaffold.sh` і skill плагіна `tma-starter`. Частину B будують після A, бо вона залежить від A.
 
 ## 1. Problem
 
@@ -18,7 +20,7 @@
 
 ## 2. Constraint that shapes the solution
 
-Код, у якому живуть безпека й гроші (initData, адмін-права, платежі), має оновлюватися в уже створених проєктах, а не лише копіюватися при їх створенні. Тому одного шаблону-копії недостатньо, і ядро виноситься в **опубліковані npm-пакети**. Шаблон (частина B, окремий spec) стає тонким застосунком поверх них. Виправлення в пакеті доходить до проєкту через `pnpm update`.
+Код, у якому живуть безпека й гроші (initData, адмін-права, платежі), має оновлюватися в уже створених проєктах, а не лише копіюватися при їх створенні. Тому одного шаблону-копії недостатньо, і ядро виноситься в **опубліковані npm-пакети**. Шаблон (частина B) стає тонким застосунком поверх них. Виправлення в пакеті доходить до проєкту через `pnpm update`.
 
 Друге обмеження: стек береться з plivka як найактуальніший. Це NestJS 10, Knex 3, PostgreSQL 16, grammY, React 18 і TanStack Query 5. Пакети підключають ці бібліотеки як `peerDependencies`. Якби вони були звичайними залежностями, у застосунку з'явилися б дві копії Nest/Knex, і DI-токени та `instanceof` перестали б збігатися.
 
@@ -178,6 +180,7 @@ TmaCoreModule.forRoot({
 
 | Метод | Шлях | Guard | Відповідь |
 |---|---|---|---|
+| GET | `/api/health` | public | `{ ok: true }`; 503 `{ ok: false }`, якщо `select 1` до БД не проходить |
 | GET | `/api/me` | auth | `{ id, firstName, username, language, theme, isAdmin, adminSource }` |
 | PATCH | `/api/me` | auth | `{ language?, theme? }` → як GET |
 | GET | `/api/admin/users?q=&cursor=` | admin | `{ items: AdminUser[], nextCursor }` |
@@ -352,7 +355,7 @@ interface Product {
    - `POST /api/subscriptions/:productId/cancel` викликає `editUserStarSubscription(user, subscription_charge_id, is_canceled: true)` і ставить `canceled_at`. Доступ лишається до `expires_at`. Користувач отримує повідомлення `subscriptionCanceled`.
    - `.../resume` робить те саме з `is_canceled: false` і `canceled_at = null`.
    - Якщо підписку скасовано в самому Telegram, бот update не отримає, і доступ закінчиться на `expires_at`.
-5. **Прострочення.** `EntitlementsService.has(userId, productId)` повертає `expires_at is null or expires_at > now()`. Крону немає.
+5. **Прострочення.** `EntitlementsService.has(userId, productId)` повертає `expires_at is null or expires_at > now()`. Крону немає. `@UseGuards(EntitlementGuard('<productId>'))` дає 403 `NO_ENTITLEMENT`, коли `has` повертає false.
 6. **Refund.**
    - `refund()`, `refundStars()` з обробкою `alreadyRefunded` і `retryPendingRefunds()` перенесено з `plivka payments.service.ts:217-260`.
    - Retry запускається кожні `refundRetryIntervalMs`, коли `runWorker` увімкнено.
@@ -371,7 +374,7 @@ interface Product {
 
 | Метод | Шлях | Guard | Відповідь |
 |---|---|---|---|
-| GET | `/api/products` | auth | `[{ id, kind, priceStars, title, description }]` мовою користувача (для `priceStars` з `targetId` клієнт передає `?targetId=`) |
+| GET | `/api/products` | auth | `[{ id, kind, repeatable, priceStars, title, description }]` мовою користувача (для `priceStars` з `targetId` клієнт передає `?targetId=`) |
 | POST | `/api/payments/invoice` | auth | `{ invoiceLink } \| { settled: true }` |
 | GET | `/api/entitlements` | auth | `[{ productId, source, expiresAt, canceled }]` (лише активні) |
 | POST | `/api/subscriptions/:productId/cancel` / `resume` | auth | entitlement |
@@ -381,7 +384,7 @@ interface Product {
 | DELETE | `/api/admin/users/:id/entitlements/:productId` | admin | 204; аудит `entitlement.revoke` |
 | POST | `/api/admin/payments/reconcile` | admin | `getStarTransactions` (до 100 за запит) → транзакції `invoice_payment`, яких немає в `payments`; лише звіт |
 
-Коди помилок пакета: `PRODUCT_NOT_FOUND`, `PRODUCT_UNAVAILABLE`, `ALREADY_SUBSCRIBED`, `ALREADY_OWNED`, `ENTITLEMENT_HELD_BY_SUBSCRIPTION`, `NO_SUBSCRIPTION`, `PAYMENT_NOT_FOUND`, `ALREADY_REFUNDED`, `PAYMENT_PROVIDER_UNAVAILABLE`.
+Коди помилок пакета: `NO_ENTITLEMENT`, `PRODUCT_NOT_FOUND`, `PRODUCT_UNAVAILABLE`, `ALREADY_SUBSCRIBED`, `ALREADY_OWNED`, `ENTITLEMENT_HELD_BY_SUBSCRIPTION`, `NO_SUBSCRIPTION`, `PAYMENT_NOT_FOUND`, `ALREADY_REFUNDED`, `PAYMENT_PROVIDER_UNAVAILABLE`.
 
 ### 3.6 `@dmytro-rudenko/tma-web`
 
@@ -402,6 +405,7 @@ ESM. Пакет не містить жодного UI-компонента. Ек
   - `applyThemeParams()` (opt-in) мапить `themeParams` у `--tg-theme-*`;
   - `createPrefsCache(key)` повертає `{ read, write, restore }`. Недоступний localStorage мовчки ігнорується.
 - `createI18n({ resources, supported, fallback })` повертає `{ i18n, setLanguage, applyLanguagePref, langFromCode }`. `langFromCode` працює за тим самим правилом, що й бот.
+- `TMA_ERROR_CODES` — масив усіх кодів помилок core, bot і payments, плюс тип `TmaApiErrorCode`. Тест у корені репо звіряє цей масив з enum'ами nest-пакетів, тож розбіжність ламає CI (рішення білдера: `apps/web` не може імпортувати nest-пакети). `errorText.ts` шаблону має тип `Record<TmaApiErrorCode | AppErrorCode, string>`.
 - `createApiClient({ baseUrl = '' })` повертає `{ request<T>(path, { method, json, body, headers }) }`:
   - додає заголовок `Authorization: tma <initData>`;
   - помилка → `ApiError { status, code: string, message }`.
@@ -446,14 +450,277 @@ ESM. Пакет не містить жодного UI-компонента. Ек
 - `waitFor(fn, timeoutMs)`.
 
 **Підшляхи**
-- `./playwright` (peer `@playwright/test`): `telegramStub(page, opts)`, `appUrl(user, { startParam?, botToken? })`, `tgCalls(page)`. Перенесено з `plivka e2e/telegram-stub.ts`.
+- `devUrl({ baseUrl, user, botToken, startParam? }) → string` (корінь пакета, Node): URL виду `<baseUrl>/#tgWebAppData=<signed>&tgWebAppVersion=8.0&tgWebAppPlatform=tdesktop`. Справжній `telegram-web-app.js` сам читає ці hash-параметри, тож застосунок відкривається у звичайному браузері з валідним initData.
+- Playwright-заглушки немає: e2e-тестів шаблон не має (рішення користувача).
 - `./dom`: `installFakeWebApp(window, overrides)` для vitest + jsdom.
 
-**bin `tma-test-pg start|stop|status`** — перенесений `plivka scripts/test-pg.sh`: PG 16 без Docker на `127.0.0.1:54329`, `fsync=off`.
+**bin `tma-test-pg start|stop|status`** — перенесений `plivka scripts/test-pg.sh`: PG 16 без Docker на `127.0.0.1:54329`, `fsync=off`. Шукає `pg_ctl` також у Homebrew-шляхах `postgresql@16`. На macOS використовує локаль `en_US.UTF-8` замість `C.UTF-8`.
+
+### 3.8 Плагін `tma-starter`: структура і версія
+
+```
+.claude-plugin/plugin.json          # name: tma-starter, version = версія пакетів (fixed)
+.claude-plugin/marketplace.json     # marketplace "tma-starter" з одним плагіном
+skills/new/SKILL.md                 # /tma-starter:new
+skills/new/scaffold.sh
+skills/new/scaffold.test.sh
+template/                           # 3.9
+```
+
+- **Один реліз на весь spec (рішення білдера).** Частини A і B будуються на одній гілці й виходять одним релізом `0.1.0`. Публікація — останній крок плану, після зеленого `template-smoke`. Поки реліз не відбувся, частина B може правити пакети A. `changeset-check` не перевіряє гілки `changeset-release/*`.
+- `version` у `plugin.json` дорівнює версії пакетів. Скрипт `scripts/sync-plugin-version.mjs` переписує її на кроці `changeset version` у `release.yml`. CI-крок `changeset-check` вимагає changeset у кожному PR, який змінює `skills/`, `template/` або `packages/`. Так виконується правило «кожна зміна skill бампить версію»: changeset бампить пакети, а за ними й плагін.
+- `scaffold.sh` визначає версію пакетів, на яку підставити `__TMA_VERSION__`, з `version` у `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`. Тому встановлена версія плагіна завжди генерує проєкт з пакетами тієї самої версії.
+
+### 3.9 Шаблон `template/`
+
+pnpm-монорепо поверх пакетів A. Структура взята з plivka, але без `packages/shared`: спільні типи дають пакети.
+
+```
+template/
+  package.json  pnpm-workspace.yaml  tsconfig.base.json  .nvmrc  .prettierrc  .editorconfig  .gitignore
+  .env.example  CLAUDE.md  README.md
+  .claude/rules/{architecture,code-organization,code-style,server,web,deploy}.md
+  apps/api/   apps/web/
+  deploy/     .github/workflows/deploy.yml
+  scripts/dev.mjs
+```
+
+**Плейсхолдери.** Їх підставляє `scaffold.sh` у вмісті текстових файлів та в іменах файлів:
+
+| Плейсхолдер | Значення | Приклад |
+|---|---|---|
+| `__APP_SLUG__` | `^[a-z][a-z0-9-]{1,30}$`: npm-scope застосунку, шляхи `/opt/<slug>` тощо, compose project, імена файлів nginx | `coffee-club` |
+| `__APP_DB__` | slug із `-` → `_`: ім'я БД і користувача Postgres | `coffee_club` |
+| `__APP_TITLE__` | назва для людей: `<title>`, профіль бота, README | `Coffee Club` |
+| `__BOT_USERNAME__` | без `@` | `coffee_club_bot` |
+| `__DOMAIN__` | домен без схеми | `coffee.example.com` |
+| `__DEFAULT_LANG__` | `uk` або `en` | `uk` |
+| `__ACCENT__` | `#rrggbb` | `#2f80ed` |
+| `__TMA_VERSION__` | точна версія пакетів | `0.1.0` |
+| `__API_PORT__` | порт API на хості (compose, nginx `proxy_pass`, `check.sh`), за замовчуванням `3200` | `3201` |
+
+**Маркери варіанту.**
+- Код магазину лежить у теках `apps/api/src/shop/` і `apps/web/src/features/shop/`.
+- У спільних файлах код магазину обгорнуто рядками-маркерами `// tma:shop:start` і `// tma:shop:end`, у CSS — `/* tma:shop:start */` і `/* tma:shop:end */`. Спільні файли з такими блоками: `app.module.ts`, `products.ts`, `features/registry.tsx`, `state/tabs.ts`, `i18n/uk.json` та `en.json` (ключі `shop.*` лежать в окремих `shop.uk.json` і `shop.en.json`, які підключаються маркерним блоком у `i18n/index.ts`).
+- `scaffold.sh` обробляє варіанти так:
+  - **`empty`:** видаляє теки магазину й вміст маркерних блоків разом із маркерами;
+  - **`shop`:** видаляє лише рядки-маркери.
+
+**`apps/api`** (NestJS 10, CJS)
+- `main.ts` перенесено з plivka як є: `trust proxy`, `ValidationPipe`, `enableShutdownHooks`, `IoAdapter`.
+- `config/env.ts`: class-validator, за патерном `plivka config/env.ts`.
+  - **Обов'язкові змінні:** `BOT_TOKEN`, `BOT_USERNAME`, `WEBAPP_URL`, `WEBHOOK_SECRET`, `WEBHOOK_PATH_TOKEN`, `DATABASE_URL`.
+  - **Опційні змінні:** `PORT=3100`, `BOT_API_ROOT`, `RUN_WORKER=true`, `API_RATE_LIMIT=120`, `ADMIN_USER_IDS`, `INIT_DATA_MAX_AGE_SEC=86400`.
+- `app.module.ts` підключає модулі в такому порядку: `ConfigModule`, `DatabaseModule` (провайдер knex), `TmaCoreModule.forRoot`, `TmaBotModule.forRoot`, `TmaPaymentsModule.forRoot({ products })`, `ExampleModule`, а у варіанті shop ще `ShopModule`.
+- `products.ts`:
+  - `empty`: `export const products: Product[] = []`;
+  - `shop`: продукти, які skill отримав в опитуванні (див. 3.11).
+- `features/example/`: приклад доменного модуля, `GET /api/example/hello` → `{ greeting }` мовою користувача, з власним acceptance-тестом. Цей модуль — зразок того, куди і як додавати свій код.
+- `shop/`:
+  - `ShopModule` реєструє `StartParamRoute` `^shop$`: `/start shop` відкриває застосунок одразу на вкладці Shop;
+  - `GET /api/premium/content` під guard'ом `EntitlementGuard('premium')` повертає 403 `NO_ENTITLEMENT`, якщо entitlement немає.
+- `database/migrate.ts` викликає `composeMigrations(core, bot, payments, appMigrations)`. Власні міграції застосунку лежать у `database/migrations/` (спершу порожня тека з `.gitkeep`).
+- `bot/profile.json`: `menuButtonText`, uk/en `short_description` і `description` з `__APP_TITLE__`, команди `start` і `help`.
+
+**`apps/web`** (React 18, Vite 5, TanStack Query 5, i18next)
+- `main.tsx`/`App.tsx`: `TmaProvider` → `useMe`.
+  - При `blocked` показується `BlockedScreen`.
+  - Інакше `MainScreen` (вкладки + `TabBar`), шари стека й `ToastHost`.
+  - `routeStartParam` — порожній роутер-приклад. У shop він знає параметр `shop`.
+- **Навігація:** механіка `state/stack.ts` і `state/tabs.ts` з plivka.
+  - `Tab = 'home' | 'settings'`, у shop ще `'shop'`.
+  - `EntryKind = 'adminUsers' | 'adminUser' | 'adminSettings' | 'adminBroadcasts' | 'adminBroadcast' | 'adminBroadcastNew' | 'adminAudit' | 'adminPayments'`, у shop ще `'paywall'`.
+  - `features/registry.tsx` мапить `kind` на компонент.
+- **Компоненти з plivka без змін:** `components/sheet/*` (`Sheet`, `FullscreenLayer`), `Toast`, `Avatar`, `AdminConfirm`, `BlockedScreen`, `useDebounced`.
+- **Тема:** `theme/tokens.css` з нейтральною палітрою (світла й темна) і `--accent: __ACCENT__`, без доменних токенів plivka; `global.css` з plivka.
+- **i18n:** `createI18n` з `tma-web`, словники `i18n/uk.json` і `en.json`, `api/errorText.ts` мапить коди помилок усіх пакетів на тексти.
+- `__DEFAULT_LANG__` впливає лише на web: `<html lang>` і `fallback` у `createI18n` (рішення білдера). Мова бота за замовчуванням лишається `en` за правилом `langOf`.
+- `index.html`: `lang="__DEFAULT_LANG__"`, `<title>__APP_TITLE__</title>`, `telegram-web-app.js`, без зовнішніх шрифтів.
+- `vite.config.ts`: proxy `/api` і `/api/socket.io` (ws) на `127.0.0.1:3100`, а також `/bot` для локального fake-бота; vitest із jsdom.
+- Realtime: `useRealtimeEvent('payment.settled')` показує toast «Оплату зараховано».
+
+**Екрани (обидва варіанти).** Візуальні патерни взято з адмінки plivka (`features/admin/*`).
+- **Home:** заголовок `__APP_TITLE__`, привітання на ім'я, підказка «тут ваш контент» з посиланням на `features/example`.
+- **Settings:**
+  - тема `system/light/dark` і мова `uk/en` через `useUpdateMe`;
+  - секція «Адмін», видима лише при `isAdmin`, з пунктами «Користувачі», «Налаштування», «Розсилки», «Платежі» й «Аудит».
+- **Користувачі** (`AdminUsersSheet` з plivka): пошук із debounce 300 мс, infinite-список по 50, у рядку `Avatar`, ім'я, `@username`, чипи `admin` (env або granted) та `blocked`, дата останнього візиту (`updated_at`).
+- **Картка користувача** (`AdminUserSheet` без доменних блоків):
+  - шапка, block/unblock і grant/revoke через `AdminConfirm`; помилки показуються toast'ом через `errorText`;
+  - блок «Бот»: `botBlockedAt`;
+  - блок «Платежі» (`cards.payments`): останні 20 платежів зі статусом і кнопкою «Повернути» (`AdminConfirm`, `POST …/refund`);
+  - блок «Доступи»: активні entitlements (продукт, джерело, `expires_at`, позначка «скасовано») з кнопкою «Відкликати»;
+  - форма «Видати доступ»: select продукту з `useProducts`, опційна дата закінчення.
+  - Блоки «Платежі» й «Доступи» показуються і в `empty`: модуль payments підключений завжди.
+- **Налаштування:** список з `GET /api/admin/settings`, редактор обирається за типом `default`:
+  - `boolean` → перемикач;
+  - `number` → числове поле;
+  - `string` → текст;
+  - `number[]` → поле «id через кому» (так редагується `payments.test_users`);
+  - решта → textarea з JSON.
+  - Збереження через `PATCH`, помилка `VALIDATION` показується під полем.
+- **Розсилки:**
+  - список з прогресом `sent/total`, `failed` і статусом;
+  - створення: textarea з HTML-текстом, опційна кнопка (текст + `startParam`), аудиторія (чекбокси мов + фільтри з `GET …/audience-filters`; для `entitlement` — select продукту), live-лічильник отримувачів через `estimate` з debounce 500 мс, кнопки «Надіслати собі» (`preview`) і «Надіслати» (`AdminConfirm` з числом отримувачів);
+  - деталі розсилки: прогрес оновлюється polling'ом кожні 3 с, поки статус `queued` або `running`; кнопка «Скасувати».
+- **Платежі:** список з `GET /api/admin/payments` з фільтром за статусом, тап відкриває картку користувача-платника; кнопка «Звірити з Telegram» (`reconcile`) показує звіт про розбіжності.
+- **Аудит:** infinite-список (час, актор, дія, ціль, `meta` розгортається), фільтри за актором і ціллю. Тап на актора або на ціль-користувача відкриває його картку.
+
+**Екрани варіанту `shop`.**
+- **Shop:**
+  - `useProducts()` → картки продуктів (назва, опис, ціна в ⭐);
+  - кнопка «Купити» або «Оформити» викликає `usePurchase`, стан `paying` блокує кнопку;
+  - для куплених (не `repeatable`) і активної підписки замість кнопки чип «Активно до …».
+- **Premium на Home:** блок «Преміум-контент».
+  - Без entitlement `premium` — замок і кнопка, що відкриває `paywall`.
+  - З entitlement — дані з `GET /api/premium/content`.
+- **Paywall:** sheet з описом підписки та кнопкою оформлення.
+- **Settings → «Підписка»** (якщо є entitlement підписки): дата наступного списання, кнопка «Скасувати» або «Відновити».
+
+**`scripts/dev.mjs`** (`pnpm dev`): локальний запуск без Telegram і без справжнього бота.
+- Запускає `startFakeBotApi({ port: 3199 })`, API з `BOT_API_ROOT=http://127.0.0.1:3199`, потім `vite` на 5173.
+- Друкує `devUrl` для першого id з `ADMIN_USER_IDS` з `BOT_TOKEN` із `.env`.
+- Якщо ключа `payments.test_users` в `app_settings` ще немає, записує туди `ADMIN_USER_IDS`. Тоді покупка в браузері поза Telegram одразу проходить у test mode.
+- Потрібна запущена БД. Скрипт перевіряє `DATABASE_URL` і, якщо БД недоступна, підказує `pnpm db:start` (`tma-test-pg start`) та `pnpm db:migrate`.
+- Скрипти кореневого `package.json`:
+  - `db:start` / `db:stop` → `tma-test-pg start|stop`;
+  - `db:create` → `scripts/db-create.mjs` (створює БД з імені в `DATABASE_URL`, якщо її ще немає; адмін-підключення — та сама адреса з БД `postgres`);
+  - `db:migrate` → `pnpm --filter @__APP_SLUG__/api migrate`;
+  - `dev` → `node scripts/dev.mjs`.
+
+**Тести шаблону** (лише unit і модульні, без e2e):
+- **api, jest:**
+  - `createTestApp` з `AppModule`-фабрикою: `/api/health`, `/api/me`, `/api/example/hello`, adminGuard на `/api/admin/users`;
+  - у shop: оплата `premium` через `updates.successfulPayment` → `GET /api/premium/content` 200; без entitlement → 403;
+  - `env.ts` валідує обов'язкові змінні.
+- **web, vitest + jsdom + `installFakeWebApp`:**
+  - паритет ключів `uk.json` і `en.json`;
+  - `errorText` покриває всі коди помилок з пакетів;
+  - редактор налаштувань рендерить потрібний контрол для кожного типу;
+  - `AdminUserSheet` показує блоки з `cards`;
+  - у shop: кнопка покупки проходить стани `usePurchase` з mock-клієнтом, а Premium-блок перемикається за `useEntitlement`.
+- **deploy:** `deploy/deploy.test.sh` і `server-setup.test.sh` з plivka, адаптовані до нового порядку.
+
+**Деплой** (`template/deploy/`, з plivka, `plivka` → `__APP_SLUG__`/`__APP_DB__`, домен → `__DOMAIN__`)
+- Без змін, крім плейсхолдерів:
+  - `docker-compose.yml`: api і postgres, порт лише на loopback, ліміти пам'яті;
+  - `nginx/__APP_SLUG__.conf` і `__APP_SLUG__-bootstrap.conf`: locations `/api/socket.io` (ws), `/api`, `/bot/`, статика; `/media` прибрано;
+  - `server-setup.sh`: генерує `/etc/__APP_SLUG__/.env` з випадковими секретами, certbot webroot, cron backup;
+  - `backup.sh` (без rsync фото) і `check.sh` (звіряє `env.ts` з `.env.example`);
+  - `apps/api/Dockerfile`: `@plivka/*` → `@__APP_SLUG__/*`, без `MALLOC_ARENA_MAX`, HEALTHCHECK на `/api/health`.
+- `deploy.sh` (rsync + ssh) з **новим порядком**:
+  1. `up -d --wait postgres`;
+  2. `compose run --rm api node dist/database/migrate.js latest`;
+  3. `up -d api`;
+  4. health-check `/api/health`;
+  5. `compose exec -T api npx tma-bot setup`.
+  - `set-webhook.sh` видалено.
+- `.github/workflows/deploy.yml` з plivka:
+  - job `test` з `postgres:16`;
+  - `check.sh`;
+  - деплой по SSH на push у `main`, з секретами `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS`, `DEPLOY_HOST`, `DEPLOY_USER` і `BOT_TOKEN`.
+- `template/README.md`, розділ «Deploy», дає чекліст:
+  1. BotFather: `/newbot`, увімкнути Mini App і payments (Stars);
+  2. DNS для `__DOMAIN__`;
+  3. `server-setup.sh` на сервері;
+  4. `BOT_TOKEN` у `/etc/__APP_SLUG__/.env`;
+  5. секрети GitHub;
+  6. push у `main`.
+
+**Версії пакетів у проєкті (рішення білдера).** Усі п'ять `@dmytro-rudenko/tma-*` запінені точною версією `__TMA_VERSION__`. Оновлення однією командою, вона описана в `README.md` і `CLAUDE.md`: `pnpm up -r '@dmytro-rudenko/tma-*@latest'`, потім `pnpm db:migrate`.
+
+**Мова документації (рішення білдера):** `CLAUDE.md`, rules, README і діалог skill-а — українською, як у plivka. Ідентифікатори, коміти й коментарі в коді — англійською.
+
+**`CLAUDE.md` і `.claude/rules/`**
+- `CLAUDE.md` з plivka узагальнено: опис `__APP_TITLE__`, стек, команди, умови тестів (`pnpm db:start`), локальний запуск (`pnpm dev`, порти 3100/3199/5173), попередження «push у main деплоїть у production».
+- Правило для агентів: інфраструктура (auth, адмінка, платежі, бот) живе в пакетах `@dmytro-rudenko/tma-*`; її не копіюють у застосунок, а розширюють через `forRoot`, реєстри та `copy`.
+- `.claude/rules/*` з plivka:
+  - `server.md`: migrate-before-start, без `MEDIA_SIGNING_SECRET`;
+  - `web.md`: `tg`, теми й префи — з `tma-web`;
+  - `deploy.md`: `tma-bot setup` замість `set-webhook.sh`.
+
+### 3.10 `scaffold.sh`
+
+Bash, працює на Linux і macOS. Заміни в тексті робить `perl -pi`, а не `sed -i`, бо `sed -i` поводиться по-різному в GNU і BSD.
+
+```
+scaffold.sh --dir <path> --slug <slug> --title <title> --bot-username <name> --domain <domain>
+            --variant empty|shop [--default-lang uk|en] [--accent '#rrggbb']
+            [--admin-ids 1,2] [--api-port 3200] [--products <json-file>] [--tma-source <dir-with-tarballs>]
+```
+
+Кроки:
+1. **Валідація аргументів.** Помилка дає exit 2 з повідомленням: slug — regex з 3.9, `--dir` не існує або порожня, accent — `#rrggbb`, bot-username — `^[A-Za-z0-9_]{5,32}$`, domain без схеми, title — 2–32 символи з літер (зокрема кирилиці), цифр, пробілу й `. , - ! ? : ’` (рішення білдера: так title безпечно підставляється в JSON, HTML, TS і Markdown без екранування), api-port — 1024–65535, `--products` — валідний JSON за схемою з 3.11.
+2. **Копіювання.** `template/` копіюється в `--dir` без `node_modules`, `dist` і `.env`.
+3. **Варіант:** обробка маркерів і тек магазину (3.9). Для `shop` вміст `--products` генерується в `products.ts`, і кожен рядок проходить JSON-енкодер (`JSON.stringify` через `node -e`). Якщо файл не передано, лишаються продукти за замовчуванням із шаблону.
+4. **Плейсхолдери.** Заміна у вмісті всіх текстових файлів (за `file --mime-encoding`, крім binary) і перейменування файлів та тек з плейсхолдерами в імені.
+5. **`--tma-source`** (CI плагіна): залежності `@dmytro-rudenko/tma-*` переписуються на `file:<tarball>`.
+6. **`.env`** з `.env.example`:
+   - `WEBHOOK_SECRET` і `WEBHOOK_PATH_TOKEN` — `openssl rand -hex 32`;
+   - `BOT_TOKEN=000000:dev-local-token`, `BOT_API_ROOT=http://127.0.0.1:3199`;
+   - `DATABASE_URL=postgres://postgres@127.0.0.1:54329/__APP_DB__`;
+   - `ADMIN_USER_IDS` з `--admin-ids`. Якщо їх не передано, у локальний `.env` пишеться `1`, щоб `devUrl` відкривав застосунок як адмін (рішення білдера). `.env.example` для production лишається порожнім, а skill позначає це в чеклісті.
+   - `.env` стоїть у `.gitignore`.
+7. **Самоперевірка.** Exit 3, якщо в `--dir` лишився рядок `__[A-Z_]+__` або `tma:shop:`; повідомлення перелічує файли.
+
+Скрипт не запускає `pnpm`, git і мережу: це робить skill. `scaffold.test.sh`:
+- перевіряє title кирилицею з `’` і продукти з лапками в описі;
+- генерує обидва варіанти у тимчасову теку;
+- перевіряє відсутність плейсхолдерів і маркерів, наявність або відсутність тек магазину, перейменування nginx-конфігів, коди виходу для невалідних аргументів і для непорожньої `--dir`.
+
+### 3.11 Skill `/tma-starter:new`
+
+`skills/new/SKILL.md`, frontmatter `name: new`, `description` (тригери: «створи telegram mini app», «новий TMA-проєкт», «scaffold mini app»), `version` дорівнює версії плагіна.
+
+**Опитування.** Кожне питання — окреме `AskUserQuestion`. Значення, які користувач уже назвав у запиті, skill не перепитує.
+1. **Варіант:** «Порожній каркас» (Home + Settings + адмінка) або «Демо-магазин» (+ Shop, Premium, paywall, керування підпискою).
+2. **Назва застосунку** (`title`). `slug` виводиться з неї (транслітерація, kebab-case) і показується для підтвердження чи правки.
+3. **Username бота** (можна «ще немає» — тоді `<slug>_bot` з позначкою в чеклісті) і **домен** (можна «ще немає» — тоді `<slug>.example.com`).
+4. **Мова за замовчуванням** (`uk`/`en`) і **акцентний колір** (3 пресети + Other).
+5. **Telegram id адмінів** (можна пропустити). Підказка: id показує `@userinfobot`.
+6. **Лише для shop — продукти.**
+   - «Прийняти стандартні» (`premium`: subscription, 250 ⭐; `coffee`: one_time, `repeatable`, 50 ⭐) або «Задати свої».
+   - «Задати свої»: для кожного продукту `id`, `kind`, ціна, назва й опис uk/en. Один продукт мусить мати id `premium` і `kind: subscription`, бо від нього залежать Premium-блок і paywall. Якщо користувач відмовляється, skill повертає стандартні.
+7. **Директорія:** за замовчуванням `./<slug>` від поточної.
+
+Схема `--products` JSON: `[{ id, kind: 'one_time'|'subscription', priceStars: 1..10000, repeatable?: boolean, title: { uk, en }, description: { uk, en } }]`.
+
+**Preflight перед опитуванням (рішення білдера).**
+- Перевіряє Node ≥ 26.13, pnpm 10, `perl`, `openssl` і `pg_ctl` (у PATH, `/usr/lib/postgresql/16/bin`, `/opt/homebrew/opt/postgresql@16/bin`, `/usr/local/opt/postgresql@16/bin`).
+- Без Postgres 16 skill пропонує або команду встановлення для ОС, або вказати наявний `DATABASE_ADMIN_URL`. У другому випадку `db:start` пропускається.
+
+**Виконання.**
+1. Підсумок параметрів одним повідомленням, далі `scaffold.sh` (шлях `${CLAUDE_PLUGIN_ROOT}/skills/new/scaffold.sh`).
+2. У згенерованому проєкті:
+   - `pnpm install`;
+   - `pnpm db:start` (`tma-test-pg start`) і `pnpm db:create` (створює `__APP_DB__`);
+   - `pnpm db:migrate`;
+   - `pnpm -r typecheck`, `pnpm -r test`, `pnpm -r build`.
+3. Якщо крок падає, skill показує вивід і зупиняється. Сам він нічого в шаблоні не латає, а пропонує повідомити про баг плагіна.
+4. `git init -b main`, `git add -A`, `git commit -m "chore: scaffold from tma-starter <version>"`.
+5. Фінальне повідомлення:
+   - команда `pnpm dev` і що вона друкує `devUrl`;
+   - чекліст деплою з `README.md`;
+   - позначки, де лишились значення за замовчуванням (бот, домен, адміни).
+   - Деплой, GitHub-репо й секрети skill не чіпає.
+
+### 3.12 CI плагіна для частини B
+
+`ci.yml` отримує job `template-smoke` після job пакетів:
+1. `pnpm -r build && pnpm -r pack --pack-destination /tmp/tma-tarballs`.
+2. `scaffold.test.sh`.
+3. Для кожного варіанту (`empty`, `shop`): `scaffold.sh … --tma-source /tmp/tma-tarballs`, далі `pnpm install`, `pnpm db:create`, `pnpm db:migrate`, `pnpm -r typecheck`, `pnpm -r test`, `pnpm -r build`.
+
+Сервіс `postgres:16` використовується спільно, `DATABASE_ADMIN_URL` вказує на нього.
+
+Job `scaffold-macos` (`macos-latest`) запускає лише `scaffold.test.sh` — це перевірка портабельності bash і perl.
 
 ## 4. Out of scope
 
-- Шаблон застосунку, екрани й адмін-UI, `scaffold.sh`, skill, Playwright e2e, деплой (`deploy/*`, nginx). Усе це частина B, окремий spec.
+- E2E-тести (Playwright) — і в пакетах, і в шаблоні. У шаблоні лише unit- і модульні тести.
+- Браузерний прототип нових екранів.
+- Розгортання skill-ом на сервер, створення GitHub-репо згенерованого проєкту, секрети CI: skill закінчує на локально зеленому проєкті й чеклісті деплою.
+- Інші варіанти шаблону, крім `empty` і `shop`; фронтенд крім React; БД крім PostgreSQL.
 - Ролі `owner/admin/moderator` і дозволи.
 - Фіатні платежі (`provider_token`), валюти крім XTR.
 - Фото й медіа в розсилках, довільний `reply_markup`.
@@ -466,12 +733,16 @@ ESM. Пакет не містить жодного UI-компонента. Ек
 ## 5. Trade-offs accepted
 
 - **Пакети замість копії.** Тепер треба підтримувати пакети: semver, changesets, peerDependencies. Breaking change у пакеті змушує мігрувати кожен проєкт. Ціна прийнятна, бо виправлення безпеки й платежів інакше не доходять до проєктів.
-- **Linked-версії.** Зміна в одному пакеті бампить версію всім. Зате шаблон завжди посилається на один узгоджений набір.
+- **Fixed-версії.** Зміна в одному пакеті бампить і публікує всі п'ять. Зате шаблон і плагін завжди посилаються на один узгоджений набір.
 - **Таблиці без префікса.** Застосунок не може мати власну таблицю `users` чи `payments`. Ці імена стають частиною контракту пакетів.
 - **Бінарні адмін-права.** Модератора з обмеженим доступом не зробити без розширення пакета.
 - **Підписка без крону.** Якщо користувач скасував підписку в самому Telegram, бот про це не дізнається, і доступ триває до `expires_at`. Це очікувана поведінка Stars-підписок.
 - **`tma-bot setup` окремим кроком.** Його легко забути після зміни профілю. Пом'якшення: `deploy.sh` у шаблоні викликає його завжди.
 - **Окрема БД на кожен тест.** На CI тести повільніші, ніж із truncate, зате стабільні з фоновими worker-ами.
+- **Без e2e.** Зв'язку «браузер → Telegram SDK → API» автоматично ніхто не перевіряє. Вона покрита лише unit-тестами `tma-web` і ручною перевіркою через `pnpm dev`. Рішення користувача: менше залежностей і швидший CI.
+- **Без прототипу.** Нові екрани (розсилки, аудит, налаштування, платежі, магазин) можуть потребувати візуальних правок після реалізації. Пом'якшення: їх зібрано з уже перевірених компонентів plivka.
+- **Маркери варіанту у спільних файлах.** У шаблоні вони виглядають як шум, а помилка в маркері дає зламаний `empty`. Пом'якшення: самоперевірка `scaffold.sh` і `template-smoke` в CI для обох варіантів.
+- **Модуль payments завжди підключений**, навіть у `empty` з порожнім `products`. Адмінка платежів і таблиці існують без продуктів, зате додати перший продукт можна без зміни структури застосунку.
 
 ## 6. Verification
 
@@ -483,4 +754,13 @@ ESM. Пакет не містить жодного UI-компонента. Ек
   - **web** (vitest + jsdom): `tg` без WebApp; Android inset; `openInvoice`, коли SDK кидає виняток; api-клієнт (заголовок і `ApiError`); `langFromCode`; `usePurchase` на всіх гілках статусів; `useMe` застосовує префи; `useRealtimeEvent` інвалідує після reconnect;
   - **testing:** правила `FakeBotApi.respond`/`times`; клонування шаблонної БД.
 - Крок `pack-check` у CI: tarball-и з `pnpm pack` ставляться в чистий fixture-проєкт, і кожен шлях з `exports` імпортується та компілюється.
+- **Частина B:**
+  - `scaffold.test.sh` зелений;
+  - `template-smoke` у CI зелений для `empty` і `shop`;
+  - `/tma-starter:new` у Claude Code після встановлення плагіна з marketplace `dmytro-rudenko/tma-starter`, вручну, для обох варіантів:
+    - опитування проходить;
+    - проєкт генерується, тести й build зелені, є перший коміт;
+    - `pnpm dev` друкує `devUrl`, який відкриває застосунок у браузері;
+    - адмін із `ADMIN_USER_IDS` бачить секцію «Адмін»;
+    - у shop покупка через `payments.test_users` відкриває Premium-блок.
 - Після релізу `npm view @dmytro-rudenko/tma-nest-core@0.1.0` (і для решти чотирьох пакетів) показує версію, ліцензію MIT і provenance. У чистій теці `pnpm add @dmytro-rudenko/tma-nest-core@0.1.0` разом із peer-залежностями встановлюється без помилок.
