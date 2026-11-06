@@ -1,11 +1,4 @@
-import {
-  HttpStatus,
-  Inject,
-  Injectable,
-  Logger,
-  OnApplicationBootstrap,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import {
   AdminRightsService,
   apiError,
@@ -16,13 +9,11 @@ import {
   UsersService,
 } from '@dmytro-rudenko/tma-nest-core';
 import {
-  BotCopyEntries,
   BotLang,
   BotService,
   DEFAULT_BOT_COPY,
   escapeHtml,
   langOf,
-  NotificationsService,
 } from '@dmytro-rudenko/tma-nest-bot';
 import { randomUUID } from 'crypto';
 import type { Context, Filter } from 'grammy';
@@ -31,19 +22,12 @@ import type { Knex } from 'knex';
 import { EntitlementRow, EntitlementsService } from './entitlements.service';
 import { TmaPaymentsErrorCode } from './error-codes';
 import { makePayload, parsePayload } from './invoice-payload';
-import {
-  ResolvedTmaPaymentsOptions,
-  SUBSCRIPTION_PERIOD_SEC,
-  TMA_PAYMENTS_OPTIONS,
-} from './options';
+import { SUBSCRIPTION_PERIOD_SEC } from './options';
 import { PaidOutcome, PaymentRecorder, Recurrence } from './payment-recorder';
 import type { PaymentRow, Product, ProductKind } from './product';
 import { ProductRegistry } from './product.registry';
+import { RefundsService } from './refunds.service';
 import { PAYMENTS_TEST_USERS } from './settings';
-
-const REFUND_RETRY_BATCH = 20;
-const REFUND_BACKOFF_MAX_MIN = 1440;
-const REFUND_ATTEMPTS_WARN = 5;
 
 export type InvoiceResult = { invoiceLink: string } | { settled: true };
 
@@ -54,13 +38,6 @@ export interface ProductView {
   priceStars: number;
   title: string;
   description: string;
-}
-
-function alreadyRefunded(err: unknown): boolean {
-  const e = err as { description?: unknown; message?: unknown } | null;
-  return /CHARGE_ALREADY_REFUNDED/.test(
-    `${String(e?.description ?? '')} ${String(e?.message ?? '')}`,
-  );
 }
 
 export function heldCode(
@@ -74,19 +51,16 @@ export function heldCode(
 }
 
 @Injectable()
-export class PaymentsService implements OnApplicationBootstrap, OnModuleDestroy {
+export class PaymentsService {
   private readonly logger = new Logger(PaymentsService.name);
   private readonly recorder: PaymentRecorder;
-  private timer?: ReturnType<typeof setInterval>;
-  private retrying?: Promise<void>;
 
   constructor(
     @Inject(TMA_KNEX) private readonly knex: Knex,
-    @Inject(TMA_PAYMENTS_OPTIONS) private readonly opts: ResolvedTmaPaymentsOptions,
     private readonly registry: ProductRegistry,
     private readonly entitlements: EntitlementsService,
     private readonly bots: BotService,
-    private readonly notifications: NotificationsService,
+    private readonly refunds: RefundsService,
     private readonly realtime: RealtimeService,
     private readonly settings: AppSettingsService,
     private readonly rights: AdminRightsService,
@@ -94,18 +68,6 @@ export class PaymentsService implements OnApplicationBootstrap, OnModuleDestroy 
     private readonly audit: AuditService,
   ) {
     this.recorder = new PaymentRecorder(users);
-  }
-
-  onApplicationBootstrap(): void {
-    if (!this.opts.runWorker) return;
-    this.timer = setInterval(() => void this.retryPendingRefunds(), this.opts.refundRetryIntervalMs);
-    this.timer.unref?.();
-  }
-
-  async onModuleDestroy(): Promise<void> {
-    if (this.timer) clearInterval(this.timer);
-    this.timer = undefined;
-    await this.retrying;
   }
 
   async products(userId: number, targetId?: string): Promise<ProductView[]> {
@@ -204,7 +166,7 @@ export class PaymentsService implements OnApplicationBootstrap, OnModuleDestroy 
     const product = parsed && this.registry.get(parsed.productId);
     if (!parsed || !product) {
       this.logger.error(`successful_payment ${chargeId} has an unknown payload; refunding`);
-      await this.refundStars(from.id, chargeId);
+      await this.refunds.refundStars(from.id, chargeId);
       return;
     }
     const recurrence: Recurrence =
@@ -236,51 +198,8 @@ export class PaymentsService implements OnApplicationBootstrap, OnModuleDestroy 
     await this.afterCommit(outcome, product);
   }
 
-  async retryPendingRefunds(): Promise<void> {
-    if (this.retrying) return this.retrying;
-    this.retrying = (async () => {
-      try {
-        const rows: PaymentRow[] = await this.knex('payments')
-          .where({ status: 'refund_pending' })
-          .where((w) =>
-            w
-              .whereNull('refund_attempted_at')
-              .orWhereRaw(
-                "refund_attempted_at < now() - interval '1 minute' * least(power(2, refund_attempts), ?)",
-                [REFUND_BACKOFF_MAX_MIN],
-              ),
-          )
-          .orderByRaw('refund_attempted_at asc nulls first, created_at asc')
-          .limit(REFUND_RETRY_BATCH);
-        for (const row of rows) {
-          try {
-            await this.refundPending(row);
-          } catch {
-            await this.recordFailedAttempt(row);
-          }
-        }
-      } catch (err) {
-        this.logger.error(`refund retry failed: ${String(err)}`);
-      } finally {
-        this.retrying = undefined;
-      }
-    })();
-    return this.retrying;
-  }
-
-  private async recordFailedAttempt(row: PaymentRow): Promise<void> {
-    const [updated]: PaymentRow[] = await this.knex('payments')
-      .where({ id: row.id, status: 'refund_pending' })
-      .update({
-        refund_attempts: this.knex.raw('refund_attempts + 1'),
-        refund_attempted_at: this.knex.fn.now(),
-      })
-      .returning('*');
-    if (updated && updated.refund_attempts === REFUND_ATTEMPTS_WARN) {
-      this.logger.warn(
-        `refund ${updated.telegram_payment_charge_id} failed ${updated.refund_attempts} times, still refund_pending`,
-      );
-    }
+  retryPendingRefunds(): Promise<void> {
+    return this.refunds.retryPendingRefunds();
   }
 
   private async testSettle(
@@ -318,7 +237,7 @@ export class PaymentsService implements OnApplicationBootstrap, OnModuleDestroy 
 
   private async afterCommit(outcome: PaidOutcome, product: Product): Promise<void> {
     if (outcome.kind === 'refund') {
-      await this.refundPending(outcome.payment);
+      await this.refunds.refundPending(outcome.payment);
       return;
     }
     if (outcome.kind !== 'settled') return;
@@ -328,46 +247,12 @@ export class PaymentsService implements OnApplicationBootstrap, OnModuleDestroy 
       productId: product.id,
       paymentId: payment.id,
     });
-    void this.notify(payerId, (copy, lang) => {
+    void this.refunds.notify(payerId, (copy, lang) => {
       const title = escapeHtml(product.title(lang));
       if (!outcome.renewal) return copy.paymentReceived?.(title) ?? null;
       const until = (payment.subscription_expires_at ?? new Date()).toISOString().slice(0, 10);
       return copy.subscriptionRenewed?.(title, until) ?? null;
     });
-  }
-
-  private async refundPending(payment: PaymentRow): Promise<void> {
-    const payerId = Number(payment.payer_id);
-    try {
-      await this.refundStars(payerId, payment.telegram_payment_charge_id);
-    } catch (err) {
-      this.logger.error(
-        `refund ${payment.telegram_payment_charge_id} failed, stays refund_pending: ${String(err)}`,
-      );
-      throw err;
-    }
-    const product = this.registry.get(payment.product_id);
-    const refunded = await this.knex.transaction(async (trx) => {
-      const [row]: PaymentRow[] = await trx('payments')
-        .where({ id: payment.id, status: 'refund_pending' })
-        .update({ status: 'refunded', refunded_at: trx.fn.now() })
-        .returning('*');
-      if (row && row.settled_at !== null) await product?.onRefund?.(trx, row);
-      return row;
-    });
-    if (refunded && product) {
-      void this.notify(payerId, (copy, lang) =>
-        copy.paymentRefunded?.(escapeHtml(product.title(lang)), refunded.amount_stars) ?? null,
-      );
-    }
-  }
-
-  private async refundStars(payerId: number, chargeId: string): Promise<void> {
-    try {
-      await this.bots.bot.api.refundStarPayment(payerId, chargeId);
-    } catch (err) {
-      if (!alreadyRefunded(err)) throw err;
-    }
   }
 
   private async isPayable(q: PreCheckoutQuery): Promise<boolean> {
@@ -392,18 +277,5 @@ export class PaymentsService implements OnApplicationBootstrap, OnModuleDestroy 
   private async langOf(userId: number): Promise<BotLang> {
     const user = await this.users.get(userId);
     return langOf(user?.language ?? user?.languageCode);
-  }
-
-  private async notify(
-    userId: number,
-    render: (copy: BotCopyEntries, lang: BotLang) => string | null,
-  ): Promise<void> {
-    try {
-      const lang = await this.langOf(userId);
-      const text = render(this.bots.copy[lang], lang);
-      if (text !== null) await this.notifications.send(userId, () => text);
-    } catch (err) {
-      this.logger.warn(`notify ${userId} failed: ${String(err)}`);
-    }
   }
 }
