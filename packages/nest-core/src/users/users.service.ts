@@ -1,5 +1,6 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
+import { AuditService } from '../audit/audit.service';
 import type { TgUser } from '../auth/init-data';
 import { apiError } from '../common/api-error';
 import { isEnvAdmin, ResolvedTmaCoreOptions } from '../options';
@@ -85,6 +86,7 @@ export class UsersService {
   constructor(
     @Inject(TMA_KNEX) private readonly knex: Knex,
     @Inject(TMA_CORE_OPTIONS) private readonly opts: ResolvedTmaCoreOptions,
+    private readonly audit: AuditService,
   ) {}
 
   async upsert(from: TgUser, trx?: Knex.Transaction): Promise<TmaUser> {
@@ -113,7 +115,9 @@ export class UsersService {
     return !!row?.blocked_at;
   }
 
-  async list({ q, cursor, limit = 50 }: UsersListQuery = {}): Promise<UsersPage> {
+  async list({ q, cursor, limit: requested = 50 }: UsersListQuery = {}): Promise<UsersPage> {
+    const n = Math.trunc(Number(requested));
+    const limit = Number.isFinite(n) ? Math.min(100, Math.max(1, n)) : 50;
     const query = this.knex('users')
       .select(
         '*',
@@ -148,11 +152,23 @@ export class UsersService {
   }
 
   async block(actorId: number, id: number): Promise<TmaUser> {
-    return (await this.knex.transaction((trx) => this.applyBlock(trx, actorId, id))).user;
+    return this.knex.transaction(async (trx) => {
+      const r = await this.applyBlock(trx, actorId, id);
+      if (r.changed) {
+        await this.audit.record(trx, { actorId, action: 'user.block', targetType: 'user', targetId: id });
+      }
+      return r.user;
+    });
   }
 
   async unblock(actorId: number, id: number): Promise<TmaUser> {
-    return (await this.knex.transaction((trx) => this.applyUnblock(trx, actorId, id))).user;
+    return this.knex.transaction(async (trx) => {
+      const r = await this.applyUnblock(trx, actorId, id);
+      if (r.changed) {
+        await this.audit.record(trx, { actorId, action: 'user.unblock', targetType: 'user', targetId: id });
+      }
+      return r.user;
+    });
   }
 
   async applyBlock(trx: Knex.Transaction, actorId: number, id: number): Promise<UserChange> {

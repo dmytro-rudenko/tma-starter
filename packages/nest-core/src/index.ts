@@ -19,6 +19,37 @@ export {
 } from './users/users.service';
 export { AdminRightsService, AdminSource } from './admin-rights/admin-rights.service';
 export { AdminGuard } from './admin-rights/admin.guard';
+export {
+  AUDIT_META_MAX_BYTES,
+  AUDIT_PAGE_SIZE,
+  AuditEvent,
+  AuditListQuery,
+  AuditPage,
+  AuditRecordInput,
+  AuditService,
+  TmaCoreAuditAction,
+} from './audit/audit.service';
+export { SettingDefinition, defineSetting } from './app-settings/define-setting';
+export { AppSettingsRegistry } from './app-settings/registry';
+export {
+  APP_SETTINGS_CACHE_MS,
+  APP_SETTINGS_CLOCK,
+  AppSettingView,
+  AppSettingsService,
+} from './app-settings/app-settings.service';
+export { TMA_REALTIME_PATH, TmaRealtimeGateway } from './realtime/realtime.gateway';
+export { RealtimeService, userRoom } from './realtime/realtime.service';
+export { AdminUserCardLoader, AdminUserCardRegistry } from './admin/admin-user-card.registry';
+export {
+  AdminUser,
+  AdminUserDetail,
+  AdminUsersController,
+  AdminUsersPage,
+  UserIdPipe,
+} from './admin/admin-users.controller';
+export { AdminSettingsController } from './admin/admin-settings.controller';
+export { AdminAuditController } from './admin/admin-audit.controller';
+export { MeController, MeResponse } from './me/me.controller';
 export { apiError } from './common/api-error';
 export { TMA_CORE_ERROR_CODES, TmaCoreErrorCode } from './common/error-codes';
 export { UserThrottlerGuard } from './common/user-throttler.guard';

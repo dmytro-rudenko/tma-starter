@@ -1,5 +1,6 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import type { Knex } from 'knex';
+import { AuditService } from '../audit/audit.service';
 import { apiError } from '../common/api-error';
 import { isEnvAdmin, ResolvedTmaCoreOptions } from '../options';
 import { TMA_CORE_OPTIONS, TMA_KNEX } from '../tokens';
@@ -13,6 +14,7 @@ export class AdminRightsService {
     @Inject(TMA_KNEX) private readonly knex: Knex,
     @Inject(TMA_CORE_OPTIONS) private readonly opts: ResolvedTmaCoreOptions,
     private readonly users: UsersService,
+    private readonly audit: AuditService,
   ) {}
 
   sourceOf(id: number, adminGrantedAt: Date | null | undefined): AdminSource | null {
@@ -31,11 +33,23 @@ export class AdminRightsService {
   }
 
   async grant(actorId: number, id: number): Promise<TmaUser> {
-    return (await this.knex.transaction((trx) => this.applyGrant(trx, actorId, id))).user;
+    return this.knex.transaction(async (trx) => {
+      const r = await this.applyGrant(trx, actorId, id);
+      if (r.changed) {
+        await this.audit.record(trx, { actorId, action: 'admin.grant', targetType: 'user', targetId: id });
+      }
+      return r.user;
+    });
   }
 
   async revoke(actorId: number, id: number): Promise<TmaUser> {
-    return (await this.knex.transaction((trx) => this.applyRevoke(trx, actorId, id))).user;
+    return this.knex.transaction(async (trx) => {
+      const r = await this.applyRevoke(trx, actorId, id);
+      if (r.changed) {
+        await this.audit.record(trx, { actorId, action: 'admin.revoke', targetType: 'user', targetId: id });
+      }
+      return r.user;
+    });
   }
 
   async applyGrant(trx: Knex.Transaction, actorId: number, id: number): Promise<UserChange> {
