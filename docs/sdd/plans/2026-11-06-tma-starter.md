@@ -82,7 +82,7 @@ Forced serialization:
 
 Each nest spec builds the application with `createTestApp({ imports: ctx => [...], migrations })` from `@dmytro-rudenko/tma-testing` and signs users with `tokenFor({ id, first_name })`. Test cases (one `it` each; the names are mandatory, the body is the assertion from the list):
 
-- [ ] **Step 1: write `core.acceptance.spec.ts`**
+- [x] **Step 1: write `core.acceptance.spec.ts`**
   - `rejects missing / bad-hash / expired initData with 401 UNAUTHORIZED`
   - `upserts the user on first request`: `GET /api/me` → 200, row present in `users`
   - `GET /api/health is public`: 200 `{ ok: true }`
@@ -98,7 +98,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - `PATCH /api/me stores language and theme`
   - `realtime: valid initData joins user:<id>, invalid or expired initData disconnects; emitToUser delivers`
   - `GET /api/admin/users/:id includes cards from AdminUserCardRegistry`
-- [ ] **Step 2: write `bot.acceptance.spec.ts`**
+- [x] **Step 2: write `bot.acceptance.spec.ts`**
   - `webhook rejects wrong path token or secret with 401`
   - `critical handler failure → 500, non-critical failure → 200`
   - `blocked user: /start ignored, successful_payment still reaches handler`
@@ -111,7 +111,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - `broadcast resumes after restart without duplicates`
   - `two workers in parallel deliver exactly one message per recipient`
   - `tma-bot setup: calls setWebhook then profile methods; exit 1 when setWebhook fails, exit 2 when profile fails`
-- [ ] **Step 3: write `payments.acceptance.spec.ts`**
+- [x] **Step 3: write `payments.acceptance.spec.ts`**
   - `one_time end-to-end: invoice → pre_checkout ok → successful_payment → settle once`
   - `pre_checkout rejects wrong amount, wrong currency, blocked payer`
   - `duplicate charge id is a no-op`
@@ -128,7 +128,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - `admin refund writes audit payment.refund`
   - `reconcile reports invoice_payment transactions missing from payments`
   - `payment.settled realtime event emitted after commit`
-- [ ] **Step 4: write `web.acceptance.test.tsx`** (vitest + jsdom + `installFakeWebApp` from `@dmytro-rudenko/tma-testing/dom`)
+- [x] **Step 4: write `web.acceptance.test.tsx`** (vitest + jsdom + `installFakeWebApp` from `@dmytro-rudenko/tma-testing/dom`)
   - `tg works without WebApp: initDataRaw '' , openInvoice 'failed', no throw`
   - `Android adds 24px min bottom inset`
   - `openInvoice returns 'failed' when SDK throws`
@@ -137,12 +137,12 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - `usePurchase: settled, paid, cancelled, failed, pending→payment.settled`
   - `useMe applies theme and language`
   - `useRealtimeEvent invalidates me/entitlements on reconnect`
-- [ ] **Step 5: write `testing.acceptance.spec.ts`**
+- [x] **Step 5: write `testing.acceptance.spec.ts`**
   - `FakeBotApi.respond with times`
   - `blockedByUser / tooManyRequests replies`
   - `createTestDatabase clones template db and drop removes it`
   - `devUrl produces hash that validateInitData accepts`
-- [ ] **Step 6: write `skills/new/scaffold.test.sh`.** Bash, `set -euo pipefail`. On a temporary directory `$T` it checks:
+- [x] **Step 6: write `skills/new/scaffold.test.sh`.** Bash, `set -euo pipefail`. On a temporary directory `$T` it checks:
   - (a) for each variant `empty` and `shop`: `scaffold.sh --dir "$T/my app <variant>" --slug demo-app --title "Кава’Клуб" --bot-username demo_app_bot --domain demo.example.com --variant <v>` → exit 0;
   - (b) `grep -rE '__[A-Z_]+__|tma:shop:'` in the result → nothing found;
   - (c) `empty` has no `apps/api/src/shop` and no `apps/web/src/features/shop`, `shop` has both;
@@ -153,7 +153,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - (h) a leftover placeholder planted in a copy of the template → exit 3.
 
   It prints `All checks passed.` at the end.
-- [ ] **Step 7: run them, watch them fail.** `pnpm -r test` → modules `@dmytro-rudenko/tma-*` are not found. `bash skills/new/scaffold.test.sh` → `scaffold.sh: No such file`. The behaviour is missing.
+- [x] **Step 7: run them, watch them fail.** `pnpm -r test` → modules `@dmytro-rudenko/tma-*` are not found. `bash skills/new/scaffold.test.sh` → `scaffold.sh: No such file`. The behaviour is missing.
 
 ### Task 1: monorepo skeleton
 **Writes:** `package.json`, `pnpm-workspace.yaml`, `tsconfig.base.json`, `.nvmrc`, `.prettierrc`, `.editorconfig`, `.gitignore`, `LICENSE`, `.changeset/config.json`, `packages/{nest-core,nest-bot,nest-payments,web,testing}/{package.json,tsconfig.json,tsconfig.build.json,LICENSE,src/index.ts}`, `packages/{nest-core,nest-bot,nest-payments,testing}/jest.config.js`, `packages/web/vitest.config.ts`
