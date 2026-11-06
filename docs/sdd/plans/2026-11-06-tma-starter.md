@@ -210,10 +210,10 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
     - Under root, run `runuser -u postgres` as in plivka.
   - `package.json`: `bin: { "tma-test-pg": "dist/bin/tma-test-pg.js" }`, `exports: { ".": …, "./dom": … }`.
 
-- [ ] Step 1: unit specs: `fake-bot-api.spec.ts` (respond/times, 403/429 bodies `{ ok:false, error_code, description, parameters:{retry_after} }`) and `init-data.spec.ts` (round-trip with an independent HMAC check).
-- [ ] Step 2: `pnpm --filter @dmytro-rudenko/tma-testing test`. Expect failures: functions are missing.
-- [ ] Step 3: implement by porting the plivka files listed in **Reads**. `jest` is not imported anywhere.
-- [ ] Step 4: `pnpm --filter @dmytro-rudenko/tma-testing build && pnpm --filter @dmytro-rudenko/tma-testing test`. The unit specs and `testing.acceptance.spec.ts` must be green. The `createTestDatabase` case needs `pnpm db:start`.
+- [x] Step 1: unit specs: `fake-bot-api.spec.ts` (respond/times, 403/429 bodies `{ ok:false, error_code, description, parameters:{retry_after} }`) and `init-data.spec.ts` (round-trip with an independent HMAC check).
+- [x] Step 2: `pnpm --filter @dmytro-rudenko/tma-testing test`. Expect failures: functions are missing.
+- [x] Step 3: implement by porting the plivka files listed in **Reads**. `jest` is not imported anywhere.
+- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-testing build && pnpm --filter @dmytro-rudenko/tma-testing test`. The unit specs and `testing.acceptance.spec.ts` must be green. The `createTestDatabase` case needs `pnpm db:start`.
 
 ### Task 3: tma-nest-core — module, auth, users, admin rights, common, health, migration
 **Writes:** `packages/nest-core/src/{index.ts,core.module.ts,options.ts,tokens.ts}`, `src/auth/{init-data.ts,telegram-auth.guard.ts,public.decorator.ts,current-user.decorator.ts}`, `src/users/users.service.ts`, `src/admin-rights/{admin-rights.service.ts,admin.guard.ts}`, `src/common/{api-error.ts,error-codes.ts,user-throttler.guard.ts,validation.ts}`, `src/health/health.controller.ts`, `src/migrations/{index.ts,compose.ts,tma_core_001_init.ts}`, and the matching `*.spec.ts`
@@ -470,10 +470,10 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   3. `scaffold.sh --dir "$TMP/app" --slug smoke-app --title "Smoke App" --bot-username smoke_app_bot --domain smoke.example.com --variant $1 --tma-source "$TMP/tarballs"`;
   4. in the result: `pnpm install`, `pnpm db:create`, `pnpm db:migrate`, `pnpm -r typecheck`, `pnpm -r test`, `pnpm -r build`;
   5. on success print `smoke OK: $1`.
-- [ ] Step 1: the test already exists (`scaffold.test.sh`, Task 0).
-- [ ] Step 2: `bash skills/new/scaffold.test.sh`. The argument checks (g) should pass. Steps (a)–(f) fail because the template is missing.
-- [ ] Step 3: implement both scripts.
-- [ ] Step 4: on a temporary `template/` fixture of three files with placeholders and a shop block (created inside the test via `PLUGIN_ROOT` override `TMA_PLUGIN_ROOT`), cases (b), (e), (g) and (h) must be green. The full green run comes after Task 15.
+- [x] Step 1: the test already exists (`scaffold.test.sh`, Task 0).
+- [x] Step 2: `bash skills/new/scaffold.test.sh`. The argument checks (g) should pass. Steps (a)–(f) fail because the template is missing.
+- [x] Step 3: implement both scripts.
+- [x] Step 4: on a temporary `template/` fixture of three files with placeholders and a shop block (created inside the test via `PLUGIN_ROOT` override `TMA_PLUGIN_ROOT`), cases (b), (e), (g) and (h) must be green. The full green run comes after Task 15.
 
 ### Task 11: `skills/new/SKILL.md`
 **Writes:** `skills/new/SKILL.md`
@@ -501,8 +501,8 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - **Failure:** show the output and stop. Do not patch the template; suggest an issue at `https://github.com/dmytro-rudenko/tma-starter/issues`.
   - **Commit:** `git init -b main && git add -A && git commit -m "chore: scaffold from tma-starter <version>"`.
   - **Final message:** `pnpm dev` / `devUrl`, the deploy checklist from `README.md`, and flags for default values (bot, domain, admins `1`). The bot's fallback language is `en`.
-- [ ] Step 1: write the file.
-- [ ] Step 2: `head -5 skills/new/SKILL.md` shows valid frontmatter. `grep -c AskUserQuestion skills/new/SKILL.md` ≥ 7.
+- [x] Step 1: write the file.
+- [x] Step 2: `head -5 skills/new/SKILL.md` shows valid frontmatter. `grep -c AskUserQuestion skills/new/SKILL.md` ≥ 7.
 
 ### Task 12: template — deploy, CI workflow, docs, rules
 **Writes:** `template/deploy/{docker-compose.yml,deploy.sh,deploy.test.sh,server-setup.sh,server-setup.test.sh,backup.sh,check.sh,README.md}`, `template/deploy/nginx/{__APP_SLUG__.conf,__APP_SLUG__-bootstrap.conf}`, `template/apps/api/Dockerfile`, `template/.github/workflows/deploy.yml`, `template/CLAUDE.md`, `template/README.md`, `template/.claude/rules/{architecture,code-organization,code-style,server,web,deploy}.md`
