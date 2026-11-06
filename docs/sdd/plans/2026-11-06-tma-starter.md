@@ -344,10 +344,10 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
     - `package.json` `bin: { "tma-bot": "dist/bin/tma-bot.js" }`.
 - Consumes: `BotService`, `NotificationsService`, `AuditService`.
 
-- [ ] Step 1: unit specs: `audience.registry.spec.ts`, `sync-bot-profile.spec.ts` (an en fallback without a language code).
-- [ ] Step 2: red.
-- [ ] Step 3: implement. The Review Focus 3 test goes into the acceptance cases through `FakeBotApi.blockedByUser` mid-batch.
-- [ ] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-bot test`. The whole of `bot.acceptance.spec.ts` must be green.
+- [x] Step 1: unit specs: `audience.registry.spec.ts`, `sync-bot-profile.spec.ts` (an en fallback without a language code).
+- [x] Step 2: red.
+- [x] Step 3: implement. The Review Focus 3 test goes into the acceptance cases through `FakeBotApi.blockedByUser` mid-batch.
+- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-bot test`. The whole of `bot.acceptance.spec.ts` must be green.
 
 ### Task 7: tma-nest-payments — registry, payload, tables, invoice, pre_checkout, successful_payment, entitlements
 **Writes:** `packages/nest-payments/src/{index.ts,payments.module.ts,options.ts,product.ts,product.registry.ts,invoice-payload.ts,payment-recorder.ts,payments.service.ts,entitlements.service.ts,entitlement.guard.ts,payments.controller.ts,error-codes.ts,settings.ts}`, `src/migrations/{index.ts,tma_payments_001_payments.ts,tma_payments_002_entitlements.ts}`, and the matching `*.spec.ts`
@@ -381,10 +381,10 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - Parallel duplicate deliveries are serialized by UNIQUE on the charge plus `onConflict().ignore()`: `settle` runs only when the insert returned a row (Review Focus 1).
 - Consumes: `BotService.on`, `NotificationsService`, `RealtimeService`, `AppSettingsRegistry`, `UsersService.upsert(from, trx)`.
 
-- [ ] Step 1: unit specs: `invoice-payload.spec.ts` (port of plivka's 48 lines) and `product.registry.spec.ts`.
-- [ ] Step 2: red.
-- [ ] Step 3: implement by porting `payment-recorder.ts`. Replace `payable.ts` with the registry.
-- [ ] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-payments test`. The listed acceptance cases must be green, plus the Review Focus 1 and 2 tests.
+- [x] Step 1: unit specs: `invoice-payload.spec.ts` (port of plivka's 48 lines) and `product.registry.spec.ts`.
+- [x] Step 2: red.
+- [x] Step 3: implement by porting `payment-recorder.ts`. Replace `payable.ts` with the registry.
+- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-payments test`. The listed acceptance cases must be green, plus the Review Focus 1 and 2 tests.
 
 ### Task 8: tma-nest-payments — refund/retry, cancel/resume, admin API, reconcile, audience filter, card
 **Writes:** `packages/nest-payments/src/{refunds.service.ts,subscriptions.controller.ts,admin-payments.controller.ts,admin-entitlements.controller.ts,reconcile.service.ts,payments.module.ts,index.ts}`, and the matching `*.spec.ts`
