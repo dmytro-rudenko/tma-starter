@@ -63,23 +63,25 @@ export function usePurchase() {
       }
 
       return new Promise<PurchaseOutcome>((resolve) => {
+        const settle = (result: PurchaseOutcome) => {
+          clearTimeout(timer);
+          off();
+          if (pendingCleanup.current === abandon) pendingCleanup.current = null;
+          resolve(result);
+        };
+        const abandon = () => settle('pending');
         const timer = setTimeout(() => {
+          settle('pending');
           invalidate();
-          resolve('pending');
+          setStatus('idle');
         }, PENDING_FALLBACK_MS);
         const off = realtime.subscribe('payment.settled', (payload) => {
           const settled = payload as { productId?: string } | undefined;
           if (settled?.productId && settled.productId !== productId) return;
-          cleanup();
+          settle('paid');
           finish('paid');
-          resolve('paid');
         });
-        const cleanup = () => {
-          clearTimeout(timer);
-          off();
-          if (pendingCleanup.current === cleanup) pendingCleanup.current = null;
-        };
-        pendingCleanup.current = cleanup;
+        pendingCleanup.current = abandon;
       });
     },
     [api, realtime, qc],

@@ -48,9 +48,6 @@
     },
     "react-i18next": {
       "optional": true
-    },
-    "socket.io-client": {
-      "optional": true
     }
   },
   "devDependencies": {

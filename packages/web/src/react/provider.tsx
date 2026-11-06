@@ -139,7 +139,17 @@ export function TmaProvider({
     };
   }, []);
 
-  useEffect(() => () => value.realtime.close(), [value]);
+  useEffect(() => {
+    const off = value.realtime.subscribe('payment.settled', () => {
+      void client.invalidateQueries({ queryKey: tmaKeys.me });
+      void client.invalidateQueries({ queryKey: tmaKeys.entitlements });
+      void client.invalidateQueries({ queryKey: tmaKeys.products });
+    });
+    return () => {
+      off();
+      value.realtime.close();
+    };
+  }, [value, client]);
 
   return (
     <QueryClientProvider client={client}>

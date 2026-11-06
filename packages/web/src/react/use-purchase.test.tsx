@@ -24,7 +24,13 @@ const sock = vi.hoisted(() => {
     disconnect: () => socket,
     close: () => socket,
   };
-  return { socket, reset: () => handlers.clear() };
+  return {
+    socket,
+    reset: () => handlers.clear(),
+    fire(e: string, ...args: unknown[]) {
+      for (const h of handlers.get(e) ?? []) h(...args);
+    },
+  };
 });
 
 vi.mock('socket.io-client', () => {
@@ -85,7 +91,8 @@ function setup(invoice: () => Response, sdkStatus: SdkStatus) {
   const hook = renderHook(() => usePurchase(), { wrapper: wrapperFor(qc) });
   const keys = () =>
     [...new Set(invalidate.mock.calls.map(([arg]) => JSON.stringify((arg as any)?.queryKey)))].sort();
-  return { hook, notify, openInvoice, invoiceBodies, keys };
+  const calls = () => invalidate.mock.calls.map(([arg]) => JSON.stringify((arg as any)?.queryKey));
+  return { hook, notify, openInvoice, invoiceBodies, keys, calls };
 }
 
 const ALL_KEYS = () => [tmaKeys.me, tmaKeys.entitlements, tmaKeys.products].map((k) => JSON.stringify(k)).sort();
@@ -183,5 +190,46 @@ describe('usePurchase', () => {
       await vi.advanceTimersByTimeAsync(1500);
     });
     expect(keys()).toContain(JSON.stringify(tmaKeys.entitlements));
+  });
+
+  it("pending: after the 5 s fallback status stays 'idle' on a late payment.settled, the provider still invalidates", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const { hook, openInvoice, notify, calls } = setup(
+      () => json(200, { invoiceLink: 'https://t.me/$inv6' }),
+      'pending',
+    );
+    act(() => {
+      void hook.result.current.purchase({ productId: 'premium' });
+    });
+    await waitFor(() => expect(openInvoice).toHaveBeenCalled());
+    expect(hook.result.current.status).toBe('paying');
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5500);
+    });
+    expect(hook.result.current.status).toBe('idle');
+
+    const before = calls().length;
+    act(() => {
+      sock.fire('connect');
+      sock.fire('payment.settled', { productId: 'premium', paymentId: 'p-late' });
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(100);
+    });
+    expect(hook.result.current.status).toBe('idle');
+    expect(notify).not.toHaveBeenCalled();
+    expect([...new Set(calls().slice(before))].sort()).toEqual(ALL_KEYS());
+  });
+
+  it("pending: unmount resolves the purchase promise with 'pending'", async () => {
+    const { hook, openInvoice } = setup(() => json(200, { invoiceLink: 'https://t.me/$inv7' }), 'pending');
+    let result!: Promise<unknown>;
+    act(() => {
+      result = hook.result.current.purchase({ productId: 'premium' });
+    });
+    await waitFor(() => expect(openInvoice).toHaveBeenCalled());
+    hook.unmount();
+    const timeout = new Promise((r) => setTimeout(() => r('timeout'), 1000));
+    await expect(Promise.race([result, timeout])).resolves.toBe('pending');
   });
 });
