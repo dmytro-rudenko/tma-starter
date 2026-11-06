@@ -37,9 +37,15 @@ async function withAdmin<T>(fn: (client: PgClient) => Promise<T>): Promise<T> {
   }
 }
 
-async function migrationNames(source: Knex.MigrationSource<unknown>): Promise<string[]> {
+async function migrationsFingerprint(source: Knex.MigrationSource<unknown>): Promise<string> {
   const list = await source.getMigrations([]);
-  return list.map((m) => source.getMigrationName(m));
+  const parts = await Promise.all(
+    list.map(async (m) => {
+      const migration = await source.getMigration(m);
+      return [source.getMigrationName(m), migration.up.toString(), migration.down?.toString() ?? ''];
+    }),
+  );
+  return createHash('sha1').update(JSON.stringify(parts)).digest('hex').slice(0, 12);
 }
 
 const readyTemplates = new Map<string, Promise<string>>();
@@ -63,9 +69,8 @@ async function buildTemplate(client: PgClient, name: string, source: Knex.Migrat
 }
 
 function ensureTemplate(source: Knex.MigrationSource<unknown>): Promise<string> {
-  return migrationNames(source).then((names) => {
-    const name =
-      'tma_tpl_' + createHash('sha1').update(names.join('\n')).digest('hex').slice(0, 12);
+  return migrationsFingerprint(source).then((hash) => {
+    const name = 'tma_tpl_' + hash;
     let ready = readyTemplates.get(name);
     if (!ready) {
       ready = withAdmin(async (client) => {
