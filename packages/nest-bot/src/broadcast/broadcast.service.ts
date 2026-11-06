@@ -54,6 +54,8 @@ export interface BroadcastPage {
 export const BROADCAST_PAGE_SIZE = 50;
 
 const LANGUAGES: readonly BotLang[] = ['uk', 'en'];
+export const BROADCAST_TEXT_MAX = 4096;
+const START_PARAM_RE = /^[A-Za-z0-9_-]{1,64}$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const CURSOR_RE =
   /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z)_([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
@@ -102,14 +104,20 @@ export function parseBroadcastInput(body: unknown): BroadcastInput {
   if (typeof value.text !== 'string' || value.text.trim() === '') {
     throw invalid('text must be a non-empty string');
   }
+  if (value.text.length > BROADCAST_TEXT_MAX) {
+    throw invalid(`text must be at most ${BROADCAST_TEXT_MAX} characters`);
+  }
   let button: BroadcastButton | null = null;
   if (value.button !== undefined && value.button !== null) {
     const b = value.button;
     if (!isObject(b) || typeof b.text !== 'string' || b.text.trim() === '') {
       throw invalid('button.text must be a non-empty string');
     }
-    if (b.startParam !== undefined && (typeof b.startParam !== 'string' || b.startParam === '')) {
-      throw invalid('button.startParam must be a non-empty string');
+    if (
+      b.startParam !== undefined &&
+      (typeof b.startParam !== 'string' || !START_PARAM_RE.test(b.startParam))
+    ) {
+      throw invalid('button.startParam must match [A-Za-z0-9_-]{1,64}');
     }
     button = b.startParam === undefined ? { text: b.text } : { text: b.text, startParam: b.startParam };
   }

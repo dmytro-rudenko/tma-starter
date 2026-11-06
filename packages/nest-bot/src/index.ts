@@ -27,6 +27,7 @@ export {
 } from './broadcast/audience.registry';
 export {
   BROADCAST_PAGE_SIZE,
+  BROADCAST_TEXT_MAX,
   BroadcastAudience,
   BroadcastButton,
   BroadcastInput,
@@ -41,6 +42,7 @@ export {
 export {
   BROADCAST_BATCH_SIZE,
   BROADCAST_IDLE_MS,
+  BROADCAST_LEASE_MINUTES,
   BROADCAST_MAX_ATTEMPTS,
   BROADCAST_SEND_INTERVAL_MS,
   BroadcastWorker,

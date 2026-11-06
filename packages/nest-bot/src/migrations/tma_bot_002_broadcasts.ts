@@ -24,6 +24,7 @@ export async function up(knex: Knex): Promise<void> {
       attempts smallint not null default 0,
       error text null,
       sent_at timestamptz null,
+      claimed_at timestamptz null,
       primary key (broadcast_id, user_id)
     );
     create index broadcast_deliveries_broadcast_id_status_idx on broadcast_deliveries (broadcast_id, status);
