@@ -15,6 +15,9 @@
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "tma-test-pg": "dist/bin/tma-test-pg.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
