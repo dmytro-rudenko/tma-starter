@@ -408,10 +408,10 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - Card `payments`: `{ payments: last 20, entitlements }`.
 - Consumes: `BroadcastAudienceRegistry` (Task 6), `AdminUserCardRegistry` (Task 4), `PaymentsService` (Task 7).
 
-- [ ] Step 1: unit spec `refunds.service.spec.ts` (`alreadyRefunded`, retry).
-- [ ] Step 2: red.
-- [ ] Step 3: implement.
-- [ ] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-payments test`. The whole of `payments.acceptance.spec.ts` must be green.
+- [x] Step 1: unit spec `refunds.service.spec.ts` (`alreadyRefunded`, retry).
+- [x] Step 2: red.
+- [x] Step 3: implement.
+- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-payments test`. The whole of `payments.acceptance.spec.ts` must be green.
 
 ### Task 9: `@dmytro-rudenko/tma-web`
 **Writes:** `packages/web/src/{index.ts,tg.ts,theme.ts,prefs.ts,i18n.ts,api.ts,tma-api.ts,error-codes.ts,realtime.ts}`, `packages/web/src/react/{index.ts,provider.tsx,query-client.ts,keys.ts,use-me.ts,use-update-me.ts,use-products.ts,use-entitlement.ts,use-purchase.ts,use-realtime-event.ts}`, `packages/web/src/**/*.test.ts(x)`, `packages/web/package.json`
