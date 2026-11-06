@@ -14,10 +14,10 @@ started: 2026-11-06
 який проходить свої тести й стартує локально.
 
 ## Now
-Хвилі 0–3 закриті, групове рев'ю 1–3 закрито (faa79a3). Наступна хвиля 4: Task 4 (core B: audit, settings, realtime, admin/me API) — вона ж закриває core.acceptance (Satisfies перенесено з Task 3).
-GROUP_BASE: (нова група 4–6 починається з HEAD перед хвилею 4)
-Перенесено в контекст: Task 4 — clamp limit у users list; Task 13 — pnpm.overrides для tma-* і .dockerignore у шаблоні.
-Перевірка хвилі 4: pnpm --filter @dmytro-rudenko/tma-nest-core test (усе зелене, включно з core.acceptance).
+Хвиля 4 закрита (core зелений повністю, 117 тестів). Хвиля 5: Task 5 (nest-bot A).
+GROUP_BASE: 278e3c5
+На Finish: prettier --write по гілці. Контекст Task 13: pnpm.overrides для tma-*, .dockerignore.
+Перевірка хвилі 5: pnpm --filter @dmytro-rudenko/tma-nest-bot test (кейси webhook/critical/blocked/StartParam/Notifications).
 
 ## Timeline
 
@@ -55,3 +55,5 @@ GROUP_BASE: (нова група 4–6 починається з HEAD перед
 - 21:34 ● faa79a3 fix(template): deploy tests independent of the project slug
 - 21:34 ● a556b13 docs(plan): tick wave 3
 - 21:35 ✎ Хвиля 3 і групове рев'ю 1–3: core A, web, deploy-шаблон; виправлено guard /api, future auth_date, atomic template DB, pending fallback, scaffold args
+- 21:35 ● 278e3c5 chore(journal): wave 3 and group 1-3 review closed
+- 21:45 ✎ Хвиля 4: nest-core повністю зелений, core.acceptance пройдено
