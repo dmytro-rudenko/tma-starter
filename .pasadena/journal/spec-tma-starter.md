@@ -14,10 +14,10 @@ started: 2026-11-06
 який проходить свої тести й стартує локально.
 
 ## Now
-Хвиля 4 закрита (core зелений повністю, 117 тестів). Хвиля 5: Task 5 (nest-bot A).
-GROUP_BASE: 278e3c5
-На Finish: prettier --write по гілці. Контекст Task 13: pnpm.overrides для tma-*, .dockerignore.
-Перевірка хвилі 5: pnpm --filter @dmytro-rudenko/tma-nest-bot test (кейси webhook/critical/blocked/StartParam/Notifications).
+Хвилі 0–6 закриті, групове рев'ю 4–6 закрито. Хвиля 7: Task 8 (payments B: refund/admin/cancel/reconcile/audience filter/card) — закриває 6 червоних кейсів payments.acceptance.
+GROUP_BASE: (нова група 7–9 від HEAD перед хвилею 7)
+Контекст Task 13: pnpm.overrides для tma-*, .dockerignore. На Finish: prettier --write.
+Перевірка хвилі 7: pnpm --filter @dmytro-rudenko/tma-nest-payments test — усе зелене.
 
 ## Timeline
 
@@ -57,3 +57,14 @@ GROUP_BASE: 278e3c5
 - 21:35 ✎ Хвиля 3 і групове рев'ю 1–3: core A, web, deploy-шаблон; виправлено guard /api, future auth_date, atomic template DB, pending fallback, scaffold args
 - 21:35 ● 278e3c5 chore(journal): wave 3 and group 1-3 review closed
 - 21:45 ✎ Хвиля 4: nest-core повністю зелений, core.acceptance пройдено
+- 21:45 ● a403d2b feat(nest-core): audit, app settings, realtime and admin/me API
+- 21:45 ● 59601fd docs(plan): tick wave 4
+- 21:45 ● 75b6fb7 chore(journal): wave 4 closed
+- 21:54 ● 0780812 test(nest-bot): type error replies in bot acceptance as ok: false
+- 21:54 ● 22037ab feat(nest-bot): webhook, middleware, commands, i18n and notifications
+- 21:54 ● e290b5a docs(plan): tick wave 5
+- 22:05 ● 2d49198 feat(nest-bot): durable broadcasts and tma-bot setup
+- 22:05 ● a8f043b feat(nest-payments): Stars products, invoices and entitlements
+- 22:05 ● 24561c8 fix(testing): waitFor resolves NonNullable<T>
+- 22:05 ● cafd260 fix(web): add BROADCAST_NOT_FOUND to TMA_ERROR_CODES
+- 22:25 ✎ Хвиля 6 і групове рев'ю 4–6: розсилки на lease, settled_at для onRefund, backoff refund-retry
