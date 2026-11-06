@@ -42,6 +42,8 @@ import { ProductRegistry } from './product.registry';
 import { PAYMENTS_TEST_USERS } from './settings';
 
 const REFUND_RETRY_BATCH = 20;
+const REFUND_BACKOFF_MAX_MIN = 1440;
+const REFUND_ATTEMPTS_WARN = 5;
 
 export type InvoiceResult = { invoiceLink: string } | { settled: true };
 
@@ -108,16 +110,26 @@ export class PaymentsService implements OnApplicationBootstrap, OnModuleDestroy 
 
   async products(userId: number, targetId?: string): Promise<ProductView[]> {
     const lang = await this.langOf(userId);
-    return Promise.all(
-      this.registry.all().map(async (p) => ({
-        id: p.id,
-        kind: p.kind,
-        repeatable: !!p.repeatable,
-        priceStars: await p.priceStars({ userId, targetId, trx: this.knex }),
-        title: p.title(lang),
-        description: p.description(lang),
-      })),
+    const views = await Promise.all(
+      this.registry.all().map(async (p): Promise<ProductView | null> => {
+        let priceStars: number;
+        try {
+          priceStars = await p.priceStars({ userId, targetId, trx: this.knex });
+        } catch (err) {
+          this.logger.warn(`priceStars of ${p.id} failed, product skipped: ${String(err)}`);
+          return null;
+        }
+        return {
+          id: p.id,
+          kind: p.kind,
+          repeatable: !!p.repeatable,
+          priceStars,
+          title: p.title(lang),
+          description: p.description(lang),
+        };
+      }),
     );
+    return views.filter((v): v is ProductView => v !== null);
   }
 
   async createInvoiceLink(userId: number, productId: string, targetId?: string): Promise<InvoiceResult> {
@@ -136,9 +148,19 @@ export class PaymentsService implements OnApplicationBootstrap, OnModuleDestroy 
     const held = heldCode(product, targetId, await this.entitlements.active(userId, product.id));
     if (held) throw apiError(HttpStatus.CONFLICT, held);
 
+    let amount: number;
+    try {
+      amount = await product.priceStars(ctx);
+    } catch (err) {
+      this.logger.warn(`priceStars of ${product.id} failed: ${String(err)}`);
+      throw apiError(HttpStatus.CONFLICT, 'PRODUCT_UNAVAILABLE', 'Product price is not available');
+    }
+    if (!Number.isInteger(amount) || amount < 1) {
+      throw apiError(HttpStatus.CONFLICT, 'PRODUCT_UNAVAILABLE', 'Product price is not available');
+    }
+
     if (await this.isTestUser(userId)) return this.testSettle(userId, product, payload, targetId);
 
-    const amount = await product.priceStars(ctx);
     const lang = await this.langOf(userId);
     const title = product.title(lang);
     try {
@@ -220,9 +242,23 @@ export class PaymentsService implements OnApplicationBootstrap, OnModuleDestroy 
       try {
         const rows: PaymentRow[] = await this.knex('payments')
           .where({ status: 'refund_pending' })
-          .orderBy('created_at')
+          .where((w) =>
+            w
+              .whereNull('refund_attempted_at')
+              .orWhereRaw(
+                "refund_attempted_at < now() - interval '1 minute' * least(power(2, refund_attempts), ?)",
+                [REFUND_BACKOFF_MAX_MIN],
+              ),
+          )
+          .orderByRaw('refund_attempted_at asc nulls first, created_at asc')
           .limit(REFUND_RETRY_BATCH);
-        for (const row of rows) await this.refundPending(row).catch(() => undefined);
+        for (const row of rows) {
+          try {
+            await this.refundPending(row);
+          } catch {
+            await this.recordFailedAttempt(row);
+          }
+        }
       } catch (err) {
         this.logger.error(`refund retry failed: ${String(err)}`);
       } finally {
@@ -230,6 +266,21 @@ export class PaymentsService implements OnApplicationBootstrap, OnModuleDestroy 
       }
     })();
     return this.retrying;
+  }
+
+  private async recordFailedAttempt(row: PaymentRow): Promise<void> {
+    const [updated]: PaymentRow[] = await this.knex('payments')
+      .where({ id: row.id, status: 'refund_pending' })
+      .update({
+        refund_attempts: this.knex.raw('refund_attempts + 1'),
+        refund_attempted_at: this.knex.fn.now(),
+      })
+      .returning('*');
+    if (updated && updated.refund_attempts === REFUND_ATTEMPTS_WARN) {
+      this.logger.warn(
+        `refund ${updated.telegram_payment_charge_id} failed ${updated.refund_attempts} times, still refund_pending`,
+      );
+    }
   }
 
   private async testSettle(
@@ -301,7 +352,7 @@ export class PaymentsService implements OnApplicationBootstrap, OnModuleDestroy 
         .where({ id: payment.id, status: 'refund_pending' })
         .update({ status: 'refunded', refunded_at: trx.fn.now() })
         .returning('*');
-      if (row) await product?.onRefund?.(trx, row);
+      if (row && row.settled_at !== null) await product?.onRefund?.(trx, row);
       return row;
     });
     if (refunded && product) {

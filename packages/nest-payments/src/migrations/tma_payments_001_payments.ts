@@ -13,7 +13,10 @@ export async function up(knex: Knex): Promise<void> {
       is_recurring boolean not null default false,
       subscription_expires_at timestamptz null,
       status text not null check (status in ('paid', 'refund_pending', 'refunded')),
+      settled_at timestamptz null,
       refunded_at timestamptz null,
+      refund_attempts int not null default 0,
+      refund_attempted_at timestamptz null,
       created_at timestamptz not null default now()
     )
   `);

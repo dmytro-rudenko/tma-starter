@@ -38,6 +38,8 @@ export class PaymentRecorder {
       accept = await product.validate({ userId: payerId, targetId, trx });
     }
 
+    const writesEntitlement =
+      input.recurrence !== 'none' || (targetId === undefined && !product.repeatable);
     const recorded = await this.record(trx, {
       payer_id: payerId,
       product_id: product.id,
@@ -48,6 +50,7 @@ export class PaymentRecorder {
       is_recurring: input.recurrence !== 'none',
       subscription_expires_at: input.expiresAt,
       status: accept ? 'paid' : 'refund_pending',
+      settled_at: accept ? trx.fn.now() : null,
     });
     if (recorded.kind !== 'inserted') return recorded;
     const payment = recorded.payment;
@@ -65,11 +68,17 @@ export class PaymentRecorder {
           updated_at: trx.fn.now(),
         })
         .onConflict(['user_id', 'product_id'])
-        .merge();
+        .merge({
+          source: 'subscription',
+          expires_at: trx.raw('greatest(entitlements.expires_at, excluded.expires_at)'),
+          subscription_charge_id: input.subscriptionChargeId,
+          canceled_at: null,
+          updated_at: trx.fn.now(),
+        });
     } else if (input.recurrence === 'renewal') {
       await this.extend(trx, payerId, input);
     } else {
-      if (targetId === undefined && !product.repeatable) {
+      if (writesEntitlement) {
         await trx('entitlements')
           .insert({
             user_id: payerId,
@@ -98,6 +107,7 @@ export class PaymentRecorder {
     if (updated > 0) return;
     const first = await trx('payments')
       .where({ payer_id: payerId, invoice_payload: input.invoicePayload, is_recurring: true })
+      .whereNot({ telegram_payment_charge_id: input.chargeId })
       .orderBy('created_at', 'asc')
       .first('telegram_payment_charge_id');
     await trx('entitlements')
@@ -116,7 +126,10 @@ export class PaymentRecorder {
 
   private async record(
     trx: Knex.Transaction,
-    row: Omit<PaymentRow, 'id' | 'refunded_at' | 'created_at' | 'status'> & { status: PaymentStatus },
+    row: Omit<
+      PaymentRow,
+      'id' | 'refunded_at' | 'created_at' | 'status' | 'settled_at' | 'refund_attempts' | 'refund_attempted_at'
+    > & { status: PaymentStatus; settled_at: Knex.Raw | null },
   ): Promise<Recorded> {
     const [inserted]: PaymentRow[] = await trx('payments')
       .insert(row)
@@ -134,6 +147,7 @@ export class PaymentRecorder {
         ...row,
         invoice_payload: `${row.invoice_payload}#${row.telegram_payment_charge_id}`,
         status: 'refund_pending',
+        settled_at: null,
       })
       .onConflict()
       .ignore()

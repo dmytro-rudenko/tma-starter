@@ -14,7 +14,10 @@ export interface PaymentRow {
   is_recurring: boolean;
   subscription_expires_at: Date | null;
   status: PaymentStatus;
+  settled_at: Date | null;
   refunded_at: Date | null;
+  refund_attempts: number;
+  refund_attempted_at: Date | null;
   created_at: Date;
 }
 
