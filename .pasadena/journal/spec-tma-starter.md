@@ -14,10 +14,10 @@ started: 2026-11-06
 який проходить свої тести й стартує локально.
 
 ## Now
-Хвилі 0–2 закриті (c9c2d87). Хвиля 3: Tasks 3 (core A), 9 (web), 12 (template deploy). Group base для рев'ю хвиль 1–3: 454cc5a.
-GROUP_BASE: 454cc5a
-Тести працюють проти PG 16 на 127.0.0.1:54329 (контейнер plivka-test-pg), локальних бінарників PG 16 немає.
-Далі: після хвилі 3 — групове рев'ю 1–3.
+Хвилі 0–3 закриті, групове рев'ю 1–3 закрито (faa79a3). Наступна хвиля 4: Task 4 (core B: audit, settings, realtime, admin/me API) — вона ж закриває core.acceptance (Satisfies перенесено з Task 3).
+GROUP_BASE: (нова група 4–6 починається з HEAD перед хвилею 4)
+Перенесено в контекст: Task 4 — clamp limit у users list; Task 13 — pnpm.overrides для tma-* і .dockerignore у шаблоні.
+Перевірка хвилі 4: pnpm --filter @dmytro-rudenko/tma-nest-core test (усе зелене, включно з core.acceptance).
 
 ## Timeline
 
@@ -43,3 +43,15 @@ GROUP_BASE: 454cc5a
 - 21:07 ● 90c1a70 feat(skill): /tma-starter:new skill instructions
 - 21:07 ● c9c2d87 docs(plan): tick wave 2
 - 21:07 ✎ Хвиля 2: tma-testing зелений (36 тестів), scaffold.sh і SKILL.md готові
+- 21:07 ● 0f552d0 chore(journal): wave 2 closed
+- 21:23 ● df3448d feat(nest-core): auth, users, admin rights, health and core migration
+- 21:23 ● 9a63fa4 feat(web): tma-web Telegram facade, theme, i18n, api client and React hooks
+- 21:23 ● c8a7919 feat(template): deploy scripts, workflow, docs and agent rules
+- 21:34 ● 3517a8f fix(testing): build template database atomically
+- 21:34 ● 7edd55f fix(nest-core): guard bare /api and reject future auth_date
+- 21:34 ● 305d856 fix(web): settle refresh after pending fallback, require socket.io-client
+- 21:34 ● fb12342 fix(skill): safer argument handling in scaffold.sh
+- 21:34 ● f6a54b5 fix(skill): products temp file via mktemp in one Bash call
+- 21:34 ● faa79a3 fix(template): deploy tests independent of the project slug
+- 21:34 ● a556b13 docs(plan): tick wave 3
+- 21:35 ✎ Хвиля 3 і групове рев'ю 1–3: core A, web, deploy-шаблон; виправлено guard /api, future auth_date, atomic template DB, pending fallback, scaffold args
