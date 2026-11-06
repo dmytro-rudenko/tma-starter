@@ -2,6 +2,10 @@ import { DynamicModule, Global, Inject, Module, OnModuleInit } from '@nestjs/com
 import { AdminUserCardRegistry, TMA_KNEX } from '@dmytro-rudenko/tma-nest-core';
 import { Knex } from 'knex';
 import { BotController } from './bot.controller';
+import { BroadcastAudienceRegistry } from './broadcast/audience.registry';
+import { BroadcastAdminController } from './broadcast/broadcast-admin.controller';
+import { BroadcastService } from './broadcast/broadcast.service';
+import { BroadcastWorker } from './broadcast/broadcast.worker';
 import { BotService } from './bot.service';
 import { NotificationsService } from './notifications.service';
 import { resolveBotOptions, TMA_BOT_OPTIONS, TmaBotOptions } from './options';
@@ -19,14 +23,25 @@ export class TmaBotModule implements OnModuleInit {
     const resolved = resolveBotOptions(opts);
     return {
       module: TmaBotModule,
-      controllers: [BotController],
+      controllers: [BotController, BroadcastAdminController],
       providers: [
         { provide: TMA_BOT_OPTIONS, useValue: resolved },
         BotService,
         NotificationsService,
         PreparedMessagesService,
+        BroadcastAudienceRegistry,
+        BroadcastService,
+        BroadcastWorker,
       ],
-      exports: [TMA_BOT_OPTIONS, BotService, NotificationsService, PreparedMessagesService],
+      exports: [
+        TMA_BOT_OPTIONS,
+        BotService,
+        NotificationsService,
+        PreparedMessagesService,
+        BroadcastAudienceRegistry,
+        BroadcastService,
+        BroadcastWorker,
+      ],
     };
   }
 

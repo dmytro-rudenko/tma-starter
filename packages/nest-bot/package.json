@@ -15,6 +15,9 @@
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "tma-bot": "dist/bin/tma-bot.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
