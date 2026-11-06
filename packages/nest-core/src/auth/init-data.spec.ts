@@ -37,6 +37,12 @@ describe('validateInitData', () => {
     expect(validateInitData(raw, BOT, MAX_AGE)).toEqual(user);
   });
 
+  it('rejects auth_date more than 60 s in the future', () => {
+    const nowSec = Math.floor(Date.now() / 1000);
+    expect(validateInitData(signInitData(user, BOT, { authDate: nowSec + 120 }), BOT, MAX_AGE)).toBeNull();
+    expect(validateInitData(signInitData(user, BOT, { authDate: nowSec + 30 }), BOT, MAX_AGE)).toEqual(user);
+  });
+
   it('returns null when hash is missing', () => {
     const p = new URLSearchParams(signInitData(user, BOT));
     p.delete('hash');

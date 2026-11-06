@@ -24,7 +24,7 @@ export class TelegramAuthGuard implements CanActivate {
       user?: AuthUser;
     }>();
     // Express matches routes case-insensitively, so /API/me must not bypass the guard.
-    if (!req.path.toLowerCase().startsWith('/api/')) return true;
+    if (!/^\/api(\/|$)/i.test(req.path)) return true;
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       ctx.getHandler(),
       ctx.getClass(),

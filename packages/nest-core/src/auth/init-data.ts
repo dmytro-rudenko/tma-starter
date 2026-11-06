@@ -30,7 +30,8 @@ export function validateInitData(
 
   const authDate = Number(params.get('auth_date'));
   if (!Number.isFinite(authDate) || authDate <= 0) return null;
-  if (now / 1000 - authDate > maxAgeSec) return null;
+  const ageSec = now / 1000 - authDate;
+  if (ageSec > maxAgeSec || ageSec < -60) return null;
 
   try {
     const user = JSON.parse(params.get('user') ?? '') as TgUser;
