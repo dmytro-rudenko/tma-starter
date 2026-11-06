@@ -2,13 +2,13 @@ export async function waitFor<T>(
   fn: () => T | Promise<T>,
   timeoutMs = 2000,
   intervalMs = 25,
-): Promise<T> {
+): Promise<NonNullable<T>> {
   const deadline = Date.now() + timeoutMs;
   let lastError: unknown;
   for (;;) {
     try {
       const value = await fn();
-      if (value) return value;
+      if (value) return value as NonNullable<T>;
       lastError = undefined;
     } catch (err) {
       lastError = err;
