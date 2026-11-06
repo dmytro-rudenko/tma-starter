@@ -182,7 +182,7 @@ function afterNthCall(app: TestApp, method: string, n: number, arm: () => void, 
 }
 
 const err = (code: number, description: string, retryAfter?: number) => ({
-  ok: false,
+  ok: false as const,
   error_code: code,
   description,
   ...(retryAfter !== undefined ? { parameters: { retry_after: retryAfter } } : {}),
