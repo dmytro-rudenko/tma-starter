@@ -1,0 +1,46 @@
+# Shared host: the project name is pinned (own network and volumes), the api is published on
+# loopback only and host nginx proxies to it, postgres is not published at all.
+name: __APP_SLUG__
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    env_file: /etc/__APP_SLUG__/.env
+    ports:
+      - "127.0.0.1:${API_HOST_PORT:-__API_PORT__}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    mem_limit: 768m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: __APP_DB__
+      POSTGRES_USER: __APP_DB__
+      POSTGRES_PASSWORD: ${PG_PASSWORD:?PG_PASSWORD is required}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U __APP_DB__"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    mem_limit: 512m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  pgdata:

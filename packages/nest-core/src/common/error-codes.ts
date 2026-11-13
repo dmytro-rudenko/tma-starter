@@ -1,0 +1,15 @@
+export const TMA_CORE_ERROR_CODES = [
+  'UNAUTHORIZED',
+  'USER_BLOCKED',
+  'NOT_ADMIN',
+  'USER_NOT_FOUND',
+  'CANNOT_BLOCK_ADMIN',
+  'CANNOT_GRANT_BLOCKED',
+  'CANNOT_REVOKE_ENV_ADMIN',
+  'CANNOT_TARGET_SELF',
+  'UNKNOWN_SETTING',
+  'VALIDATION',
+  'RATE_LIMITED',
+] as const;
+
+export type TmaCoreErrorCode = (typeof TMA_CORE_ERROR_CODES)[number];
