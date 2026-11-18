@@ -1,0 +1,21 @@
+{
+  "name": "tma-starter",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=26.13.0"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "db:start": "node packages/testing/dist/bin/tma-test-pg.js start",
+    "db:stop": "node packages/testing/dist/bin/tma-test-pg.js stop"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.9",
+    "@types/node": "^26",
+    "prettier": "^3.3.3",
+    "typescript": "~5.6.3"
+  }
+}
