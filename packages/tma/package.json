@@ -1,7 +1,19 @@
 {
   "name": "tma-starter",
   "version": "0.1.0",
+  "description": "Building blocks for Telegram Mini Apps: NestJS auth, users, admin rights, grammY bot, Telegram Stars payments, React client and test utilities",
   "license": "MIT",
+  "homepage": "https://github.com/dmytro-rudenko/tma-starter#readme",
+  "bugs": "https://github.com/dmytro-rudenko/tma-starter/issues",
+  "keywords": [
+    "telegram",
+    "telegram-mini-app",
+    "tma",
+    "nestjs",
+    "react",
+    "grammy",
+    "telegram-stars"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dmytro-rudenko/tma-starter.git",
