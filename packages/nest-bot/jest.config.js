@@ -10,7 +10,7 @@ module.exports = {
     ],
   },
   moduleNameMapper: {
-    '^@dmytro-rudenko/tma-(nest-core|nest-bot|nest-payments|testing)$': '<rootDir>/../$1/src/index.ts',
+    '^@pctea/tma-(nest-core|nest-bot|nest-payments|testing)$': '<rootDir>/../$1/src/index.ts',
   },
   testTimeout: 30000,
   maxWorkers: 4,

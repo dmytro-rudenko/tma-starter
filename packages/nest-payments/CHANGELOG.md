@@ -1,4 +1,4 @@
-# @dmytro-rudenko/tma-nest-payments
+# @pctea/tma-nest-payments
 
 ## 0.1.0
 
@@ -9,5 +9,5 @@
 ### Patch Changes
 
 - Updated dependencies [8ac81d5]
-  - @dmytro-rudenko/tma-nest-core@0.1.0
-  - @dmytro-rudenko/tma-nest-bot@0.1.0
+  - @pctea/tma-nest-core@0.1.0
+  - @pctea/tma-nest-bot@0.1.0

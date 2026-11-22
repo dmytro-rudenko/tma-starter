@@ -7,14 +7,14 @@ import {
   RealtimeService,
   TMA_KNEX,
   UsersService,
-} from '@dmytro-rudenko/tma-nest-core';
+} from '@pctea/tma-nest-core';
 import {
   BotLang,
   BotService,
   DEFAULT_BOT_COPY,
   escapeHtml,
   langOf,
-} from '@dmytro-rudenko/tma-nest-bot';
+} from '@pctea/tma-nest-bot';
 import { randomUUID } from 'crypto';
 import type { Context, Filter } from 'grammy';
 import type { PreCheckoutQuery } from 'grammy/types';

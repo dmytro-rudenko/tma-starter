@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, HttpStatus, Injectable, mixin, Type } from '@nestjs/common';
-import { apiError, AuthUser } from '@dmytro-rudenko/tma-nest-core';
+import { apiError, AuthUser } from '@pctea/tma-nest-core';
 import { EntitlementsService } from './entitlements.service';
 
 export function EntitlementGuard(productId: string): Type<CanActivate> {

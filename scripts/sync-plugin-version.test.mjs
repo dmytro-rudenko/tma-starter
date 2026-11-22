@@ -12,7 +12,7 @@ const script = path.join(root, 'scripts/sync-plugin-version.mjs');
 const pluginJson = {
   name: 'tma-starter',
   version: '0.0.0',
-  description: 'Scaffold Telegram Mini Apps on @dmytro-rudenko/tma-* packages',
+  description: 'Scaffold Telegram Mini Apps on @pctea/tma-* packages',
   author: { name: 'Dmytro Rudenko' },
   license: 'MIT',
   repository: 'https://github.com/dmytro-rudenko/tma-starter',
@@ -34,7 +34,7 @@ function makeFixture() {
   mkdirSync(path.join(dir, '.claude-plugin'), { recursive: true });
   mkdirSync(path.join(dir, 'skills/new'), { recursive: true });
 
-  const corePkgText = JSON.stringify({ name: '@dmytro-rudenko/tma-nest-core', version: '1.2.3' }, null, 2) + '\n';
+  const corePkgText = JSON.stringify({ name: '@pctea/tma-nest-core', version: '1.2.3' }, null, 2) + '\n';
   writeFileSync(path.join(dir, 'packages/nest-core/package.json'), corePkgText);
 
   writeFileSync(path.join(dir, '.claude-plugin/plugin.json'), JSON.stringify(pluginJson, null, 2) + '\n');

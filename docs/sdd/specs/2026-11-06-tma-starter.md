@@ -1,4 +1,4 @@
-# tma-starter: пакети `@dmytro-rudenko/tma-*` і плагін-шаблон Telegram Mini App — design
+# tma-starter: пакети `@pctea/tma-*` і плагін-шаблон Telegram Mini App — design
 
 **Date:** 2026-11-06
 **Status:** agreed
@@ -42,7 +42,7 @@ packages/
 package.json  pnpm-workspace.yaml  tsconfig.base.json  .nvmrc  .prettierrc  .editorconfig
 ```
 
-- Імена npm-пакетів: `@dmytro-rudenko/tma-nest-core`, `-tma-nest-bot`, `-tma-nest-payments`, `-tma-web`, `-tma-testing`. Усі мають `publishConfig.access: public`.
+- Імена npm-пакетів: `@pctea/tma-nest-core`, `-tma-nest-bot`, `-tma-nest-payments`, `-tma-web`, `-tma-testing`. Усі мають `publishConfig.access: public`.
 - `pnpm-workspace.yaml` містить лише `packages/*`. Залежності між пакетами оголошені як `workspace:*`.
 - Тулчейн:
   - Node `26.13.0`: `.nvmrc`, `engines: >=26.13.0`;
@@ -71,7 +71,7 @@ package.json  pnpm-workspace.yaml  tsconfig.base.json  .nvmrc  .prettierrc  .edi
 - Ліцензія MIT: файл `LICENSE` у корені та в кожному пакеті, `"license": "MIT"`. `repository` має вигляд `{ type: "git", url: "git+https://github.com/dmytro-rudenko/tma-starter.git", directory: "packages/<name>" }` — без цього `--provenance` не спрацює.
 - Перший реліз входить у частину A:
   - публічний GitHub-репо `dmytro-rudenko/tma-starter` створюється через `gh`;
-  - npm scope `@dmytro-rudenko` і секрет `NPM_TOKEN` у репо налаштовує власник;
+  - npm scope `@pctea` і секрет `NPM_TOKEN` у репо налаштовує власник;
   - реліз — `0.1.0`, опублікований через `release.yml`.
   - Кроки для власника описані в `README.md`, розділ «Release».
 - `version` у `plugin.json` бампиться в кожному PR, що змінює `skills/` або `template/`. Версіями npm-пакетів керують changesets.
@@ -80,10 +80,10 @@ package.json  pnpm-workspace.yaml  tsconfig.base.json  .nvmrc  .prettierrc  .edi
 
 - Кожен nest-пакет експортує `migrations: Knex.MigrationSource<Migration>`. Модулі міграцій імпортуються статично, а не через `directory`, тож шлях `dist` після встановлення ролі не грає.
 - Імена мають вигляд `tma_<pkg>_<NNN>_<what>`, наприклад `tma_core_001_init`.
-- `@dmytro-rudenko/tma-nest-core` експортує `composeMigrations(...sources)`. Він повертає одне `MigrationSource`, у якому порядок міграцій такий: core → bot → payments → міграції застосунку. Порядок задається порядком аргументів, а не сортуванням імен.
+- `@pctea/tma-nest-core` експортує `composeMigrations(...sources)`. Він повертає одне `MigrationSource`, у якому порядок міграцій такий: core → bot → payments → міграції застосунку. Порядок задається порядком аргументів, а не сортуванням імен.
 - Таблиці мають імена без префікса: `users`, `audit_events`, `app_settings`, `broadcasts`, `broadcast_deliveries`, `payments`, `entitlements`.
 
-### 3.3 `@dmytro-rudenko/tma-nest-core`
+### 3.3 `@pctea/tma-nest-core`
 
 Залежності між пакетами: немає. Інші nest-пакети залежать від core.
 
@@ -193,7 +193,7 @@ TmaCoreModule.forRoot({
 
 Заблокований користувач отримує 403 `USER_BLOCKED` на всі `/api/*`, зокрема на `/api/me`. Клієнт показує `BlockedScreen` (частина B), коли бачить цей код.
 
-### 3.4 `@dmytro-rudenko/tma-nest-bot`
+### 3.4 `@pctea/tma-nest-bot`
 
 Залежить від core.
 
@@ -279,7 +279,7 @@ TmaBotModule.forRoot({
 
 **`PreparedMessagesService.save(userId, result: InlineQueryResultArticle): Promise<string>`** викликає `savePreparedInlineMessage` (прапорці як у `retro-game-bot bot/prepared-messages.ts:24-31`).
 
-### 3.5 `@dmytro-rudenko/tma-nest-payments`
+### 3.5 `@pctea/tma-nest-payments`
 
 Залежить від core і bot. Валюта лише `XTR` (Telegram Stars).
 
@@ -386,7 +386,7 @@ interface Product {
 
 Коди помилок пакета: `NO_ENTITLEMENT`, `PRODUCT_NOT_FOUND`, `PRODUCT_UNAVAILABLE`, `ALREADY_SUBSCRIBED`, `ALREADY_OWNED`, `ENTITLEMENT_HELD_BY_SUBSCRIPTION`, `NO_SUBSCRIPTION`, `PAYMENT_NOT_FOUND`, `ALREADY_REFUNDED`, `PAYMENT_PROVIDER_UNAVAILABLE`.
 
-### 3.6 `@dmytro-rudenko/tma-web`
+### 3.6 `@pctea/tma-web`
 
 ESM. Пакет не містить жодного UI-компонента. Екрани, адмінка, навігація (`stack`/`tabs`), `tokens.css` і словники живуть у шаблоні (частина B).
 
@@ -428,7 +428,7 @@ ESM. Пакет не містить жодного UI-компонента. Ек
   - на кожен результат викликає haptic notify.
 - `useRealtimeEvent(event, handler)` тримає одне з'єднання на провайдер і після reconnect інвалідує `me` та `entitlements`.
 
-### 3.7 `@dmytro-rudenko/tma-testing`
+### 3.7 `@pctea/tma-testing`
 
 Хелпери не імпортують jest.
 
@@ -627,13 +627,13 @@ template/
   5. секрети GitHub;
   6. push у `main`.
 
-**Версії пакетів у проєкті (рішення білдера).** Усі п'ять `@dmytro-rudenko/tma-*` запінені точною версією `__TMA_VERSION__`. Оновлення однією командою, вона описана в `README.md` і `CLAUDE.md`: `pnpm tma:upgrade [version]` (оновлює і залежності, і `pnpm.overrides`, бо `pnpm up` overrides не змінює), потім `pnpm db:migrate`.
+**Версії пакетів у проєкті (рішення білдера).** Усі п'ять `@pctea/tma-*` запінені точною версією `__TMA_VERSION__`. Оновлення однією командою, вона описана в `README.md` і `CLAUDE.md`: `pnpm tma:upgrade [version]` (оновлює і залежності, і `pnpm.overrides`, бо `pnpm up` overrides не змінює), потім `pnpm db:migrate`.
 
 **Мова документації (рішення білдера):** `CLAUDE.md`, rules, README і діалог skill-а — українською, як у plivka. Ідентифікатори, коміти й коментарі в коді — англійською.
 
 **`CLAUDE.md` і `.claude/rules/`**
 - `CLAUDE.md` з plivka узагальнено: опис `__APP_TITLE__`, стек, команди, умови тестів (`pnpm db:start`), локальний запуск (`pnpm dev`, порти 3100/3199/5173), попередження «push у main деплоїть у production».
-- Правило для агентів: інфраструктура (auth, адмінка, платежі, бот) живе в пакетах `@dmytro-rudenko/tma-*`; її не копіюють у застосунок, а розширюють через `forRoot`, реєстри та `copy`.
+- Правило для агентів: інфраструктура (auth, адмінка, платежі, бот) живе в пакетах `@pctea/tma-*`; її не копіюють у застосунок, а розширюють через `forRoot`, реєстри та `copy`.
 - `.claude/rules/*` з plivka:
   - `server.md`: migrate-before-start, без `MEDIA_SIGNING_SECRET`;
   - `web.md`: `tg`, теми й префи — з `tma-web`;
@@ -654,7 +654,7 @@ scaffold.sh --dir <path> --slug <slug> --title <title> --bot-username <name> --d
 2. **Копіювання.** `template/` копіюється в `--dir` без `node_modules`, `dist` і `.env`.
 3. **Варіант:** обробка маркерів і тек магазину (3.9). Для `shop` вміст `--products` генерується в `products.ts`, і кожен рядок проходить JSON-енкодер (`JSON.stringify` через `node -e`). Якщо файл не передано, лишаються продукти за замовчуванням із шаблону.
 4. **Плейсхолдери.** Заміна у вмісті всіх текстових файлів (за `file --mime-encoding`, крім binary) і перейменування файлів та тек з плейсхолдерами в імені.
-5. **`--tma-source`** (CI плагіна): залежності `@dmytro-rudenko/tma-*` переписуються на `file:<tarball>`.
+5. **`--tma-source`** (CI плагіна): залежності `@pctea/tma-*` переписуються на `file:<tarball>`.
 6. **`.env`** з `.env.example`:
    - `WEBHOOK_SECRET` і `WEBHOOK_PATH_TOKEN` — `openssl rand -hex 32`;
    - `BOT_TOKEN=000000:dev-local-token`, `BOT_API_ROOT=http://127.0.0.1:3199`;
@@ -763,4 +763,4 @@ Job `scaffold-macos` (`macos-latest`) запускає лише `scaffold.test.s
     - `pnpm dev` друкує `devUrl`, який відкриває застосунок у браузері;
     - адмін із `ADMIN_USER_IDS` бачить секцію «Адмін»;
     - у shop покупка через `payments.test_users` відкриває Premium-блок.
-- Після релізу `npm view @dmytro-rudenko/tma-nest-core@0.1.0` (і для решти чотирьох пакетів) показує версію, ліцензію MIT і provenance. У чистій теці `pnpm add @dmytro-rudenko/tma-nest-core@0.1.0` разом із peer-залежностями встановлюється без помилок.
+- Після релізу `npm view @pctea/tma-nest-core@0.1.0` (і для решти чотирьох пакетів) показує версію, ліцензію MIT і provenance. У чистій теці `pnpm add @pctea/tma-nest-core@0.1.0` разом із peer-залежностями встановлюється без помилок.

@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
-import { apiError, AuthUser, CurrentUser } from '@dmytro-rudenko/tma-nest-core';
+import { apiError, AuthUser, CurrentUser } from '@pctea/tma-nest-core';
 import { EntitlementsService, EntitlementView } from './entitlements.service';
 import { InvoiceResult, PaymentsService, ProductView } from './payments.service';
 

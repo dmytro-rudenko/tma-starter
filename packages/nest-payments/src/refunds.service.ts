@@ -6,7 +6,7 @@ import {
   OnApplicationBootstrap,
   OnModuleDestroy,
 } from '@nestjs/common';
-import { apiError, AuditService, TMA_KNEX, UsersService } from '@dmytro-rudenko/tma-nest-core';
+import { apiError, AuditService, TMA_KNEX, UsersService } from '@pctea/tma-nest-core';
 import {
   BotCopyEntries,
   BotLang,
@@ -14,7 +14,7 @@ import {
   escapeHtml,
   langOf,
   NotificationsService,
-} from '@dmytro-rudenko/tma-nest-bot';
+} from '@pctea/tma-nest-bot';
 import type { Knex } from 'knex';
 import { ResolvedTmaPaymentsOptions, TMA_PAYMENTS_OPTIONS } from './options';
 import type { PaymentRow } from './product';

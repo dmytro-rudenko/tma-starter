@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GATEWAY_OPTIONS } from '@nestjs/websockets/constants';
-import { createTestDatabase, signInitData, TestDatabase } from '@dmytro-rudenko/tma-testing';
+import { createTestDatabase, signInitData, TestDatabase } from '@pctea/tma-testing';
 import { RealtimeService, TmaCoreModule, TmaRealtimeGateway, UsersService, migrations } from '../index';
 
 const BOT = '123456:REALTIME-TEST';

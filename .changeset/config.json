@@ -1,5 +1,5 @@
 {
-  "fixed": [["@dmytro-rudenko/tma-*"]],
+  "fixed": [["@pctea/tma-*"]],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch"

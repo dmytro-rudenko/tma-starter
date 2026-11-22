@@ -9,8 +9,8 @@ import {
   composeMigrations,
   defineSetting,
   migrations as coreMigrations,
-} from '@dmytro-rudenko/tma-nest-core';
-import { createTestApp, signInitData, waitFor } from '@dmytro-rudenko/tma-testing';
+} from '@pctea/tma-nest-core';
+import { createTestApp, signInitData, waitFor } from '@pctea/tma-testing';
 
 jest.setTimeout(60_000);
 

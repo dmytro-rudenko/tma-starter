@@ -1,3 +1,3 @@
-import { createApiClient } from '@dmytro-rudenko/tma-web';
+import { createApiClient } from '@pctea/tma-web';
 
 export const apiClient = createApiClient();

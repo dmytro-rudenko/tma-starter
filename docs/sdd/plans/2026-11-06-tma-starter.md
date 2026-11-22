@@ -1,6 +1,6 @@
 # tma-starter — implementation plan
 
-**Goal:** the `dmytro-rudenko/tma-starter` repository contains five npm packages, `@dmytro-rudenko/tma-{nest-core,nest-bot,nest-payments,web,testing}`, and the `tma-starter` plugin. The plugin ships the skill `/tma-starter:new`, `scaffold.sh` and `template/` (variants `empty` and `shop`). Everything is green in CI, and release `0.1.0` is published to npm with provenance.
+**Goal:** the `dmytro-rudenko/tma-starter` repository contains five npm packages, `@pctea/tma-{nest-core,nest-bot,nest-payments,web,testing}`, and the `tma-starter` plugin. The plugin ships the skill `/tma-starter:new`, `scaffold.sh` and `template/` (variants `empty` and `shop`). Everything is green in CI, and release `0.1.0` is published to npm with provenance.
 **Spec:** docs/sdd/specs/2026-11-06-tma-starter.md
 **Prototype:** — (no prototype, by the user's decision)
 **Verification:** from the repository root, with `pnpm db:start` running:
@@ -30,7 +30,7 @@ Forced serialization:
 
 ## Global constraints
 - Toolchain: Node `26.13.0` (`.nvmrc`, `engines: ">=26.13.0"`), `packageManager: "pnpm@10.28.0"`, TypeScript `~5.6.3`, Prettier `^3.3.3`. Copy `tsconfig.base.json` from `/home/pc/projects/plivka/tsconfig.base.json`.
-- npm names: `@dmytro-rudenko/tma-nest-core`, `@dmytro-rudenko/tma-nest-bot`, `@dmytro-rudenko/tma-nest-payments`, `@dmytro-rudenko/tma-web`, `@dmytro-rudenko/tma-testing`. Each has:
+- npm names: `@pctea/tma-nest-core`, `@pctea/tma-nest-bot`, `@pctea/tma-nest-payments`, `@pctea/tma-web`, `@pctea/tma-testing`. Each has:
   - `"version": "0.0.0"`, `"license": "MIT"`, `publishConfig.access: "public"`, `files: ["dist"]`;
   - `repository: { type: "git", url: "git+https://github.com/dmytro-rudenko/tma-starter.git", directory: "packages/<dir>" }`.
   Internal dependencies use `workspace:*`.
@@ -80,7 +80,7 @@ Forced serialization:
 - "`scaffold.test.sh` зелений";
 - "`template-smoke` у CI зелений для `empty` і `shop`" (via `scaffold.test.sh` plus Task 10's smoke).
 
-Each nest spec builds the application with `createTestApp({ imports: ctx => [...], migrations })` from `@dmytro-rudenko/tma-testing` and signs users with `tokenFor({ id, first_name })`. Test cases (one `it` each; the names are mandatory, the body is the assertion from the list):
+Each nest spec builds the application with `createTestApp({ imports: ctx => [...], migrations })` from `@pctea/tma-testing` and signs users with `tokenFor({ id, first_name })`. Test cases (one `it` each; the names are mandatory, the body is the assertion from the list):
 
 - [x] **Step 1: write `core.acceptance.spec.ts`**
   - `rejects missing / bad-hash / expired initData with 401 UNAUTHORIZED`
@@ -128,7 +128,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - `admin refund writes audit payment.refund`
   - `reconcile reports invoice_payment transactions missing from payments`
   - `payment.settled realtime event emitted after commit`
-- [x] **Step 4: write `web.acceptance.test.tsx`** (vitest + jsdom + `installFakeWebApp` from `@dmytro-rudenko/tma-testing/dom`)
+- [x] **Step 4: write `web.acceptance.test.tsx`** (vitest + jsdom + `installFakeWebApp` from `@pctea/tma-testing/dom`)
   - `tg works without WebApp: initDataRaw '' , openInvoice 'failed', no throw`
   - `Android adds 24px min bottom inset`
   - `openInvoice returns 'failed' when SDK throws`
@@ -153,7 +153,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - (h) a leftover placeholder planted in a copy of the template → exit 3.
 
   It prints `All checks passed.` at the end.
-- [x] **Step 7: run them, watch them fail.** `pnpm -r test` → modules `@dmytro-rudenko/tma-*` are not found. `bash skills/new/scaffold.test.sh` → `scaffold.sh: No such file`. The behaviour is missing.
+- [x] **Step 7: run them, watch them fail.** `pnpm -r test` → modules `@pctea/tma-*` are not found. `bash skills/new/scaffold.test.sh` → `scaffold.sh: No such file`. The behaviour is missing.
 
 ### Task 1: monorepo skeleton
 **Writes:** `package.json`, `pnpm-workspace.yaml`, `tsconfig.base.json`, `.nvmrc`, `.prettierrc`, `.editorconfig`, `.gitignore`, `LICENSE`, `.changeset/config.json`, `packages/{nest-core,nest-bot,nest-payments,web,testing}/{package.json,tsconfig.json,tsconfig.build.json,LICENSE,src/index.ts}`, `packages/{nest-core,nest-bot,nest-payments,testing}/jest.config.js`, `packages/web/vitest.config.ts`
@@ -165,7 +165,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 - Produces:
   - root scripts: `build` = `pnpm -r build`, `typecheck` = `pnpm -r typecheck`, `test` = `pnpm -r test`, `db:start` = `node packages/testing/dist/bin/tma-test-pg.js start` (after build), `db:stop`;
   - in each package: `build`, `typecheck` (`tsc --noEmit`) and `test`.
-- `.changeset/config.json`: `{ "fixed": [["@dmytro-rudenko/tma-*"]], "access": "public", "baseBranch": "main", "updateInternalDependencies": "patch" }`.
+- `.changeset/config.json`: `{ "fixed": [["@pctea/tma-*"]], "access": "public", "baseBranch": "main", "updateInternalDependencies": "patch" }`.
 - `pnpm-workspace.yaml`: `packages: ["packages/*"]`, `onlyBuiltDependencies: ["@nestjs/core", "esbuild"]`.
 - Dependencies between packages:
   - `nest-bot` → `nest-core`;
@@ -177,7 +177,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 - [x] Step 2: `pnpm install && pnpm -r build && pnpm -r typecheck`. Expect exit 0.
 - [x] Step 3: `pnpm -r test`. Expect the Task 0 acceptance specs to fail on imports (they are still red).
 
-### Task 2: `@dmytro-rudenko/tma-testing`
+### Task 2: `@pctea/tma-testing`
 **Writes:** `packages/testing/src/{index.ts,init-data.ts,updates.ts,webhook.ts,fake-bot-api.ts,database.ts,test-app.ts,wait-for.ts,dev-url.ts}`, `packages/testing/src/dom/index.ts`, `packages/testing/src/bin/tma-test-pg.ts`, `packages/testing/src/*.spec.ts`, `packages/testing/package.json`
 **Reads:** `plivka/apps/api/test/utils/{test-app,init-data,fake-bot-api,http-error}.ts`, `plivka/scripts/test-pg.sh`, `plivka/e2e/telegram-stub.ts:36-125`
 **Depends on:** Task 1
@@ -211,9 +211,9 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - `package.json`: `bin: { "tma-test-pg": "dist/bin/tma-test-pg.js" }`, `exports: { ".": …, "./dom": … }`.
 
 - [x] Step 1: unit specs: `fake-bot-api.spec.ts` (respond/times, 403/429 bodies `{ ok:false, error_code, description, parameters:{retry_after} }`) and `init-data.spec.ts` (round-trip with an independent HMAC check).
-- [x] Step 2: `pnpm --filter @dmytro-rudenko/tma-testing test`. Expect failures: functions are missing.
+- [x] Step 2: `pnpm --filter @pctea/tma-testing test`. Expect failures: functions are missing.
 - [x] Step 3: implement by porting the plivka files listed in **Reads**. `jest` is not imported anywhere.
-- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-testing build && pnpm --filter @dmytro-rudenko/tma-testing test`. The unit specs and `testing.acceptance.spec.ts` must be green. The `createTestDatabase` case needs `pnpm db:start`.
+- [x] Step 4: `pnpm --filter @pctea/tma-testing build && pnpm --filter @pctea/tma-testing test`. The unit specs and `testing.acceptance.spec.ts` must be green. The `createTestDatabase` case needs `pnpm db:start`.
 
 ### Task 3: tma-nest-core — module, auth, users, admin rights, common, health, migration
 **Writes:** `packages/nest-core/src/{index.ts,core.module.ts,options.ts,tokens.ts}`, `src/auth/{init-data.ts,telegram-auth.guard.ts,public.decorator.ts,current-user.decorator.ts}`, `src/users/users.service.ts`, `src/admin-rights/{admin-rights.service.ts,admin.guard.ts}`, `src/common/{api-error.ts,error-codes.ts,user-throttler.guard.ts,validation.ts}`, `src/health/health.controller.ts`, `src/migrations/{index.ts,compose.ts,tma_core_001_init.ts}`, and the matching `*.spec.ts`
@@ -248,7 +248,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 - [x] Step 1: unit specs: `init-data.spec.ts` (port of plivka's 47 lines), `admin-rights.service.spec.ts` (the matrix), `compose.spec.ts` (order of names).
 - [x] Step 2: run → red.
 - [x] Step 3: implement by porting plivka. Remove the `hasGrantColumn`/`hasBlockedColumn` checks.
-- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-core test`. Unit tests and the listed acceptance cases must be green. The audit, settings, realtime and cards cases stay red.
+- [x] Step 4: `pnpm --filter @pctea/tma-nest-core test`. Unit tests and the listed acceptance cases must be green. The audit, settings, realtime and cards cases stay red.
 
 ### Task 4: tma-nest-core — audit, app settings, realtime, admin/me API, card registry
 **Writes:** `packages/nest-core/src/audit/audit.service.ts`, `src/app-settings/{app-settings.service.ts,registry.ts,define-setting.ts}`, `src/realtime/{realtime.gateway.ts,realtime.service.ts}`, `src/admin/{admin-users.controller.ts,admin-settings.controller.ts,admin-audit.controller.ts,admin-user-card.registry.ts}`, `src/me/me.controller.ts`, `src/core.module.ts`, `src/index.ts`, `src/users/users.service.ts`, `src/admin-rights/admin-rights.service.ts`, and the matching `*.spec.ts`
@@ -282,7 +282,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 - [x] Step 1: unit specs: `app-settings.service.spec.ts` (cache with a fake clock, parse, unknown key; port of plivka's 121 lines), `audit.service.spec.ts` (truncate meta, prune), `realtime.gateway.spec.ts` (valid, invalid and expired initData — Review Focus 4).
 - [x] Step 2: red.
 - [x] Step 3: implement.
-- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-core test`. The whole of `core.acceptance.spec.ts` must be green.
+- [x] Step 4: `pnpm --filter @pctea/tma-nest-core test`. The whole of `core.acceptance.spec.ts` must be green.
 
 ### Task 5: tma-nest-bot — module, webhook, middleware, commands, i18n, notifications, prepared messages
 **Writes:** `packages/nest-bot/src/{index.ts,bot.module.ts,options.ts,bot.service.ts,bot.controller.ts,start-param.router.ts,copy.ts,lang.ts,notifications.service.ts,prepared-messages.service.ts}`, `src/migrations/{index.ts,tma_bot_001_users_bot_blocked_at.ts}`, and the matching `*.spec.ts`
@@ -316,7 +316,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 - [x] Step 1: unit specs: `lang.spec.ts`, `start-param.router.spec.ts`, `notifications.service.spec.ts` (403/429 through `FakeBotApi`).
 - [x] Step 2: red.
 - [x] Step 3: implement by porting plivka. Generalize `isPaymentUpdate` into the critical filters.
-- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-bot test`. The listed acceptance cases must be green.
+- [x] Step 4: `pnpm --filter @pctea/tma-nest-bot test`. The listed acceptance cases must be green.
 
 ### Task 6: tma-nest-bot — broadcast and `tma-bot setup`
 **Writes:** `packages/nest-bot/src/broadcast/{broadcast.service.ts,broadcast.worker.ts,broadcast-admin.controller.ts,audience.registry.ts}`, `src/migrations/tma_bot_002_broadcasts.ts`, `src/migrations/index.ts`, `src/bin/tma-bot.ts`, `src/setup/sync-bot-profile.ts`, `src/bot.module.ts`, `src/index.ts`, `packages/nest-bot/package.json`, and the matching `*.spec.ts`
@@ -347,7 +347,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 - [x] Step 1: unit specs: `audience.registry.spec.ts`, `sync-bot-profile.spec.ts` (an en fallback without a language code).
 - [x] Step 2: red.
 - [x] Step 3: implement. The Review Focus 3 test goes into the acceptance cases through `FakeBotApi.blockedByUser` mid-batch.
-- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-bot test`. The whole of `bot.acceptance.spec.ts` must be green.
+- [x] Step 4: `pnpm --filter @pctea/tma-nest-bot test`. The whole of `bot.acceptance.spec.ts` must be green.
 
 ### Task 7: tma-nest-payments — registry, payload, tables, invoice, pre_checkout, successful_payment, entitlements
 **Writes:** `packages/nest-payments/src/{index.ts,payments.module.ts,options.ts,product.ts,product.registry.ts,invoice-payload.ts,payment-recorder.ts,payments.service.ts,entitlements.service.ts,entitlement.guard.ts,payments.controller.ts,error-codes.ts,settings.ts}`, `src/migrations/{index.ts,tma_payments_001_payments.ts,tma_payments_002_entitlements.ts}`, and the matching `*.spec.ts`
@@ -384,7 +384,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 - [x] Step 1: unit specs: `invoice-payload.spec.ts` (port of plivka's 48 lines) and `product.registry.spec.ts`.
 - [x] Step 2: red.
 - [x] Step 3: implement by porting `payment-recorder.ts`. Replace `payable.ts` with the registry.
-- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-payments test`. The listed acceptance cases must be green, plus the Review Focus 1 and 2 tests.
+- [x] Step 4: `pnpm --filter @pctea/tma-nest-payments test`. The listed acceptance cases must be green, plus the Review Focus 1 and 2 tests.
 
 ### Task 8: tma-nest-payments — refund/retry, cancel/resume, admin API, reconcile, audience filter, card
 **Writes:** `packages/nest-payments/src/{refunds.service.ts,subscriptions.controller.ts,admin-payments.controller.ts,admin-entitlements.controller.ts,reconcile.service.ts,payments.module.ts,index.ts}`, and the matching `*.spec.ts`
@@ -411,9 +411,9 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 - [x] Step 1: unit spec `refunds.service.spec.ts` (`alreadyRefunded`, retry).
 - [x] Step 2: red.
 - [x] Step 3: implement.
-- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-nest-payments test`. The whole of `payments.acceptance.spec.ts` must be green.
+- [x] Step 4: `pnpm --filter @pctea/tma-nest-payments test`. The whole of `payments.acceptance.spec.ts` must be green.
 
-### Task 9: `@dmytro-rudenko/tma-web`
+### Task 9: `@pctea/tma-web`
 **Writes:** `packages/web/src/{index.ts,tg.ts,theme.ts,prefs.ts,i18n.ts,api.ts,tma-api.ts,error-codes.ts,realtime.ts}`, `packages/web/src/react/{index.ts,provider.tsx,query-client.ts,keys.ts,use-me.ts,use-update-me.ts,use-products.ts,use-entitlement.ts,use-purchase.ts,use-realtime-event.ts}`, `packages/web/src/**/*.test.ts(x)`, `packages/web/package.json`
 **Reads:** `plivka/apps/web/src/{telegram/tg.ts,theme/applyTheme.ts,state/prefs.ts,i18n/index.ts,api/client.ts,api/hooks.ts,realtime/*}`, `retro-game-bot/apps/miniapp/src/telegram.ts:56-66`, spec §3.6
 **Depends on:** Task 2
@@ -430,7 +430,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 - [x] Step 1: unit tests `tg.test.ts`, `api.test.ts`, `i18n.test.ts`, `react/use-purchase.test.tsx`.
 - [x] Step 2: red.
 - [x] Step 3: implement by porting plivka.
-- [x] Step 4: `pnpm --filter @dmytro-rudenko/tma-web test`. `web.acceptance.test.tsx` must be green.
+- [x] Step 4: `pnpm --filter @pctea/tma-web test`. `web.acceptance.test.tsx` must be green.
 
 ### Task 10: `scaffold.sh` and smoke of the template
 **Writes:** `skills/new/scaffold.sh`, `scripts/smoke-template.sh`
@@ -457,7 +457,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
     - `shop` removes only the marker lines.
   - **Products.** For `shop` with `--products`, generate `apps/api/src/products.ts` through `node -e` + `JSON.stringify`.
   - **Placeholders.** Replace `__APP_SLUG__`, `__APP_DB__`, `__APP_TITLE__`, `__BOT_USERNAME__`, `__DOMAIN__`, `__DEFAULT_LANG__`, `__ACCENT__`, `__TMA_VERSION__` (from `${PLUGIN_ROOT}/.claude-plugin/plugin.json` `version`) and `__API_PORT__` in text files (`file --mime-encoding` ≠ binary), and rename files and directories that contain placeholders.
-  - **`--tma-source`:** dependencies `"@dmytro-rudenko/tma-<x>": "<ver>"` become `"file:<dir>/dmytro-rudenko-tma-<x>-<ver>.tgz"`.
+  - **`--tma-source`:** dependencies `"@pctea/tma-<x>": "<ver>"` become `"file:<dir>/pctea-tma-<x>-<ver>.tgz"`.
   - **`.env`** from `.env.example`:
     - `WEBHOOK_SECRET` and `WEBHOOK_PATH_TOKEN` via `openssl rand -hex 32`;
     - `BOT_TOKEN=000000:dev-local-token`, `BOT_API_ROOT=http://127.0.0.1:3199`, `DATABASE_URL=postgres://postgres@127.0.0.1:54329/<app_db>`;
@@ -523,8 +523,8 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   4. health `/api/health`;
   5. `docker compose exec -T api npx tma-bot setup`, with env `BOT_PROFILE=/app/apps/api/bot/profile.json`.
 - `deploy.yml` from plivka, `--filter @plivka/shared` removed.
-- The `README.md` "Deploy" checklist has the six steps from spec §3.9. The "Оновлення пакетів" section: `pnpm up -r '@dmytro-rudenko/tma-*@latest'` + `pnpm db:migrate`.
-- `CLAUDE.md` and rules follow spec §3.9, including the rule "infrastructure lives in `@dmytro-rudenko/tma-*`; extend it through `forRoot`/registries/`copy`".
+- The `README.md` "Deploy" checklist has the six steps from spec §3.9. The "Оновлення пакетів" section: `pnpm up -r '@pctea/tma-*@latest'` + `pnpm db:migrate`.
+- `CLAUDE.md` and rules follow spec §3.9, including the rule "infrastructure lives in `@pctea/tma-*`; extend it through `forRoot`/registries/`copy`".
 - [x] Step 1: adapt `deploy.test.sh` (port of plivka) to the new order.
 - [x] Step 2: copy into a temporary directory with `sed` substitution of the placeholders, run `bash deploy/deploy.test.sh` → it must fail on the old order (before the edits).
 - [x] Step 3: edit the files.
@@ -539,7 +539,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 **Satisfies:** `scaffold.test.sh` (a)–(f) for `empty` together with Task 14, `smoke-template.sh empty`
 **Interfaces:**
 - Produces:
-  - **npm scope of the application:** `@__APP_SLUG__/api`, `@__APP_SLUG__/web`. The `@dmytro-rudenko/tma-*` dependencies are pinned to `__TMA_VERSION__`.
+  - **npm scope of the application:** `@__APP_SLUG__/api`, `@__APP_SLUG__/web`. The `@pctea/tma-*` dependencies are pinned to `__TMA_VERSION__`.
   - **Root scripts:** `dev`, `db:start`, `db:stop` (`tma-test-pg`), `db:create` (`node scripts/db-create.mjs`), `db:migrate`, `build`, `typecheck`, `test`.
   - **`.env.example`:** `BOT_TOKEN=`, `BOT_USERNAME=__BOT_USERNAME__`, `WEBAPP_URL=https://__DOMAIN__`, `WEBHOOK_SECRET=`, `WEBHOOK_PATH_TOKEN=`, `DATABASE_URL=`, `PORT=3100`, `BOT_API_ROOT=`, `RUN_WORKER=true`, `API_RATE_LIMIT=120`, `ADMIN_USER_IDS=`, `INIT_DATA_MAX_AGE_SEC=86400`.
   - **`app.module.ts`:**
@@ -578,7 +578,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
     - debounce 300 ms in Users, debounce 500 ms in `estimate`, polling every 3 s for a broadcast in progress;
     - the settings editor picks its control by the type of `default`.
 - Tests (vitest + jsdom + `installFakeWebApp`): `i18n.test.ts` (key parity uk/en), `errorText.test.ts` (covers all of `TMA_ERROR_CODES`), `AdminSettingsSheet.test.tsx` (boolean/number/string/number[]/json), `AdminUserSheet.test.tsx` (renders `cards.bot`, `cards.payments`).
-- Consumes: `@dmytro-rudenko/tma-web` and `./react` (Task 9).
+- Consumes: `@pctea/tma-web` and `./react` (Task 9).
 - [x] Step 1: write the tests.
 - [x] Step 2: inside `smoke-template.sh empty` (or a local scaffold into `/tmp`), `pnpm --filter @smoke-app/web test` → red.
 - [x] Step 3: implement. Port `Sheet`, `FullscreenLayer`, `Toast`, `Avatar`, `AdminConfirm`, `BlockedScreen` and `useDebounced` without changes.
@@ -611,7 +611,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 **Satisfies:** spec §6 «Крок `pack-check`»; the CI part of the verification
 **Interfaces:**
 - Produces:
-  - **`plugin.json`:** `{ "name": "tma-starter", "version": "0.0.0", "description": "Scaffold Telegram Mini Apps on @dmytro-rudenko/tma-* packages", "author": { "name": "Dmytro Rudenko" }, "license": "MIT", "repository": "https://github.com/dmytro-rudenko/tma-starter" }`.
+  - **`plugin.json`:** `{ "name": "tma-starter", "version": "0.0.0", "description": "Scaffold Telegram Mini Apps on @pctea/tma-* packages", "author": { "name": "Dmytro Rudenko" }, "license": "MIT", "repository": "https://github.com/dmytro-rudenko/tma-starter" }`.
   - **`marketplace.json`:** the format from live-coding, name `tma-starter`, one plugin with `source: "./"`.
   - **`sync-plugin-version.mjs`:** copies the `version` of `packages/nest-core/package.json` into `plugin.json` and into the `version:` of `skills/new/SKILL.md`.
   - **`error-codes.test.mjs`** (`node --test`): `TMA_ERROR_CODES` from `packages/web/dist` equals the union of `TMA_CORE_ERROR_CODES`, `TMA_BOT_ERROR_CODES` and `TMA_PAYMENTS_ERROR_CODES` from the nest-* `dist`.
@@ -625,7 +625,7 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
     - `changesets/action@v1` with `version: pnpm changeset version && node scripts/sync-plugin-version.mjs && pnpm install --lockfile-only`, `publish: pnpm -r build && pnpm changeset publish --provenance`;
     - `permissions: { contents: write, pull-requests: write, id-token: write }`, env `NPM_TOKEN`.
   - **`.changeset/initial-release.md`:** all five packages `minor` → `0.1.0`.
-  - **`README.md`** (Ukrainian): what this is; installing the plugin (`/plugin marketplace add dmytro-rudenko/tma-starter`, `/plugin install tma-starter@tma-starter`); `/tma-starter:new`; the packages; development (`pnpm db:start`, the Verification command); the «Release» section (register the `@dmytro-rudenko` scope, the `NPM_TOKEN` secret, the Version Packages PR).
+  - **`README.md`** (Ukrainian): what this is; installing the plugin (`/plugin marketplace add dmytro-rudenko/tma-starter`, `/plugin install tma-starter@tma-starter`); `/tma-starter:new`; the packages; development (`pnpm db:start`, the Verification command); the «Release» section (register the `@pctea` scope, the `NPM_TOKEN` secret, the Version Packages PR).
 - [x] Step 1: `node --test scripts/error-codes.test.mjs` → red (the file does not exist yet, then a code mismatch shows up if there is one).
 - [x] Step 2: implement all the files.
 - [x] Step 3: `node --test scripts/error-codes.test.mjs` → pass; `bash scripts/pack-check/run.sh` → `pack-check OK`; `npx --yes @action-validator/cli .github/workflows/ci.yml` (or `actionlint` when available) → no errors.
@@ -636,9 +636,9 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 **Executor:** claude
 **Complexity:** complex
 **Satisfies:** spec §6 «Після релізу `npm view …`» and the manual check of `/tma-starter:new`
-- [ ] Step 1: `gh secret list -R dmytro-rudenko/tma-starter` shows `NPM_TOKEN`. If it is missing, stop and ask the owner to register the `@dmytro-rudenko` scope and add the secret (README «Release»).
+- [ ] Step 1: `gh secret list -R dmytro-rudenko/tma-starter` shows `NPM_TOKEN`. If it is missing, stop and ask the owner to register the `@pctea` scope and add the secret (README «Release»).
 - [ ] Step 2: CI on PR #1 is green (`gh pr checks 1`). The PR becomes ready (journal close via `raj`), then merge with the owner's confirmation.
 - [ ] Step 3: `release.yml` opens «Version packages». After its CI is green, merge it with the owner's confirmation.
-- [ ] Step 4: `npm view @dmytro-rudenko/tma-<x>@0.1.0 version license` for all five packages → `0.1.0` and `MIT`; `npm view … dist.attestations` is not empty.
-- [ ] Step 5: in a clean directory, `pnpm add @dmytro-rudenko/tma-nest-core@0.1.0 @nestjs/common@^10.4 @nestjs/core@^10.4 knex pg reflect-metadata rxjs` → exit 0.
+- [ ] Step 4: `npm view @pctea/tma-<x>@0.1.0 version license` for all five packages → `0.1.0` and `MIT`; `npm view … dist.attestations` is not empty.
+- [ ] Step 5: in a clean directory, `pnpm add @pctea/tma-nest-core@0.1.0 @nestjs/common@^10.4 @nestjs/core@^10.4 knex pg reflect-metadata rxjs` → exit 0.
 - [ ] Step 6: `/plugin marketplace add dmytro-rudenko/tma-starter` → `/tma-starter:new` for both variants, following the spec §6 checklist (interview → green → commit → `pnpm dev` → `devUrl` → the «Адмін» section → in shop, test-mode purchase opens Premium).

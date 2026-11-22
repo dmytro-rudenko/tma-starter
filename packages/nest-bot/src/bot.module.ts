@@ -1,5 +1,5 @@
 import { DynamicModule, Global, Inject, Module, OnModuleInit } from '@nestjs/common';
-import { AdminUserCardRegistry, TMA_KNEX } from '@dmytro-rudenko/tma-nest-core';
+import { AdminUserCardRegistry, TMA_KNEX } from '@pctea/tma-nest-core';
 import { Knex } from 'knex';
 import { BotController } from './bot.controller';
 import { BroadcastAudienceRegistry } from './broadcast/audience.registry';

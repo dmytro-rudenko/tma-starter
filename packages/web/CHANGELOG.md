@@ -1,4 +1,4 @@
-# @dmytro-rudenko/tma-web
+# @pctea/tma-web
 
 ## 0.1.0
 

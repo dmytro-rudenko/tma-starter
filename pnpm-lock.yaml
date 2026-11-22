@@ -23,11 +23,11 @@ importers:
 
   packages/nest-bot:
     dependencies:
-      '@dmytro-rudenko/tma-nest-core':
+      '@pctea/tma-nest-core':
         specifier: workspace:*
         version: link:../nest-core
     devDependencies:
-      '@dmytro-rudenko/tma-testing':
+      '@pctea/tma-testing':
         specifier: workspace:*
         version: link:../testing
       '@nestjs/common':
@@ -102,7 +102,7 @@ importers:
 
   packages/nest-core:
     devDependencies:
-      '@dmytro-rudenko/tma-testing':
+      '@pctea/tma-testing':
         specifier: workspace:*
         version: link:../testing
       '@nestjs/common':
@@ -180,14 +180,14 @@ importers:
 
   packages/nest-payments:
     dependencies:
-      '@dmytro-rudenko/tma-nest-bot':
+      '@pctea/tma-nest-bot':
         specifier: workspace:*
         version: link:../nest-bot
-      '@dmytro-rudenko/tma-nest-core':
+      '@pctea/tma-nest-core':
         specifier: workspace:*
         version: link:../nest-core
     devDependencies:
-      '@dmytro-rudenko/tma-testing':
+      '@pctea/tma-testing':
         specifier: workspace:*
         version: link:../testing
       '@nestjs/common':
@@ -334,7 +334,7 @@ importers:
 
   packages/web:
     devDependencies:
-      '@dmytro-rudenko/tma-testing':
+      '@pctea/tma-testing':
         specifier: workspace:*
         version: link:../testing
       '@tanstack/react-query':

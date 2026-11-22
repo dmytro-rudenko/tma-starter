@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { apiError } from '@dmytro-rudenko/tma-nest-core';
+import { apiError } from '@pctea/tma-nest-core';
 import type { Knex } from 'knex';
 
 export interface BroadcastAudienceFilter {

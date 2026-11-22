@@ -1,7 +1,7 @@
-import { createTestApp } from '@dmytro-rudenko/tma-testing';
+import { createTestApp } from '@pctea/tma-testing';
 // tma:shop:start
-import { postWebhook, updates } from '@dmytro-rudenko/tma-testing';
-import { BotService } from '@dmytro-rudenko/tma-nest-bot';
+import { postWebhook, updates } from '@pctea/tma-testing';
+import { BotService } from '@pctea/tma-nest-bot';
 // tma:shop:end
 import { appImports } from '../src/app.module';
 import { migrations } from '../src/database/migrate';

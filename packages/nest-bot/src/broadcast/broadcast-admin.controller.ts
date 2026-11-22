@@ -9,7 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AdminGuard, AuthUser, CurrentUser } from '@dmytro-rudenko/tma-nest-core';
+import { AdminGuard, AuthUser, CurrentUser } from '@pctea/tma-nest-core';
 import { BroadcastAudienceFilterView, BroadcastAudienceRegistry } from './audience.registry';
 import {
   BroadcastPage,

@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { TMA_KNEX } from '@dmytro-rudenko/tma-nest-core';
+import { TMA_KNEX } from '@pctea/tma-nest-core';
 import { GrammyError } from 'grammy';
 import type { InlineKeyboardMarkup } from 'grammy/types';
 import { Knex } from 'knex';

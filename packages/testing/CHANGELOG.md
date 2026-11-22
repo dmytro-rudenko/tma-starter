@@ -1,4 +1,4 @@
-# @dmytro-rudenko/tma-testing
+# @pctea/tma-testing
 
 ## 0.1.0
 

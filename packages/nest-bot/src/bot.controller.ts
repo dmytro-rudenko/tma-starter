@@ -10,7 +10,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
-import { apiError, Public } from '@dmytro-rudenko/tma-nest-core';
+import { apiError, Public } from '@pctea/tma-nest-core';
 import { timingSafeEqual } from 'crypto';
 import type { Update } from 'grammy/types';
 import { BotService } from './bot.service';

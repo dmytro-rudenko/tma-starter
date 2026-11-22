@@ -1,6 +1,6 @@
 import { Controller, HttpCode, HttpStatus, Inject, Logger, Param, Post } from '@nestjs/common';
-import { apiError, AuthUser, CurrentUser, TMA_KNEX } from '@dmytro-rudenko/tma-nest-core';
-import { BotService, escapeHtml } from '@dmytro-rudenko/tma-nest-bot';
+import { apiError, AuthUser, CurrentUser, TMA_KNEX } from '@pctea/tma-nest-core';
+import { BotService, escapeHtml } from '@pctea/tma-nest-bot';
 import type { Knex } from 'knex';
 import {
   EntitlementRow,

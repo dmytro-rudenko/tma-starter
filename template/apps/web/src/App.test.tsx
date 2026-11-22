@@ -1,4 +1,4 @@
-import { installFakeWebApp } from '@dmytro-rudenko/tma-testing/dom';
+import { installFakeWebApp } from '@pctea/tma-testing/dom';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';

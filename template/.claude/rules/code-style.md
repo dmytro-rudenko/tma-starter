@@ -23,7 +23,7 @@
 | `apps/api` | jest, `*.spec.ts` | `test/*.spec.ts`, `test/*.acceptance.spec.ts` |
 | `apps/web` | vitest, `*.test.ts(x)` | — |
 
-Лише unit- і модульні тести: e2e і Playwright немає. API-тести піднімають `AppModule` через `createTestApp` з `@dmytro-rudenko/tma-testing` на реальному Postgres (`pnpm db:start`).
+Лише unit- і модульні тести: e2e і Playwright немає. API-тести піднімають `AppModule` через `createTestApp` з `@pctea/tma-testing` на реальному Postgres (`pnpm db:start`).
 
 ## Інструменти
 

@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { apiError, TMA_KNEX } from '@dmytro-rudenko/tma-nest-core';
-import { BotService } from '@dmytro-rudenko/tma-nest-bot';
+import { apiError, TMA_KNEX } from '@pctea/tma-nest-core';
+import { BotService } from '@pctea/tma-nest-bot';
 import type { StarTransaction } from 'grammy/types';
 import type { Knex } from 'knex';
 

@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const PREFIX = '@dmytro-rudenko/tma-';
+const PREFIX = '@pctea/tma-';
 const FIELDS = ['dependencies', 'devDependencies', 'optionalDependencies'];
 
 const wanted = process.argv[2] ?? 'latest';

@@ -4,13 +4,13 @@ import {
   TmaCoreModule,
   composeMigrations,
   migrations as coreMigrations,
-} from '@dmytro-rudenko/tma-nest-core';
+} from '@pctea/tma-nest-core';
 import {
   BroadcastAudienceRegistry,
   TmaBotModule,
   migrations as botMigrations,
-} from '@dmytro-rudenko/tma-nest-bot';
-import { createTestApp, createTestDatabase, waitFor } from '@dmytro-rudenko/tma-testing';
+} from '@pctea/tma-nest-bot';
+import { createTestApp, createTestDatabase, waitFor } from '@pctea/tma-testing';
 
 jest.setTimeout(120_000);
 

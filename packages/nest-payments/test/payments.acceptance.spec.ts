@@ -5,8 +5,8 @@ import {
   TmaCoreModule,
   composeMigrations,
   migrations as coreMigrations,
-} from '@dmytro-rudenko/tma-nest-core';
-import { TmaBotModule, migrations as botMigrations } from '@dmytro-rudenko/tma-nest-bot';
+} from '@pctea/tma-nest-core';
+import { TmaBotModule, migrations as botMigrations } from '@pctea/tma-nest-bot';
 import {
   EntitlementGuard,
   EntitlementsService,
@@ -14,14 +14,14 @@ import {
   Product,
   TmaPaymentsModule,
   migrations as paymentsMigrations,
-} from '@dmytro-rudenko/tma-nest-payments';
+} from '@pctea/tma-nest-payments';
 import {
   createTestApp,
   postWebhook,
   signInitData,
   updates,
   waitFor,
-} from '@dmytro-rudenko/tma-testing';
+} from '@pctea/tma-testing';
 
 jest.setTimeout(60_000);
 

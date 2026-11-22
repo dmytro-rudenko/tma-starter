@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
-import { langOf } from '@dmytro-rudenko/tma-nest-bot';
-import { AuthUser, CurrentUser, UsersService } from '@dmytro-rudenko/tma-nest-core';
+import { langOf } from '@pctea/tma-nest-bot';
+import { AuthUser, CurrentUser, UsersService } from '@pctea/tma-nest-core';
 
 const GREETING = {
   uk: (name: string) => `Привіт, ${name}!`,

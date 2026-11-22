@@ -6,10 +6,10 @@ const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 export default defineConfig({
   resolve: {
     alias: [
-      { find: '@dmytro-rudenko/tma-web/react', replacement: here('./src/react/index.ts') },
-      { find: '@dmytro-rudenko/tma-web', replacement: here('./src/index.ts') },
+      { find: '@pctea/tma-web/react', replacement: here('./src/react/index.ts') },
+      { find: '@pctea/tma-web', replacement: here('./src/index.ts') },
       {
-        find: '@dmytro-rudenko/tma-testing/dom',
+        find: '@pctea/tma-testing/dom',
         replacement: here('../testing/src/dom/index.ts'),
       },
     ],

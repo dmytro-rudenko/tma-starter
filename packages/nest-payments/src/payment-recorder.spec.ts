@@ -3,9 +3,9 @@ import {
   UsersService,
   composeMigrations,
   migrations as coreMigrations,
-} from '@dmytro-rudenko/tma-nest-core';
-import { TmaBotModule, migrations as botMigrations } from '@dmytro-rudenko/tma-nest-bot';
-import { createTestApp } from '@dmytro-rudenko/tma-testing';
+} from '@pctea/tma-nest-core';
+import { TmaBotModule, migrations as botMigrations } from '@pctea/tma-nest-bot';
+import { createTestApp } from '@pctea/tma-testing';
 import { makePayload } from './invoice-payload';
 import { migrations as paymentsMigrations } from './migrations';
 import { PaidInput, PaidOutcome, PaymentRecorder } from './payment-recorder';

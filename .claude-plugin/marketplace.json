@@ -1,6 +1,6 @@
 {
   "name": "tma-starter",
-  "description": "Scaffold Telegram Mini Apps on @dmytro-rudenko/tma-* packages",
+  "description": "Scaffold Telegram Mini Apps on @pctea/tma-* packages",
   "owner": {
     "name": "Dmytro Rudenko"
   },
@@ -9,7 +9,7 @@
       "name": "tma-starter",
       "source": "./",
       "license": "MIT",
-      "description": "Scaffold Telegram Mini Apps on @dmytro-rudenko/tma-* packages: users, admin rights, Telegram Stars payments",
+      "description": "Scaffold Telegram Mini Apps on @pctea/tma-* packages: users, admin rights, Telegram Stars payments",
       "category": "Development",
       "keywords": ["telegram", "mini-app", "tma", "nestjs", "scaffold"]
     }

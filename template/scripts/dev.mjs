@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
-import testing from '@dmytro-rudenko/tma-testing';
+import testing from '@pctea/tma-testing';
 
 const { devUrl, startFakeBotApi } = testing;
 

@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { createTestDatabase, TestDatabase } from '@dmytro-rudenko/tma-testing';
+import { createTestDatabase, TestDatabase } from '@pctea/tma-testing';
 import { TmaCoreModule } from '../core.module';
 import { migrations } from '../migrations';
 import { UsersService } from './users.service';

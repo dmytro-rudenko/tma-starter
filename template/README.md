@@ -1,6 +1,6 @@
 # __APP_TITLE__
 
-Telegram Mini App на `@dmytro-rudenko/tma-*`: вхід через Telegram, адмінка, бот із розсилками, платежі Telegram Stars і realtime вже підключені. Свій код живе в `apps/api/src/features/` і `apps/web/src/features/`, приклад — модуль `example`.
+Telegram Mini App на `@pctea/tma-*`: вхід через Telegram, адмінка, бот із розсилками, платежі Telegram Stars і realtime вже підключені. Свій код живе в `apps/api/src/features/` і `apps/web/src/features/`, приклад — модуль `example`.
 
 - `apps/api` — NestJS 10, Knex, PostgreSQL 16, grammY.
 - `apps/web` — React 18, Vite 5, TanStack Query 5, i18next.
@@ -39,7 +39,7 @@ pnpm dev                 # фейковий Bot API :3199, API :3100, Vite :5173
 
 ## Оновлення пакетів
 
-Усі `@dmytro-rudenko/tma-*` закріплені однією точною версією і в залежностях застосунків, і в `pnpm.overrides` кореневого `package.json`. Overrides тримають одну копію кожного пакета на весь workspace, а `pnpm up` їх не змінює, тому оновлюйте так:
+Усі `@pctea/tma-*` закріплені однією точною версією і в залежностях застосунків, і в `pnpm.overrides` кореневого `package.json`. Overrides тримають одну копію кожного пакета на весь workspace, а `pnpm up` їх не змінює, тому оновлюйте так:
 
 ```bash
 pnpm tma:upgrade

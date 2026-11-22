@@ -19,8 +19,8 @@ import {
   TMA_KNEX,
   UserIdPipe,
   UsersService,
-} from '@dmytro-rudenko/tma-nest-core';
-import { BotService } from '@dmytro-rudenko/tma-nest-bot';
+} from '@pctea/tma-nest-core';
+import { BotService } from '@pctea/tma-nest-bot';
 import type { Knex } from 'knex';
 import { EntitlementRow, EntitlementView, toEntitlementView } from './entitlements.service';
 import { ProductRegistry } from './product.registry';

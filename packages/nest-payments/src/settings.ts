@@ -1,4 +1,4 @@
-import { defineSetting } from '@dmytro-rudenko/tma-nest-core';
+import { defineSetting } from '@pctea/tma-nest-core';
 
 export const PAYMENTS_TEST_USERS = defineSetting<number[]>({
   key: 'payments.test_users',

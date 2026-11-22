@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { installFakeWebApp } from '@dmytro-rudenko/tma-testing/dom';
-import { ApiError, createApiClient } from '@dmytro-rudenko/tma-web';
+import { installFakeWebApp } from '@pctea/tma-testing/dom';
+import { ApiError, createApiClient } from '@pctea/tma-web';
 
 function stubResponse(res: Response) {
   const fetchMock = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => res);

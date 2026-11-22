@@ -3,8 +3,8 @@ import {
   TmaCoreModule,
   composeMigrations,
   migrations as coreMigrations,
-} from '@dmytro-rudenko/tma-nest-core';
-import { createTestApp } from '@dmytro-rudenko/tma-testing';
+} from '@pctea/tma-nest-core';
+import { createTestApp } from '@pctea/tma-testing';
 import { NotificationsService, TmaBotModule, migrations as botMigrations } from './index';
 import { guard } from './notifications.service';
 

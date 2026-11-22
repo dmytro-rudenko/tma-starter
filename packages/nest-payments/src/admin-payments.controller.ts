@@ -9,7 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AdminGuard, apiError, AuthUser, CurrentUser, TMA_KNEX } from '@dmytro-rudenko/tma-nest-core';
+import { AdminGuard, apiError, AuthUser, CurrentUser, TMA_KNEX } from '@pctea/tma-nest-core';
 import type { Knex } from 'knex';
 import type { PaymentRow, PaymentStatus } from './product';
 import { ReconcileReport, ReconcileService } from './reconcile.service';

@@ -2,9 +2,9 @@ import {
   TmaCoreModule,
   composeMigrations,
   migrations as coreMigrations,
-} from '@dmytro-rudenko/tma-nest-core';
-import { TmaBotModule, migrations as botMigrations } from '@dmytro-rudenko/tma-nest-bot';
-import { createTestApp, postWebhook, updates, waitFor } from '@dmytro-rudenko/tma-testing';
+} from '@pctea/tma-nest-core';
+import { TmaBotModule, migrations as botMigrations } from '@pctea/tma-nest-bot';
+import { createTestApp, postWebhook, updates, waitFor } from '@pctea/tma-testing';
 import { migrations as paymentsMigrations } from './migrations';
 import { TmaPaymentsModule } from './payments.module';
 import type { Product } from './product';

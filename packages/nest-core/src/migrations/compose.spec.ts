@@ -1,5 +1,5 @@
 import type { Knex } from 'knex';
-import { createTestDatabase, TestDatabase } from '@dmytro-rudenko/tma-testing';
+import { createTestDatabase, TestDatabase } from '@pctea/tma-testing';
 import { composeMigrations } from './compose';
 import { migrations } from './index';
 

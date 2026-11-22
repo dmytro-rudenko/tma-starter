@@ -1,4 +1,4 @@
-import type { TgUser, UsersService } from '@dmytro-rudenko/tma-nest-core';
+import type { TgUser, UsersService } from '@pctea/tma-nest-core';
 import type { Knex } from 'knex';
 import type { PaymentRow, PaymentStatus, Product } from './product';
 

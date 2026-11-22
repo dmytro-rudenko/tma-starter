@@ -8,14 +8,14 @@ import {
   TmaCoreModule,
   composeMigrations,
   migrations as coreMigrations,
-} from '@dmytro-rudenko/tma-nest-core';
+} from '@pctea/tma-nest-core';
 import {
   BotService,
   BroadcastAudienceRegistry,
   NotificationsService,
   TmaBotModule,
   migrations as botMigrations,
-} from '@dmytro-rudenko/tma-nest-bot';
+} from '@pctea/tma-nest-bot';
 import {
   createTestApp,
   createTestDatabase,
@@ -23,7 +23,7 @@ import {
   startFakeBotApi,
   updates,
   waitFor,
-} from '@dmytro-rudenko/tma-testing';
+} from '@pctea/tma-testing';
 
 jest.setTimeout(120_000);
 
@@ -546,7 +546,7 @@ describe('tma-nest-bot acceptance', () => {
 
   it('tma-bot setup: calls setWebhook then profile methods; exit 1 when setWebhook fails, exit 2 when profile fails', async () => {
     const bin = join(
-      dirname(require.resolve('@dmytro-rudenko/tma-nest-bot/package.json')),
+      dirname(require.resolve('@pctea/tma-nest-bot/package.json')),
       'dist/bin/tma-bot.js',
     );
     const dir = mkdtempSync(join(tmpdir(), 'tma-bot-setup-'));

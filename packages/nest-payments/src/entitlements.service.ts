@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { TMA_KNEX } from '@dmytro-rudenko/tma-nest-core';
+import { TMA_KNEX } from '@pctea/tma-nest-core';
 import type { Knex } from 'knex';
 
 export type EntitlementSource = 'subscription' | 'one_time' | 'grant';

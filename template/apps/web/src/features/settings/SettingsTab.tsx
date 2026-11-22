@@ -1,5 +1,5 @@
-import type { Lang, ThemePref, UpdateMeDto } from '@dmytro-rudenko/tma-web';
-import { useMe, useTma, useUpdateMe } from '@dmytro-rudenko/tma-web/react';
+import type { Lang, ThemePref, UpdateMeDto } from '@pctea/tma-web';
+import { useMe, useTma, useUpdateMe } from '@pctea/tma-web/react';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useErrorMessage } from '../../api/errorText';

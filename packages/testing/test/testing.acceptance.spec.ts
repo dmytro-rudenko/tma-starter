@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from 'crypto';
 import type { Knex } from 'knex';
 import { knex as createKnex } from 'knex';
-import { createTestDatabase, devUrl, startFakeBotApi } from '@dmytro-rudenko/tma-testing';
+import { createTestDatabase, devUrl, startFakeBotApi } from '@pctea/tma-testing';
 
 jest.setTimeout(60_000);
 

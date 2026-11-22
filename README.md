@@ -1,6 +1,6 @@
 # tma-starter
 
-Плагін для Claude Code і набір npm-пакетів `@dmytro-rudenko/tma-*` для Telegram Mini Apps. Плагін за кілька питань генерує готовий застосунок (NestJS API + React web) з користувачами, правами адміна, ботом і оплатою Telegram Stars. Уся спільна логіка живе в пакетах, тож шаблон лишається тонким, а оновлення приходять звичайним оновленням залежностей.
+Плагін для Claude Code і набір npm-пакетів `@pctea/tma-*` для Telegram Mini Apps. Плагін за кілька питань генерує готовий застосунок (NestJS API + React web) з користувачами, правами адміна, ботом і оплатою Telegram Stars. Уся спільна логіка живе в пакетах, тож шаблон лишається тонким, а оновлення приходять звичайним оновленням залежностей.
 
 ## Встановлення плагіна
 
@@ -23,11 +23,11 @@ Skill опитує про варіант (`empty` або `shop`), назву, us
 
 | Пакет | Призначення |
 | --- | --- |
-| `@dmytro-rudenko/tma-nest-core` | Авторизація через Telegram initData, користувачі, права адміна, `app_settings`, аудит, realtime, міграції |
-| `@dmytro-rudenko/tma-nest-bot` | Webhook бота на grammy, сповіщення, розсилки, CLI `tma-bot` |
-| `@dmytro-rudenko/tma-nest-payments` | Telegram Stars: разові покупки, підписки, refund, entitlements, reconcile |
-| `@dmytro-rudenko/tma-web` | Клієнтська частина: `tg`, api-клієнт, i18n, React-хуки (`/react`) |
-| `@dmytro-rudenko/tma-testing` | Тестові утиліти: підпис initData, `FakeBotApi`, `createTestApp`, шаблонна БД, CLI `tma-test-pg` |
+| `@pctea/tma-nest-core` | Авторизація через Telegram initData, користувачі, права адміна, `app_settings`, аудит, realtime, міграції |
+| `@pctea/tma-nest-bot` | Webhook бота на grammy, сповіщення, розсилки, CLI `tma-bot` |
+| `@pctea/tma-nest-payments` | Telegram Stars: разові покупки, підписки, refund, entitlements, reconcile |
+| `@pctea/tma-web` | Клієнтська частина: `tg`, api-клієнт, i18n, React-хуки (`/react`) |
+| `@pctea/tma-testing` | Тестові утиліти: підпис initData, `FakeBotApi`, `createTestApp`, шаблонна БД, CLI `tma-test-pg` |
 
 ## Розробка
 
@@ -59,14 +59,14 @@ bash scripts/smoke-template.sh shop
 
 Одноразове налаштування власником:
 
-1. Зареєструвати npm scope `@dmytro-rudenko`.
+1. Зареєструвати npm scope `@pctea`.
 2. Створити npm-токен з правом публікації і додати його в репозиторій як секрет `NPM_TOKEN` (Settings, Secrets and variables, Actions).
 
 Далі реліз іде через `.github/workflows/release.yml`:
 
 1. Після merge у `main` `changesets/action` запускає `pnpm run version-packages` і відкриває PR «Version Packages»: піднімає версії всіх п'яти пакетів, а `scripts/sync-plugin-version.mjs` переписує `version` у `.claude-plugin/plugin.json` і `skills/new/SKILL.md`.
 2. Merge цього PR запускає `pnpm run release` (`pnpm -r build` і `changeset publish`) з `NPM_TOKEN` і `NPM_CONFIG_PROVENANCE=true`, тож пакети публікуються з provenance.
-3. Перевірка: `npm view @dmytro-rudenko/tma-nest-core@<версія>` показує версію, ліцензію MIT і provenance; те саме для решти чотирьох пакетів.
+3. Перевірка: `npm view @pctea/tma-nest-core@<версія>` показує версію, ліцензію MIT і provenance; те саме для решти чотирьох пакетів.
 
 Першу версію `0.1.0` дає `.changeset/initial-release.md`.
 

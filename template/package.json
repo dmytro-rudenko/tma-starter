@@ -17,7 +17,7 @@
     "test": "pnpm -r test"
   },
   "devDependencies": {
-    "@dmytro-rudenko/tma-testing": "__TMA_VERSION__",
+    "@pctea/tma-testing": "__TMA_VERSION__",
     "@types/node": "^26",
     "pg": "^8.13.0",
     "prettier": "^3.3.3",
@@ -29,11 +29,11 @@
       "esbuild"
     ],
     "overrides": {
-      "@dmytro-rudenko/tma-nest-core": "__TMA_VERSION__",
-      "@dmytro-rudenko/tma-nest-bot": "__TMA_VERSION__",
-      "@dmytro-rudenko/tma-nest-payments": "__TMA_VERSION__",
-      "@dmytro-rudenko/tma-web": "__TMA_VERSION__",
-      "@dmytro-rudenko/tma-testing": "__TMA_VERSION__"
+      "@pctea/tma-nest-core": "__TMA_VERSION__",
+      "@pctea/tma-nest-bot": "__TMA_VERSION__",
+      "@pctea/tma-nest-payments": "__TMA_VERSION__",
+      "@pctea/tma-web": "__TMA_VERSION__",
+      "@pctea/tma-testing": "__TMA_VERSION__"
     }
   }
 }

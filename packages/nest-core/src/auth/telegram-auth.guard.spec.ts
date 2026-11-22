@@ -1,7 +1,7 @@
 import { HttpException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
-import { signInitData } from '@dmytro-rudenko/tma-testing';
+import { signInitData } from '@pctea/tma-testing';
 import { resolveCoreOptions } from '../options';
 import type { UsersService } from '../users/users.service';
 import { Public } from './public.decorator';

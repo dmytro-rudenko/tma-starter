@@ -1,4 +1,4 @@
-# @dmytro-rudenko/tma-nest-core
+# @pctea/tma-nest-core
 
 ## 0.1.0
 

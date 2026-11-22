@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { apiError, AuditService, TMA_KNEX } from '@dmytro-rudenko/tma-nest-core';
+import { apiError, AuditService, TMA_KNEX } from '@pctea/tma-nest-core';
 import { GrammyError } from 'grammy';
 import type { InlineKeyboardMarkup } from 'grammy/types';
 import { Knex } from 'knex';

@@ -6,7 +6,7 @@ import {
   TMA_KNEX,
   TmaUser,
   UsersService,
-} from '@dmytro-rudenko/tma-nest-core';
+} from '@pctea/tma-nest-core';
 import { Bot, Context, Filter, FilterQuery, matchFilter, Middleware } from 'grammy';
 import type { InlineKeyboardMarkup, Update, UserFromGetMe } from 'grammy/types';
 import { Knex } from 'knex';

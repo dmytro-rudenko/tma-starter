@@ -4,8 +4,8 @@ import {
   apiError,
   AppSettingsRegistry,
   TMA_KNEX,
-} from '@dmytro-rudenko/tma-nest-core';
-import { BotService, BroadcastAudienceRegistry } from '@dmytro-rudenko/tma-nest-bot';
+} from '@pctea/tma-nest-core';
+import { BotService, BroadcastAudienceRegistry } from '@pctea/tma-nest-bot';
 import type { Knex } from 'knex';
 import { AdminEntitlementsController } from './admin-entitlements.controller';
 import { AdminPaymentsController, toPaymentView } from './admin-payments.controller';
