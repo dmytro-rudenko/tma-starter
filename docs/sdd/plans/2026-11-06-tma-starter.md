@@ -556,10 +556,10 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - **`bot/profile.json`:** `menuButtonText: "__APP_TITLE__"`, uk/en descriptions, commands `start` and `help`.
   - **Tests:** `app.acceptance.spec.ts` covers `/api/health`, `/api/me`, `/api/example/hello`, 403 on `/api/admin/users` for a non-admin, plus a marker block `tma:shop` with the case "premium paid → `GET /api/premium/content` 200, without it 403". `env.spec.ts` covers the required variables.
 - Consumes: all the APIs of Tasks 3–9.
-- [ ] Step 1: write the template tests (the files above).
-- [ ] Step 2: `bash scripts/smoke-template.sh empty` → it fails at install or tests.
-- [ ] Step 3: implement.
-- [ ] Step 4: `bash scripts/smoke-template.sh empty` → the api part is green. The web part comes in Task 14, which runs in the same wave; the full `smoke OK: empty` happens after both are done.
+- [x] Step 1: write the template tests (the files above).
+- [x] Step 2: `bash scripts/smoke-template.sh empty` → it fails at install or tests.
+- [x] Step 3: implement.
+- [x] Step 4: `bash scripts/smoke-template.sh empty` → the api part is green. The web part comes in Task 14, which runs in the same wave; the full `smoke OK: empty` happens after both are done.
 
 ### Task 14: template — `apps/web` (base screens and admin)
 **Writes:** `template/apps/web/{package.json,tsconfig.json,vite.config.ts,index.html}`, `template/apps/web/src/{main.tsx,App.tsx}`, `template/apps/web/src/state/{stack.ts,tabs.ts}`, `template/apps/web/src/features/registry.tsx`, `template/apps/web/src/features/{home,settings,nav}/**`, `template/apps/web/src/features/admin/{AdminUsersSheet,AdminUserSheet,AdminSettingsSheet,AdminBroadcastsSheet,AdminBroadcastSheet,AdminBroadcastNewSheet,AdminPaymentsSheet,AdminAuditSheet,AdminConfirm}.tsx`, `template/apps/web/src/features/admin/Admin.module.css`, `template/apps/web/src/components/**`, `template/apps/web/src/theme/{tokens.css,global.css}`, `template/apps/web/src/i18n/{index.ts,uk.json,en.json}`, `template/apps/web/src/api/{client.ts,errorText.ts,adminHooks.ts}`, `template/apps/web/src/**/*.test.tsx`
@@ -579,10 +579,10 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
     - the settings editor picks its control by the type of `default`.
 - Tests (vitest + jsdom + `installFakeWebApp`): `i18n.test.ts` (key parity uk/en), `errorText.test.ts` (covers all of `TMA_ERROR_CODES`), `AdminSettingsSheet.test.tsx` (boolean/number/string/number[]/json), `AdminUserSheet.test.tsx` (renders `cards.bot`, `cards.payments`).
 - Consumes: `@dmytro-rudenko/tma-web` and `./react` (Task 9).
-- [ ] Step 1: write the tests.
-- [ ] Step 2: inside `smoke-template.sh empty` (or a local scaffold into `/tmp`), `pnpm --filter @smoke-app/web test` → red.
-- [ ] Step 3: implement. Port `Sheet`, `FullscreenLayer`, `Toast`, `Avatar`, `AdminConfirm`, `BlockedScreen` and `useDebounced` without changes.
-- [ ] Step 4: `bash scripts/smoke-template.sh empty` → `smoke OK: empty`. This requires Task 13.
+- [x] Step 1: write the tests.
+- [x] Step 2: inside `smoke-template.sh empty` (or a local scaffold into `/tmp`), `pnpm --filter @smoke-app/web test` → red.
+- [x] Step 3: implement. Port `Sheet`, `FullscreenLayer`, `Toast`, `Avatar`, `AdminConfirm`, `BlockedScreen` and `useDebounced` without changes.
+- [x] Step 4: `bash scripts/smoke-template.sh empty` → `smoke OK: empty`. This requires Task 13.
 
 ### Task 15: template — shop variant
 **Writes:** `template/apps/api/src/shop/{shop.module.ts,premium.controller.ts}`, `template/apps/web/src/features/shop/{ShopTab.tsx,PaywallSheet.tsx,PremiumBlock.tsx,SubscriptionSection.tsx,ShopTab.test.tsx,PremiumBlock.test.tsx}`, `template/apps/web/src/i18n/{shop.uk.json,shop.en.json}`
@@ -626,9 +626,9 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
     - `permissions: { contents: write, pull-requests: write, id-token: write }`, env `NPM_TOKEN`.
   - **`.changeset/initial-release.md`:** all five packages `minor` → `0.1.0`.
   - **`README.md`** (Ukrainian): what this is; installing the plugin (`/plugin marketplace add dmytro-rudenko/tma-starter`, `/plugin install tma-starter@tma-starter`); `/tma-starter:new`; the packages; development (`pnpm db:start`, the Verification command); the «Release» section (register the `@dmytro-rudenko` scope, the `NPM_TOKEN` secret, the Version Packages PR).
-- [ ] Step 1: `node --test scripts/error-codes.test.mjs` → red (the file does not exist yet, then a code mismatch shows up if there is one).
-- [ ] Step 2: implement all the files.
-- [ ] Step 3: `node --test scripts/error-codes.test.mjs` → pass; `bash scripts/pack-check/run.sh` → `pack-check OK`; `npx --yes @action-validator/cli .github/workflows/ci.yml` (or `actionlint` when available) → no errors.
+- [x] Step 1: `node --test scripts/error-codes.test.mjs` → red (the file does not exist yet, then a code mismatch shows up if there is one).
+- [x] Step 2: implement all the files.
+- [x] Step 3: `node --test scripts/error-codes.test.mjs` → pass; `bash scripts/pack-check/run.sh` → `pack-check OK`; `npx --yes @action-validator/cli .github/workflows/ci.yml` (or `actionlint` when available) → no errors.
 
 ### Task 17: release 0.1.0
 **Writes:** — (only the merges of PR #1 and the Version Packages PR; files are changed by `release.yml`)

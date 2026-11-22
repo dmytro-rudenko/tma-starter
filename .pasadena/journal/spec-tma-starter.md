@@ -14,10 +14,8 @@ started: 2026-11-06
 який проходить свої тести й стартує локально.
 
 ## Now
-Хвилі 0–7 закриті (8a5cc63): усі 5 пакетів зелені разом з acceptance. Хвиля 8: Tasks 13 (template root+api), 14 (template web), 16 (repo CI/manifest).
-GROUP_BASE: 5ba6476
-Шаблон тестується через scaffold у тимчасову теку з TMA_PLUGIN_ROOT (plugin.json з'являється в Task 16 цієї ж хвилі).
-Контекст Task 13: pnpm.overrides для tma-* у template/package.json, template/.dockerignore. На Finish: prettier --write.
+Хвилі 0–8 закриті (8ac81d5): smoke OK: empty, pack-check OK. PR #1 змержено передчасно; продовження йде новим PR із тієї ж гілки. Хвиля 9: Task 15 (shop) — `bash skills/new/scaffold.test.sh` і `bash scripts/smoke-template.sh shop`.
+Postgres 16 для тестів: Docker-контейнер tma-test-pg-docker на 127.0.0.1:54329 (на хості лише PG 13, `pnpm db:start` не працює).
 
 ## Timeline
 
@@ -76,3 +74,14 @@ GROUP_BASE: 5ba6476
 - 22:35 ● f59f5aa feat(nest-payments): refunds, subscription cancel, admin API and reconcile
 - 22:35 ● 8a5cc63 docs(plan): tick wave 7
 - 22:35 ✎ Хвиля 7: nest-payments B, усі пакети та їхні acceptance зелені
+- 22:35 ● 9afaa01 chore(journal): wave 7 closed
+
+### 2026-11-07
+- 08:56 ⏸ pause · exit · HEAD=9afaa01 · dirty: scripts/error-codes.test.mjs,scripts/sync-plugin-version.test.mjs,template/.dockerignore
+
+### 2026-11-22
+- 11:45 ✎ Відновлено після передчасного merge PR #1; гілку fast-forward до main d06397e
+- 11:45 ● 66c444a feat(template): workspace root and apps/api on tma-* packages
+- 11:45 ● 564e72f feat(template): apps/web base screens and admin sheets
+- 11:45 ● 8ac81d5 ci: plugin manifest, CI and release workflows, pack-check
+- 11:45 ✎ Хвиля 8: smoke empty зелений, pack-check OK, error-codes 5/5. Ruling: template/.dockerignore → Task 13, scripts/sync-plugin-version.test.mjs → Task 16 — не були в Writes — ціна помилки нульова. mutator: skipped (код хвилі вже існував; тести перевірені ручними мутаціями агентів)
