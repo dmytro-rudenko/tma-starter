@@ -1,4 +1,4 @@
-import { ApiError, TMA_ERROR_CODES } from '@pctea/tma-web';
+import { ApiError, TMA_ERROR_CODES } from '@pctea/tma/web';
 import { describe, expect, it } from 'vitest';
 import { errorMessage, errorText } from './errorText';
 

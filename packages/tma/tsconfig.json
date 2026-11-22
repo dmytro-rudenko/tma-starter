@@ -1,0 +1,28 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "node16",
+    "moduleResolution": "node16",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true,
+    "paths": {
+      "@pctea/tma/*": ["./src/*"]
+    },
+    "types": [
+      "node",
+      "jest"
+    ]
+  },
+  "include": [
+    "src/nest-core/**/*.ts",
+    "src/nest-bot/**/*.ts",
+    "src/nest-payments/**/*.ts",
+    "src/testing/**/*.ts",
+    "test/nest-core/**/*.ts",
+    "test/nest-bot/**/*.ts",
+    "test/nest-payments/**/*.ts",
+    "test/testing/**/*.ts"
+  ]
+}

@@ -12,7 +12,7 @@ const script = path.join(root, 'scripts/sync-plugin-version.mjs');
 const pluginJson = {
   name: 'tma-starter',
   version: '0.0.0',
-  description: 'Scaffold Telegram Mini Apps on @pctea/tma-* packages',
+  description: 'Scaffold Telegram Mini Apps on @pctea/tma',
   author: { name: 'Dmytro Rudenko' },
   license: 'MIT',
   repository: 'https://github.com/dmytro-rudenko/tma-starter',
@@ -30,12 +30,12 @@ version: 9.9.9
 
 function makeFixture() {
   const dir = mkdtempSync(path.join(tmpdir(), 'sync-plugin-version-'));
-  mkdirSync(path.join(dir, 'packages/nest-core'), { recursive: true });
+  mkdirSync(path.join(dir, 'packages/tma'), { recursive: true });
   mkdirSync(path.join(dir, '.claude-plugin'), { recursive: true });
   mkdirSync(path.join(dir, 'skills/new'), { recursive: true });
 
-  const corePkgText = JSON.stringify({ name: '@pctea/tma-nest-core', version: '1.2.3' }, null, 2) + '\n';
-  writeFileSync(path.join(dir, 'packages/nest-core/package.json'), corePkgText);
+  const corePkgText = JSON.stringify({ name: '@pctea/tma', version: '1.2.3' }, null, 2) + '\n';
+  writeFileSync(path.join(dir, 'packages/tma/package.json'), corePkgText);
 
   writeFileSync(path.join(dir, '.claude-plugin/plugin.json'), JSON.stringify(pluginJson, null, 2) + '\n');
 
@@ -44,7 +44,7 @@ function makeFixture() {
   return { dir, corePkgText };
 }
 
-test('copies the nest-core version into plugin.json and SKILL.md frontmatter', (t) => {
+test('copies the @pctea/tma version into plugin.json and SKILL.md frontmatter', (t) => {
   const { dir, corePkgText } = makeFixture();
   t.after(() => rmSync(dir, { recursive: true, force: true }));
 
@@ -58,7 +58,7 @@ test('copies the nest-core version into plugin.json and SKILL.md frontmatter', (
   const expectedSkill = skill.replace('version: 0.4.2', 'version: 1.2.3');
   assert.equal(readFileSync(path.join(dir, 'skills/new/SKILL.md'), 'utf8'), expectedSkill);
 
-  assert.equal(readFileSync(path.join(dir, 'packages/nest-core/package.json'), 'utf8'), corePkgText);
+  assert.equal(readFileSync(path.join(dir, 'packages/tma/package.json'), 'utf8'), corePkgText);
 });
 
 test('running it twice leaves the files unchanged', (t) => {

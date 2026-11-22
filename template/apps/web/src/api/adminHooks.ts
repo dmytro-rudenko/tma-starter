@@ -3,8 +3,8 @@ import type {
   BroadcastAudience,
   BroadcastDto,
   PaymentStatus,
-} from '@pctea/tma-web';
-import { useTma } from '@pctea/tma-web/react';
+} from '@pctea/tma/web';
+import { useTma } from '@pctea/tma/web/react';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const adminKeys = {

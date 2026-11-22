@@ -1,5 +1,5 @@
-import { tg, type BroadcastAudience, type Lang } from '@pctea/tma-web';
-import { useProducts, useTma } from '@pctea/tma-web/react';
+import { tg, type BroadcastAudience, type Lang } from '@pctea/tma/web';
+import { useProducts, useTma } from '@pctea/tma/web/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -1,5 +1,5 @@
-import type { EntitlementDto } from '@pctea/tma-web';
-import { tmaKeys, useProducts, useTma } from '@pctea/tma-web/react';
+import type { EntitlementDto } from '@pctea/tma/web';
+import { tmaKeys, useProducts, useTma } from '@pctea/tma/web/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

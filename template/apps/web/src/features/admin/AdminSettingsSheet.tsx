@@ -1,5 +1,5 @@
-import { ApiError, tg, type AdminSetting } from '@pctea/tma-web';
-import { useTma } from '@pctea/tma-web/react';
+import { ApiError, tg, type AdminSetting } from '@pctea/tma/web';
+import { useTma } from '@pctea/tma/web/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';

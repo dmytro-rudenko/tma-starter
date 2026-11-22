@@ -4,7 +4,7 @@ import {
   escapeHtml,
   ResolvedTmaBotOptions,
   TMA_BOT_OPTIONS,
-} from '@pctea/tma-nest-bot';
+} from '@pctea/tma/nest-bot';
 import { PremiumController } from './premium.controller';
 
 const SHOP_BUTTON = { uk: '🛍 Магазин', en: '🛍 Shop' };

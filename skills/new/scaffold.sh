@@ -150,7 +150,7 @@ if [ "$VARIANT" = shop ] && [ -n "$PRODUCTS" ]; then
     const fs = require("fs");
     const list = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
     const s = JSON.stringify;
-    const lines = ["import type { Product } from \"@pctea/tma-nest-payments\";", "", "export const products: Product[] = ["];
+    const lines = ["import type { Product } from \"@pctea/tma/nest-payments\";", "", "export const products: Product[] = ["];
     for (const p of list) {
       lines.push("  {");
       lines.push("    id: " + s(p.id) + ",");
@@ -192,7 +192,7 @@ done < <(find "$DIR" -depth -name '*__*__*' -print0)
 if [ -n "$TMA_SOURCE" ]; then
   export TMA_SOURCE
   while IFS= read -r -d '' f; do
-    perl -pi -e 's{"(\@pctea/tma-([a-z0-9-]+))"(\s*):(\s*)"([^"]+)"}{"$1"$3:$4"file:$ENV{TMA_SOURCE}/pctea-tma-$2-$5.tgz"}g' "$f"
+    perl -pi -e 's{"(\@pctea/tma)"(\s*):(\s*)"([^"]+)"}{"$1"$2:$3"file:$ENV{TMA_SOURCE}/pctea-tma-$4.tgz"}g' "$f"
   done < <(find "$DIR" -name package.json -type f -not -path '*/node_modules/*' -print0)
 fi
 

@@ -7,7 +7,7 @@ const root = process.argv[2]
   : path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const { version } = JSON.parse(
-  readFileSync(path.join(root, 'packages/nest-core/package.json'), 'utf8'),
+  readFileSync(path.join(root, 'packages/tma/package.json'), 'utf8'),
 );
 
 const pluginPath = path.join(root, '.claude-plugin/plugin.json');

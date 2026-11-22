@@ -1,6 +1,6 @@
 # tma-starter
 
-Плагін для Claude Code і набір npm-пакетів `@pctea/tma-*` для Telegram Mini Apps. Плагін за кілька питань генерує готовий застосунок (NestJS API + React web) з користувачами, правами адміна, ботом і оплатою Telegram Stars. Уся спільна логіка живе в пакетах, тож шаблон лишається тонким, а оновлення приходять звичайним оновленням залежностей.
+Плагін для Claude Code і npm-пакет `@pctea/tma` для Telegram Mini Apps. Плагін за кілька питань генерує готовий застосунок (NestJS API + React web) з користувачами, правами адміна, ботом і оплатою Telegram Stars. Уся спільна логіка живе в пакеті, тож шаблон лишається тонким, а оновлення приходять звичайним оновленням залежностей.
 
 ## Встановлення плагіна
 
@@ -17,17 +17,19 @@
 
 Skill опитує про варіант (`empty` або `shop`), назву, username бота, домен, мову й акцентний колір, генерує проєкт із шаблону, ставить залежності, доводить тести до зелених і робить перший коміт. Деплой, GitHub-репозиторій і секрети skill не чіпає.
 
-## Пакети
+## Пакет
 
-Усі п'ять пакетів виходять одним релізом з однією версією (`fixed` у changesets).
+`@pctea/tma` — один пакет з однією версією. Серверні підшляхи зібрані в CommonJS, web-підшляхи — в ESM; кожен має `.d.ts`. Усі peer-залежності опційні: серверному застосунку не потрібні React чи i18next, а web-застосунку — Nest чи knex.
 
-| Пакет | Призначення |
+| Підшлях | Призначення |
 | --- | --- |
-| `@pctea/tma-nest-core` | Авторизація через Telegram initData, користувачі, права адміна, `app_settings`, аудит, realtime, міграції |
-| `@pctea/tma-nest-bot` | Webhook бота на grammy, сповіщення, розсилки, CLI `tma-bot` |
-| `@pctea/tma-nest-payments` | Telegram Stars: разові покупки, підписки, refund, entitlements, reconcile |
-| `@pctea/tma-web` | Клієнтська частина: `tg`, api-клієнт, i18n, React-хуки (`/react`) |
-| `@pctea/tma-testing` | Тестові утиліти: підпис initData, `FakeBotApi`, `createTestApp`, шаблонна БД, CLI `tma-test-pg` |
+| `@pctea/tma/nest-core` | Авторизація через Telegram initData, користувачі, права адміна, `app_settings`, аудит, realtime, міграції |
+| `@pctea/tma/nest-bot` | Webhook бота на grammy, сповіщення, розсилки, CLI `tma-bot` |
+| `@pctea/tma/nest-payments` | Telegram Stars: разові покупки, підписки, refund, entitlements, reconcile |
+| `@pctea/tma/web` | Клієнтська частина: `tg`, api-клієнт, i18n; React-хуки в `@pctea/tma/web/react` |
+| `@pctea/tma/testing` | Тестові утиліти: підпис initData, `FakeBotApi`, `createTestApp`, шаблонна БД, CLI `tma-test-pg`; `installFakeWebApp` у `@pctea/tma/testing/dom` |
+
+Код лежить у `packages/tma/src/<підшлях>`, тести — поруч у `src` і в `packages/tma/test/<підшлях>`. `pnpm test` у пакеті запускає jest для серверних підшляхів і vitest для `web`.
 
 ## Розробка
 
@@ -45,13 +47,13 @@ pnpm -r typecheck && pnpm -r test
 Додаткові перевірки:
 
 ```
-node --test scripts/error-codes.test.mjs scripts/sync-plugin-version.test.mjs
+node --test scripts/*.test.mjs
 bash scripts/pack-check/run.sh
 bash scripts/smoke-template.sh empty
 bash scripts/smoke-template.sh shop
 ```
 
-`pack-check` пакує кожен пакет, ставить tarball-и в чистий проєкт і компілює імпорт кожного шляху з `exports`. `smoke-template` генерує проєкт із шаблону на локальних tarball-ах і проганяє його тести та build.
+`pack-check` пакує `@pctea/tma`, ставить tarball у чистий проєкт, компілює імпорт кожного шляху з `exports` і імпортує кожен із них у Node. `smoke-template` генерує проєкт із шаблону на локальному tarball-і і проганяє його тести та build.
 
 Кожен PR, що змінює `packages/`, `skills/` або `template/`, містить changeset (`pnpm changeset`); без нього падає `changeset-check`.
 
@@ -64,11 +66,11 @@ bash scripts/smoke-template.sh shop
 
 Далі реліз іде через `.github/workflows/release.yml`:
 
-1. Після merge у `main` `changesets/action` запускає `pnpm run version-packages` і відкриває PR «Version Packages»: піднімає версії всіх п'яти пакетів, а `scripts/sync-plugin-version.mjs` переписує `version` у `.claude-plugin/plugin.json` і `skills/new/SKILL.md`.
-2. Merge цього PR запускає `pnpm run release` (`pnpm -r build` і `changeset publish`) з `NPM_TOKEN` і `NPM_CONFIG_PROVENANCE=true`, тож пакети публікуються з provenance.
-3. Перевірка: `npm view @pctea/tma-nest-core@<версія>` показує версію, ліцензію MIT і provenance; те саме для решти чотирьох пакетів.
+1. Після merge у `main` `changesets/action` запускає `pnpm run version-packages` і відкриває PR «Version Packages»: піднімає версію `@pctea/tma`, а `scripts/sync-plugin-version.mjs` переписує `version` у `.claude-plugin/plugin.json` і `skills/new/SKILL.md`.
+2. Merge цього PR запускає `pnpm run release` (`pnpm -r build` і `changeset publish`) з `NPM_TOKEN` і `NPM_CONFIG_PROVENANCE=true`, тож пакет публікується з provenance.
+3. Перевірка: `npm view @pctea/tma@<версія>` показує версію, ліцензію MIT і provenance.
 
-Першу версію `0.1.0` дає `.changeset/initial-release.md`.
+Перша версія `@pctea/tma` — `0.1.0`: вона вже стоїть у `packages/tma/package.json`, а changesets цього релізу порожні, тож `version-packages` її не піднімає, і `changeset publish` публікує саме `0.1.0`.
 
 ## Ліцензія
 

@@ -1,5 +1,5 @@
-import { installFakeWebApp } from '@pctea/tma-testing/dom';
-import { TmaProvider, createQueryClient } from '@pctea/tma-web/react';
+import { installFakeWebApp } from '@pctea/tma/testing/dom';
+import { TmaProvider, createQueryClient } from '@pctea/tma/web/react';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { i18n } from '../../i18n';

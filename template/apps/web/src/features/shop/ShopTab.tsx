@@ -1,5 +1,5 @@
-import { useEntitlement, useProducts, usePurchase } from '@pctea/tma-web/react';
-import type { ProductDto } from '@pctea/tma-web';
+import { useEntitlement, useProducts, usePurchase } from '@pctea/tma/web/react';
+import type { ProductDto } from '@pctea/tma/web';
 import { useTranslation } from 'react-i18next';
 import { useErrorMessage } from '../../api/errorText';
 import { day } from '../../components/format';

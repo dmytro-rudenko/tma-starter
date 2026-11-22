@@ -1,4 +1,4 @@
-import { useMe } from '@pctea/tma-web/react';
+import { useMe } from '@pctea/tma/web/react';
 import { useTranslation } from 'react-i18next';
 // tma:shop:start
 import { PremiumBlock } from '../shop/PremiumBlock';

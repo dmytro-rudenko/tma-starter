@@ -1,4 +1,4 @@
-import { usePurchase, useProducts } from '@pctea/tma-web/react';
+import { usePurchase, useProducts } from '@pctea/tma/web/react';
 import { useTranslation } from 'react-i18next';
 import { useErrorMessage } from '../../api/errorText';
 import { Sheet } from '../../components/sheet/Sheet';

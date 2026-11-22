@@ -11,13 +11,12 @@
     "db:stop": "tma-test-pg stop",
     "db:create": "node scripts/db-create.mjs",
     "db:migrate": "pnpm --filter @__APP_SLUG__/api migrate",
-    "tma:upgrade": "node scripts/tma-upgrade.mjs",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test"
   },
   "devDependencies": {
-    "@pctea/tma-testing": "__TMA_VERSION__",
+    "@pctea/tma": "__TMA_VERSION__",
     "@types/node": "^26",
     "pg": "^8.13.0",
     "prettier": "^3.3.3",
@@ -27,13 +26,6 @@
     "onlyBuiltDependencies": [
       "@nestjs/core",
       "esbuild"
-    ],
-    "overrides": {
-      "@pctea/tma-nest-core": "__TMA_VERSION__",
-      "@pctea/tma-nest-bot": "__TMA_VERSION__",
-      "@pctea/tma-nest-payments": "__TMA_VERSION__",
-      "@pctea/tma-web": "__TMA_VERSION__",
-      "@pctea/tma-testing": "__TMA_VERSION__"
-    }
+    ]
   }
 }

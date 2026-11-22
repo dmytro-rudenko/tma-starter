@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { langOf } from '@pctea/tma-nest-bot';
-import { AuthUser, CurrentUser, UsersService } from '@pctea/tma-nest-core';
-import { EntitlementGuard } from '@pctea/tma-nest-payments';
+import { langOf } from '@pctea/tma/nest-bot';
+import { AuthUser, CurrentUser, UsersService } from '@pctea/tma/nest-core';
+import { EntitlementGuard } from '@pctea/tma/nest-payments';
 
 const ITEMS = {
   uk: ['Ексклюзивний гайд', 'Закрита добірка', 'Ранній доступ до новинок'],

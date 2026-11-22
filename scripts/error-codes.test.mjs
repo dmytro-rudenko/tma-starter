@@ -7,10 +7,10 @@ import path from 'node:path';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
 
-const { TMA_CORE_ERROR_CODES } = require(path.join(root, 'packages/nest-core/dist/index.js'));
-const { TMA_BOT_ERROR_CODES } = require(path.join(root, 'packages/nest-bot/dist/index.js'));
-const { TMA_PAYMENTS_ERROR_CODES } = require(path.join(root, 'packages/nest-payments/dist/index.js'));
-const { TMA_ERROR_CODES } = await import(pathToFileURL(path.join(root, 'packages/web/dist/index.js')).href);
+const { TMA_CORE_ERROR_CODES } = require(path.join(root, 'packages/tma/dist/cjs/nest-core/index.js'));
+const { TMA_BOT_ERROR_CODES } = require(path.join(root, 'packages/tma/dist/cjs/nest-bot/index.js'));
+const { TMA_PAYMENTS_ERROR_CODES } = require(path.join(root, 'packages/tma/dist/cjs/nest-payments/index.js'));
+const { TMA_ERROR_CODES } = await import(pathToFileURL(path.join(root, 'packages/tma/dist/esm/web/index.js')).href);
 
 test('every nest-* package exports a non-empty error code array', () => {
   for (const codes of [TMA_CORE_ERROR_CODES, TMA_BOT_ERROR_CODES, TMA_PAYMENTS_ERROR_CODES]) {

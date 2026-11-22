@@ -1,4 +1,4 @@
-import type { Product } from '@pctea/tma-nest-payments';
+import type { Product } from '@pctea/tma/nest-payments';
 
 export const products: Product[] = [
   // tma:shop:start

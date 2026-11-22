@@ -1,5 +1,4 @@
 {
-  "fixed": [["@pctea/tma-*"]],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch"
