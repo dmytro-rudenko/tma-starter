@@ -1,0 +1,10 @@
+{
+  "name": "tma-starter",
+  "version": "0.0.0",
+  "description": "Scaffold Telegram Mini Apps on @dmytro-rudenko/tma-* packages",
+  "author": {
+    "name": "Dmytro Rudenko"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/dmytro-rudenko/tma-starter"
+}
