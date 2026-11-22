@@ -4,6 +4,7 @@ import {
   migrations as coreMigrations,
 } from '@dmytro-rudenko/tma-nest-core';
 import { TmaBotModule, migrations as botMigrations } from '@dmytro-rudenko/tma-nest-bot';
+import { Logger } from '@nestjs/common';
 import { createTestApp, postWebhook, updates, waitFor } from '@dmytro-rudenko/tma-testing';
 import { EntitlementsService } from './entitlements.service';
 import { migrations as paymentsMigrations } from './migrations';
@@ -24,6 +25,7 @@ const ADMIN: TgUser = { id: 8001, first_name: 'Admin' };
 const PERIOD = 2_592_000;
 const PREMIUM_PRICE = 50;
 const VIP_PRICE = 100;
+const SEAT_PRICE = 30;
 const UNKNOWN_ID = '00000000-0000-4000-8000-000000000000';
 const PROVIDER_DOWN = { ok: false as const, error_code: 500, description: 'Internal Server Error' };
 const ALREADY_REFUNDED = {
@@ -56,6 +58,16 @@ const vip: Product = {
   },
 };
 
+const seat: Product = {
+  id: 'seat',
+  kind: 'one_time',
+  priceStars: () => SEAT_PRICE,
+  title: () => 'Seat',
+  description: () => 'Seat for a target',
+  lock: async (_trx, targetId) => ({ targetId }),
+  settle: async () => undefined,
+};
+
 let t: TestApp;
 let seq = 0;
 
@@ -70,22 +82,25 @@ const paymentRow = (id: string) => t.knex('payments').where({ id }).first();
 const entitlement = (u: TgUser, productId: string) =>
   t.knex('entitlements').where({ user_id: u.id, product_id: productId }).first();
 
-async function invoicePayload(u: TgUser, productId: string): Promise<string> {
+async function invoicePayload(u: TgUser, productId: string, targetId?: string): Promise<string> {
   const res = await t.http
     .post('/api/payments/invoice')
     .set('Authorization', auth(u))
-    .send({ productId });
+    .send(targetId ? { productId, targetId } : { productId });
   expect(res.status).toBe(200);
   const calls = t.fakeBot.callsOf('createInvoiceLink');
   return String(calls[calls.length - 1].body.payload);
 }
 
+const PRICES = { premium: PREMIUM_PRICE, vip: VIP_PRICE, seat: SEAT_PRICE };
+
 async function buy(
   u: TgUser,
-  productId: 'premium' | 'vip',
+  productId: keyof typeof PRICES,
+  targetId?: string,
 ): Promise<{ paymentId: string; charge: string }> {
-  const price = productId === 'premium' ? PREMIUM_PRICE : VIP_PRICE;
-  const payload = await invoicePayload(u, productId);
+  const price = PRICES[productId];
+  const payload = await invoicePayload(u, productId, targetId);
   const charge = `ch_refunds_${productId}_${++seq}`;
   const recurring =
     productId === 'vip'
@@ -124,7 +139,7 @@ beforeAll(async () => {
         apiRoot: ctx.apiRoot,
         runWorker: false,
       }),
-      TmaPaymentsModule.forRoot({ products: [premium, vip], runWorker: false }),
+      TmaPaymentsModule.forRoot({ products: [premium, vip, seat], runWorker: false }),
     ],
   });
 });
@@ -320,5 +335,66 @@ describe('admin refund', () => {
     expect(res.status).toBe(404);
     expect(res.body).toMatchObject({ statusCode: 404, code: 'PAYMENT_NOT_FOUND' });
     expect(t.fakeBot.callsOf('refundStarPayment')).toHaveLength(0);
+  });
+
+  it('refunding a targeted purchase keeps the payer\'s own one_time entitlement for that product', async () => {
+    const buyer: TgUser = { id: 8108, first_name: 'Targeted' };
+    await buy(buyer, 'seat');
+    const { paymentId } = await buy(buyer, 'seat', 'room-1');
+
+    const res = await adminRefund(paymentId);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ id: paymentId, status: 'refunded' });
+    expect(await entitlement(buyer, 'seat')).toMatchObject({ source: 'one_time', expires_at: null });
+    expect(await t.app.get(EntitlementsService).has(buyer.id, 'seat')).toBe(true);
+  });
+
+  it('refunding a subscription payment whose entitlement is gone succeeds without cancelling in Telegram', async () => {
+    const subscriber: TgUser = { id: 8109, first_name: 'Revoked' };
+    const { paymentId } = await buy(subscriber, 'vip');
+    await t.knex('entitlements').where({ user_id: subscriber.id, product_id: 'vip' }).del();
+    t.fakeBot.reset();
+
+    const res = await adminRefund(paymentId);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ id: paymentId, status: 'refunded' });
+    expect(t.fakeBot.callsOf('editUserStarSubscription')).toHaveLength(0);
+    expect(await entitlement(subscriber, 'vip')).toBeUndefined();
+  });
+
+  it('warns once when a refund has failed five times and is still refund_pending', async () => {
+    const buyer: TgUser = { id: 8110, first_name: 'Stuck' };
+    const { paymentId, charge } = await buy(buyer, 'premium');
+    const warn = jest.spyOn(Logger.prototype, 'warn');
+    const stuckWarnings = () =>
+      warn.mock.calls.filter(([message]) => String(message).startsWith(`refund ${charge} failed`));
+    const retryAfterBackoff = async () => {
+      await t
+        .knex('payments')
+        .where({ id: paymentId })
+        .update({ refund_attempted_at: t.knex.raw("now() - interval '2 days'") });
+      await t.app.get(PaymentsService).retryPendingRefunds();
+    };
+    try {
+      t.fakeBot.respond('refundStarPayment', PROVIDER_DOWN, { times: 5 });
+      expect((await adminRefund(paymentId)).status).toBe(502);
+      for (let attempt = 2; attempt <= 4; attempt++) await retryAfterBackoff();
+
+      expect((await paymentRow(paymentId)).refund_attempts).toBe(4);
+      expect(stuckWarnings()).toEqual([]);
+
+      await retryAfterBackoff();
+
+      expect((await paymentRow(paymentId)).refund_attempts).toBe(5);
+      expect(stuckWarnings()).toEqual([[`refund ${charge} failed 5 times, still refund_pending`]]);
+
+      await retryAfterBackoff();
+      expect((await paymentRow(paymentId)).status).toBe('refunded');
+      expect(stuckWarnings()).toHaveLength(1);
+    } finally {
+      warn.mockRestore();
+    }
   });
 });
