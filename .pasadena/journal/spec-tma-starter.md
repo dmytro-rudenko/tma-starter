@@ -14,8 +14,8 @@ started: 2026-11-06
 який проходить свої тести й стартує локально.
 
 ## Now
-Хвилі 0–9 і групове рев'ю 7–9 закриті (4986b67): усі пакети, smoke empty+shop, scaffold.test, pack-check зелені. Далі Finish (whole-branch review, codex review, security-review) над `git diff origin/main...HEAD`, потім push і новий PR, потім Task 17 (реліз) — merge-кроки лише з підтвердження власника.
-Postgres 16 для тестів: Docker-контейнер tma-test-pg-docker на 127.0.0.1:54329 (на хості лише PG 13, `pnpm db:start` не працює).
+Хвилі 0–9 і Finish закриті (eb17607), PR #2 відкрито (PR #1 змержено передчасно). Лишився Task 17: реліз 0.1.0 — потрібен доступ до публікації в npm (scope @dmytro-rudenko + NPM_TOKEN або trusted publishing), merge PR #2 і Version Packages — лише з підтвердження власника.
+Postgres 16 для тестів: Docker-контейнер tma-test-pg-docker на 127.0.0.1:54329 (на хості лише PG 13).
 
 ## Timeline
 
@@ -91,3 +91,7 @@ Postgres 16 для тестів: Docker-контейнер tma-test-pg-docker н
 - 12:30 ● 6c97c8b fix(template): drop dead config tokens, pin /start shop route
 - 12:30 ● 4986b67 fix(ci): smoke database url, run script tests, build before db:start
 - 12:30 ✎ Групове рев'ю 7–9: 2 раунди, 11 знахідок. Parked: #8 reconcile у UI лише останні 100 (спека: limit 100), #10 назва RefundsService.notify. Ruling: ConfigModule/DatabaseModule прибрано як мертві — спека §3.9 називала їх лише в порядку модулів — ціна: розбіжність тексту спеки
+- 13:50 ● b1e510a test(nest-payments): mutator survivors
+- 13:50 ● eb17607 fix(release): whole-branch and security review findings
+- 13:50 ✎ Finish: whole-branch + Codex + security review; реліз-воркфлоу був непрацездатний (&& без shell, --provenance), pnpm dev зламаний — виправлено. crapper: лише template (0% покриття з кореня). mutator: 9 еквівалентних survivors. Ruling: фікс-хвиля двома агентами з неперетинними файлами — обсяг
+- 13:50 ✎ PR #2 https://github.com/dmytro-rudenko/tma-starter/pull/2
