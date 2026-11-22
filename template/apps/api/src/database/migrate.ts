@@ -4,7 +4,7 @@ import type { Knex } from 'knex';
 import { migrations as botMigrations } from '@dmytro-rudenko/tma-nest-bot';
 import { composeMigrations, migrations as coreMigrations } from '@dmytro-rudenko/tma-nest-core';
 import { migrations as paymentsMigrations } from '@dmytro-rudenko/tma-nest-payments';
-import { createKnexConnection } from './database.module';
+import { createKnexConnection } from './knex';
 
 const MIGRATIONS_DIR = join(__dirname, 'migrations');
 const MIGRATION_FILE = /^(?!.*\.d\.ts$)(.+)\.(ts|js)$/;

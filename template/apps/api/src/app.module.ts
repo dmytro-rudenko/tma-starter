@@ -3,9 +3,7 @@ import { TmaBotModule } from '@dmytro-rudenko/tma-nest-bot';
 import { TmaCoreModule } from '@dmytro-rudenko/tma-nest-core';
 import { TmaPaymentsModule } from '@dmytro-rudenko/tma-nest-payments';
 import type { Knex } from 'knex';
-import { ConfigModule } from './config/config.module';
 import { validateEnv } from './config/env';
-import { DatabaseModule } from './database/database.module';
 import { ExampleModule } from './features/example/example.module';
 import { products } from './products';
 // tma:shop:start
@@ -22,8 +20,6 @@ export interface AppContext {
 export function appImports(ctx: AppContext): NonNullable<ModuleMetadata['imports']> {
   const env = validateEnv(ctx.env ?? process.env);
   return [
-    ConfigModule.forRoot(env),
-    DatabaseModule.forRoot(ctx.knex),
     TmaCoreModule.forRoot({
       knex: ctx.knex,
       botToken: ctx.botToken,

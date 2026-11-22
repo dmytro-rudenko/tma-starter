@@ -7,6 +7,8 @@ import {
 } from '@dmytro-rudenko/tma-nest-bot';
 import { PremiumController } from './premium.controller';
 
+const SHOP_BUTTON = { uk: '🛍 Магазин', en: '🛍 Shop' };
+
 @Module({
   controllers: [PremiumController],
 })
@@ -21,12 +23,12 @@ export class ShopModule implements OnModuleInit {
       pattern: /^shop$/,
       handle: async (ctx) => {
         const copy = this.bot.copyFor(ctx);
-        if (!copy.greeting || !copy.openButton) return;
+        const button = copy.openButton ?? SHOP_BUTTON[this.bot.langFor(ctx)];
         const name = escapeHtml(ctx.from?.first_name ?? '') || undefined;
-        await ctx.reply(copy.greeting(name), {
+        await ctx.reply(copy.greeting ? copy.greeting(name) : escapeHtml(button), {
           parse_mode: 'HTML',
           reply_markup: {
-            inline_keyboard: [[{ text: copy.openButton, url: this.bot.startAppUrl('shop') }]],
+            inline_keyboard: [[{ text: button, url: this.bot.startAppUrl('shop') }]],
           },
         });
       },

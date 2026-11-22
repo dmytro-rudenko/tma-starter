@@ -1,6 +1,7 @@
 import { createTestApp } from '@dmytro-rudenko/tma-testing';
 // tma:shop:start
 import { postWebhook, updates } from '@dmytro-rudenko/tma-testing';
+import { BotService } from '@dmytro-rudenko/tma-nest-bot';
 // tma:shop:end
 import { appImports } from '../src/app.module';
 import { migrations } from '../src/database/migrate';
@@ -190,6 +191,37 @@ describe('shop: premium', () => {
     const res = await get('/api/premium/content', STRANGER);
     expect(res.status).toBe(403);
     expect(res.body).toMatchObject({ statusCode: 403, code: 'NO_ENTITLEMENT' });
+  });
+});
+
+describe('shop: /start shop', () => {
+  const HOOK = { pathToken: PATH_TOKEN, secret: SECRET };
+  const SHOPPER: TgUser = { id: 7007, first_name: 'Shopper', language_code: 'en' };
+  const SHOP_URL = 'https://t.me/smoke_app_bot?startapp=shop';
+
+  async function startShop(): Promise<Array<{ text: string; url?: string }>> {
+    const before = t.fakeBot.callsOf('sendMessage').length;
+    const res = await postWebhook(t.http, updates.command('start', 'shop', SHOPPER), HOOK);
+    expect(res.status).toBe(200);
+    const sent = t.fakeBot.callsOf('sendMessage').slice(before);
+    expect(sent).toHaveLength(1);
+    expect(sent[0].body.text).toMatch(/\S/);
+    return sent[0].body.reply_markup.inline_keyboard.flat();
+  }
+
+  it('replies to /start shop with a startapp=shop button', async () => {
+    expect(await startShop()).toEqual([expect.objectContaining({ url: SHOP_URL })]);
+  });
+
+  it('still replies with the button when greeting and openButton copy are disabled', async () => {
+    const copy = t.app.get(BotService).copyFor({ from: SHOPPER } as never);
+    const saved = { greeting: copy.greeting, openButton: copy.openButton };
+    Object.assign(copy, { greeting: null, openButton: null });
+    try {
+      expect(await startShop()).toEqual([{ text: expect.stringMatching(/\S/), url: SHOP_URL }]);
+    } finally {
+      Object.assign(copy, saved);
+    }
   });
 });
 // tma:shop:end

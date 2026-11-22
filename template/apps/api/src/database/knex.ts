@@ -1,4 +1,3 @@
-import { DynamicModule, Module } from '@nestjs/common';
 import { knex as createKnex, Knex } from 'knex';
 
 // pg returns bigint (oid 20) as a string; Telegram ids fit in a JS number.
@@ -7,20 +6,6 @@ const pgTypes = (
 ).types;
 pgTypes.setTypeParser(20, (v: string) => Number(v));
 
-export const KNEX = Symbol('KNEX');
-
 export function createKnexConnection(databaseUrl: string): Knex {
   return createKnex({ client: 'pg', connection: databaseUrl, pool: { min: 0, max: 10 } });
-}
-
-@Module({})
-export class DatabaseModule {
-  static forRoot(knex: Knex): DynamicModule {
-    return {
-      module: DatabaseModule,
-      global: true,
-      providers: [{ provide: KNEX, useValue: knex }],
-      exports: [KNEX],
-    };
-  }
 }

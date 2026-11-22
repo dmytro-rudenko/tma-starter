@@ -5,7 +5,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AppModule } from './app.module';
 import { validateEnv } from './config/env';
-import { createKnexConnection } from './database/database.module';
+import { createKnexConnection } from './database/knex';
 
 async function bootstrap() {
   const env = validateEnv(process.env);
