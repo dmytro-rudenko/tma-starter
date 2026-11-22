@@ -34,6 +34,9 @@ function parseExpiresAt(v: unknown): Date | null {
   if (Number.isNaN(d.getTime())) {
     throw apiError(HttpStatus.BAD_REQUEST, 'VALIDATION', 'expiresAt must be an ISO date');
   }
+  if (d.getTime() <= Date.now()) {
+    throw apiError(HttpStatus.BAD_REQUEST, 'VALIDATION', 'expiresAt must be in the future');
+  }
   return d;
 }
 
@@ -71,6 +74,9 @@ export class AdminEntitlementsController {
         .first();
       if (held && held.source === 'subscription' && isActive(held)) {
         throw apiError(HttpStatus.CONFLICT, 'ENTITLEMENT_HELD_BY_SUBSCRIPTION');
+      }
+      if (held && held.source === 'one_time' && isActive(held)) {
+        throw apiError(HttpStatus.CONFLICT, 'ALREADY_OWNED');
       }
       const fields = {
         source: 'grant',

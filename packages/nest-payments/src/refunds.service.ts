@@ -79,7 +79,8 @@ export class RefundsService implements OnApplicationBootstrap, OnModuleDestroy {
       );
       throw err;
     }
-    return this.finish(payment);
+    const actorId = payment.refund_requested_by;
+    return this.finish(payment, actorId === null ? undefined : this.auditRefund(Number(actorId)));
   }
 
   async refund(actorId: number, paymentId: string): Promise<PaymentRow> {
@@ -90,7 +91,7 @@ export class RefundsService implements OnApplicationBootstrap, OnModuleDestroy {
     if (current.status === 'paid') {
       [pending] = await this.knex('payments')
         .where({ id: paymentId, status: 'paid' })
-        .update({ status: 'refund_pending' })
+        .update({ status: 'refund_pending', refund_requested_by: actorId })
         .returning('*');
       pending ??= await this.knex('payments').where({ id: paymentId }).first();
     }
@@ -104,20 +105,7 @@ export class RefundsService implements OnApplicationBootstrap, OnModuleDestroy {
       await this.recordFailedAttempt(pending);
       throw apiError(HttpStatus.BAD_GATEWAY, 'PAYMENT_PROVIDER_UNAVAILABLE');
     }
-    const done = await this.finish(pending, (trx, row) =>
-      this.audit.record(trx, {
-        actorId,
-        action: 'payment.refund',
-        targetType: 'payment',
-        targetId: row.id,
-        meta: {
-          payerId: Number(row.payer_id),
-          productId: row.product_id,
-          amountStars: row.amount_stars,
-          chargeId: row.telegram_payment_charge_id,
-        },
-      }),
-    );
+    const done = await this.finish(pending, this.auditRefund(actorId));
     if (!done) throw apiError(HttpStatus.CONFLICT, 'ALREADY_REFUNDED');
     return done;
   }
@@ -166,6 +154,22 @@ export class RefundsService implements OnApplicationBootstrap, OnModuleDestroy {
     } catch (err) {
       this.logger.warn(`notify ${userId} failed: ${String(err)}`);
     }
+  }
+
+  private auditRefund(actorId: number): RefundHook {
+    return (trx, row) =>
+      this.audit.record(trx, {
+        actorId,
+        action: 'payment.refund',
+        targetType: 'payment',
+        targetId: row.id,
+        meta: {
+          payerId: Number(row.payer_id),
+          productId: row.product_id,
+          amountStars: row.amount_stars,
+          chargeId: row.telegram_payment_charge_id,
+        },
+      });
   }
 
   private async finish(payment: PaymentRow, hook?: RefundHook): Promise<PaymentRow | undefined> {

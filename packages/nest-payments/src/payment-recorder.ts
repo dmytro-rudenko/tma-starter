@@ -128,7 +128,14 @@ export class PaymentRecorder {
     trx: Knex.Transaction,
     row: Omit<
       PaymentRow,
-      'id' | 'refunded_at' | 'created_at' | 'status' | 'settled_at' | 'refund_attempts' | 'refund_attempted_at'
+      | 'id'
+      | 'refunded_at'
+      | 'created_at'
+      | 'status'
+      | 'settled_at'
+      | 'refund_attempts'
+      | 'refund_attempted_at'
+      | 'refund_requested_by'
     > & { status: PaymentStatus; settled_at: Knex.Raw | null },
   ): Promise<Recorded> {
     const [inserted]: PaymentRow[] = await trx('payments')

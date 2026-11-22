@@ -18,6 +18,7 @@ export interface PaymentRow {
   refunded_at: Date | null;
   refund_attempts: number;
   refund_attempted_at: Date | null;
+  refund_requested_by: string | number | null;
   created_at: Date;
 }
 

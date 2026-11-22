@@ -291,6 +291,29 @@ describe('admin refund', () => {
     expect(await entitlement(buyer, 'premium')).toBeUndefined();
   });
 
+  it('admin refund failed at Telegram and completed by retry writes payment.refund with the initiating admin', async () => {
+    const buyer: TgUser = { id: 8107, first_name: 'DownAudit' };
+    const { paymentId } = await buy(buyer, 'premium');
+    const audits = () =>
+      t.knex('audit_events').where({ action: 'payment.refund', target_type: 'payment', target_id: paymentId });
+    t.fakeBot.respond('refundStarPayment', PROVIDER_DOWN, { times: 1 });
+
+    expect((await adminRefund(paymentId)).status).toBe(502);
+    expect(await audits()).toHaveLength(0);
+
+    await t
+      .knex('payments')
+      .where({ id: paymentId })
+      .update({ refund_attempted_at: t.knex.raw("now() - interval '2 days'") });
+    await t.app.get(PaymentsService).retryPendingRefunds();
+
+    expect((await paymentRow(paymentId)).status).toBe('refunded');
+    const rows = await audits();
+    expect(rows).toHaveLength(1);
+    expect(Number(rows[0].actor_id)).toBe(ADMIN.id);
+    expect(rows[0].meta).toMatchObject({ payerId: buyer.id, productId: 'premium', amountStars: PREMIUM_PRICE });
+  });
+
   it('unknown payment id → 404 PAYMENT_NOT_FOUND without calling Telegram', async () => {
     const res = await adminRefund(UNKNOWN_ID);
 
