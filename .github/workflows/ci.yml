@@ -54,7 +54,7 @@ jobs:
         run: pnpm -r test
 
       - name: Script tests
-        run: node --test scripts/error-codes.test.mjs scripts/sync-plugin-version.test.mjs
+        run: node --test scripts/error-codes.test.mjs scripts/sync-plugin-version.test.mjs scripts/changeset-check.test.mjs
 
       - name: Pack check
         run: bash scripts/pack-check/run.sh
@@ -70,15 +70,7 @@ jobs:
           fetch-depth: 0
 
       - name: Require a changeset for package, skill and template changes
-        run: |
-          changed="$(git diff --name-only origin/main...HEAD)"
-          if ! printf '%s\n' "$changed" | grep -E '^(packages|skills|template)/' >/dev/null; then
-            exit 0
-          fi
-          if ! printf '%s\n' "$changed" | grep -E '^\.changeset/.+\.md$' | grep -v '^\.changeset/README\.md$' >/dev/null; then
-            echo "::error::packages/, skills/ or template/ changed but the PR has no .changeset/*.md; run 'pnpm changeset'"
-            exit 1
-          fi
+        run: bash scripts/changeset-check.sh origin/main
 
   template-smoke:
     name: Template smoke (${{ matrix.variant }})

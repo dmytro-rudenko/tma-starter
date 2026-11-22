@@ -1,9 +1,12 @@
 import { installFakeWebApp } from '@dmytro-rudenko/tma-testing/dom';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
 import { i18n } from './i18n';
 import { reset } from './state/stack';
+// tma:shop:start
+import { setTab } from './state/tabs';
+// tma:shop:end
 
 const USER = {
   id: 7,
@@ -67,4 +70,19 @@ describe('App', () => {
     expect(await screen.findByText('Доступ закрито')).toBeTruthy();
     expect(screen.queryByRole('tablist')).toBeNull();
   });
+
+  // tma:shop:start
+  it('opens the Shop tab when the app is launched with startapp=shop', async () => {
+    installFakeWebApp(window, { initData: 'auth_date=1700000000&start_param=shop&hash=abc' });
+    stubApi(() => json(200, USER));
+    try {
+      render(<App />);
+      await waitFor(() =>
+        expect(screen.getByRole('tab', { selected: true }).textContent).toBe('Магазин'),
+      );
+    } finally {
+      setTab('home');
+    }
+  });
+  // tma:shop:end
 });

@@ -190,6 +190,36 @@ describe('admin grant', () => {
     expect(await entitlement(buyer, 'premium')).toBeUndefined();
   });
 
+  it('a purchase committed while the grant waits on the upsert keeps the paid row → 409 ALREADY_OWNED', async () => {
+    const buyer: TgUser = { id: 5105, first_name: 'Racer' };
+    await addUser(buyer);
+
+    const purchase = await t.knex.transaction();
+    await purchase('entitlements').insert({ user_id: buyer.id, product_id: 'premium', source: 'one_time' });
+
+    const pending = grant(buyer, { productId: 'premium' }).then((res) => res);
+    const deadline = Date.now() + 10_000;
+    for (;;) {
+      const waiting = await t
+        .knex('pg_stat_activity')
+        .where({ datname: t.knex.raw('current_database()'), wait_event_type: 'Lock' })
+        .andWhere('query', 'ilike', 'insert into "entitlements"%')
+        .count<{ count: string }[]>('* as count');
+      if (Number(waiting[0].count) > 0) break;
+      if (Date.now() > deadline) throw new Error('grant never blocked on the entitlement upsert');
+      await new Promise((r) => setTimeout(r, 20));
+    }
+    await purchase.commit();
+
+    expectError(await pending, 409, 'ALREADY_OWNED');
+    expect(await entitlement(buyer, 'premium')).toMatchObject({ source: 'one_time', expires_at: null });
+    expect(
+      await t
+        .knex('audit_events')
+        .where({ action: 'entitlement.grant', target_id: String(buyer.id) }),
+    ).toHaveLength(0);
+  });
+
   it('grant with a past expiresAt → 400 VALIDATION, nothing written', async () => {
     const u: TgUser = { id: 5102, first_name: 'Past' };
     await addUser(u);

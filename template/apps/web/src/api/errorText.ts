@@ -24,8 +24,9 @@ export const errorText: Record<TextLang, Record<ErrorCode, string>> = {
     PRODUCT_NOT_FOUND: 'Продукт не знайдено.',
     PRODUCT_UNAVAILABLE: 'Цей продукт зараз недоступний.',
     ALREADY_SUBSCRIBED: 'Підписку вже оформлено.',
-    ALREADY_OWNED: 'Цей продукт у вас уже є.',
-    ENTITLEMENT_HELD_BY_SUBSCRIPTION: 'Цей доступ тримає активна підписка. Спершу скасуйте її.',
+    ALREADY_OWNED: 'Цей продукт уже активний на акаунті.',
+    ENTITLEMENT_HELD_BY_SUBSCRIPTION:
+      'Цей доступ дає активна підписка. Видати його можна після того, як вона закінчиться.',
     NO_SUBSCRIPTION: 'Активної підписки немає.',
     PAYMENT_NOT_FOUND: 'Платіж не знайдено.',
     ALREADY_REFUNDED: 'Цей платіж уже повернуто.',
@@ -49,9 +50,9 @@ export const errorText: Record<TextLang, Record<ErrorCode, string>> = {
     PRODUCT_NOT_FOUND: 'Product not found.',
     PRODUCT_UNAVAILABLE: 'This product is not available right now.',
     ALREADY_SUBSCRIBED: 'You are already subscribed.',
-    ALREADY_OWNED: 'You already own this product.',
+    ALREADY_OWNED: 'This product is already active on the account.',
     ENTITLEMENT_HELD_BY_SUBSCRIPTION:
-      'This access is held by an active subscription. Cancel it first.',
+      'This access comes from an active subscription. It can be granted once the subscription ends.',
     NO_SUBSCRIPTION: 'There is no active subscription.',
     PAYMENT_NOT_FOUND: 'Payment not found.',
     ALREADY_REFUNDED: 'This payment is already refunded.',

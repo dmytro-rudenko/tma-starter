@@ -87,14 +87,12 @@ export class RefundsService implements OnApplicationBootstrap, OnModuleDestroy {
     if (!UUID_RE.test(paymentId)) throw apiError(HttpStatus.NOT_FOUND, 'PAYMENT_NOT_FOUND');
     const current: PaymentRow | undefined = await this.knex('payments').where({ id: paymentId }).first();
     if (!current) throw apiError(HttpStatus.NOT_FOUND, 'PAYMENT_NOT_FOUND');
-    let pending: PaymentRow | undefined = current;
-    if (current.status === 'paid') {
-      [pending] = await this.knex('payments')
-        .where({ id: paymentId, status: 'paid' })
-        .update({ status: 'refund_pending', refund_requested_by: actorId })
-        .returning('*');
-      pending ??= await this.knex('payments').where({ id: paymentId }).first();
-    }
+    let [pending]: (PaymentRow | undefined)[] = await this.knex('payments')
+      .where({ id: paymentId })
+      .whereIn('status', ['paid', 'refund_pending'])
+      .update({ status: 'refund_pending', refund_requested_by: actorId })
+      .returning('*');
+    pending ??= await this.knex('payments').where({ id: paymentId }).first();
     if (!pending || pending.status !== 'refund_pending') {
       throw apiError(HttpStatus.CONFLICT, 'ALREADY_REFUNDED');
     }

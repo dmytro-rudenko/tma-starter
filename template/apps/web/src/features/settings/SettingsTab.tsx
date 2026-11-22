@@ -1,7 +1,9 @@
-import type { Lang, ThemePref } from '@dmytro-rudenko/tma-web';
+import type { Lang, ThemePref, UpdateMeDto } from '@dmytro-rudenko/tma-web';
 import { useMe, useTma, useUpdateMe } from '@dmytro-rudenko/tma-web/react';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useErrorMessage } from '../../api/errorText';
+import { toast } from '../../components/Toast';
 import { push, type EntryKind } from '../../state/stack';
 // tma:shop:start
 import { SubscriptionSection } from '../shop/SubscriptionSection';
@@ -87,8 +89,19 @@ export function SettingsTab() {
   const me = useMe();
   const update = useUpdateMe();
   const { applyPrefs } = useTma();
+  const errorMessage = useErrorMessage();
   const lang: Lang = me.data?.language ?? (i18n.language === 'uk' ? 'uk' : 'en');
   const theme: ThemePref = me.data?.theme ?? 'system';
+
+  const save = (next: UpdateMeDto, previous: UpdateMeDto) => {
+    applyPrefs(next);
+    update.mutate(next, {
+      onError: (e) => {
+        applyPrefs(previous);
+        toast(errorMessage(e));
+      },
+    });
+  };
 
   return (
     <>
@@ -100,20 +113,14 @@ export function SettingsTab() {
         label={t('settings.language')}
         options={LANGS}
         value={lang}
-        onChange={(language) => {
-          applyPrefs({ language });
-          update.mutate({ language });
-        }}
+        onChange={(language) => save({ language }, { language: me.data?.language ?? null })}
       />
 
       <Segment
         label={t('settings.theme')}
         options={THEMES.map((o) => ({ value: o.value, label: t(o.key) }))}
         value={theme}
-        onChange={(next) => {
-          applyPrefs({ theme: next });
-          update.mutate({ theme: next });
-        }}
+        onChange={(next) => save({ theme: next }, { theme })}
       />
 
       {/* tma:shop:start */}

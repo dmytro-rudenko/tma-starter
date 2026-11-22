@@ -11,7 +11,7 @@ interface Call {
 }
 
 const BOT_BLOCKED_AT = '2026-10-15T09:30:00.000Z';
-const VIP_EXPIRES_AT = '2027-03-01T00:00:00.000Z';
+const VIP_EXPIRES_AT = new Date(Date.now() + 90 * 86_400_000).toISOString();
 
 const ME = {
   id: 1,
@@ -47,6 +47,16 @@ const REFUNDED = {
   status: 'refunded',
   refundedAt: '2026-10-11T10:00:00.000Z',
   createdAt: '2026-10-10T10:00:00.000Z',
+};
+
+const PENDING = {
+  ...PAID,
+  id: 'pay_3',
+  amountStars: 75,
+  chargeId: 'ch_3',
+  status: 'refund_pending',
+  refundAttempts: 1,
+  createdAt: '2026-10-05T10:00:00.000Z',
 };
 
 const DETAIL = {
@@ -107,7 +117,7 @@ function json(status: number, body: unknown): Response {
   });
 }
 
-function stubApi(): Call[] {
+function stubApi(detail: unknown = DETAIL): Call[] {
   const calls: Call[] = [];
   vi.stubGlobal(
     'fetch',
@@ -118,7 +128,15 @@ function stubApi(): Call[] {
       calls.push({ method, path });
       if (path === '/api/me') return json(200, ME);
       if (path === '/api/products') return json(200, PRODUCTS);
-      if (path === '/api/admin/users/42' && method === 'GET') return json(200, DETAIL);
+      if (path === '/api/admin/users/42' && method === 'GET') return json(200, detail);
+      if (path === '/api/admin/users/42/block' && method === 'DELETE')
+        return json(200, { ...(detail as object), blockedAt: null });
+      if (path === '/api/admin/payments/pay_3/refund' && method === 'POST')
+        return json(200, {
+          ...PENDING,
+          status: 'refunded',
+          refundedAt: '2026-11-06T00:00:00.000Z',
+        });
       if (path === '/api/admin/payments/pay_1/refund' && method === 'POST')
         return json(200, { ...PAID, status: 'refunded', refundedAt: '2026-11-06T00:00:00.000Z' });
       if (path === '/api/admin/users/42/entitlements/premium' && method === 'DELETE')
@@ -231,6 +249,51 @@ describe('AdminUserSheet: cards.payments', () => {
     fireEvent.click(within(dialog).getByRole('button', { name: 'Відкликати' }));
     await waitFor(() =>
       expect(sent(calls, 'DELETE')).toEqual(['/api/admin/users/42/entitlements/premium']),
+    );
+  });
+});
+
+const withPayments = (payments: unknown[]) => ({
+  ...DETAIL,
+  cards: { ...DETAIL.cards, payments: { ...DETAIL.cards.payments, payments } },
+});
+
+describe('AdminUserSheet: header actions', () => {
+  it('«Розблокувати» asks through AdminConfirm before DELETE …/block', async () => {
+    const calls = stubApi({ ...DETAIL, blockedAt: '2026-11-01T00:00:00.000Z' });
+    renderSheet();
+    fireEvent.click(await screen.findByRole('button', { name: 'Розблокувати' }));
+    expect(sent(calls, 'DELETE')).toEqual([]);
+    const dialog = await screen.findByRole('alertdialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Розблокувати' }));
+    await waitFor(() => expect(sent(calls, 'DELETE')).toEqual(['/api/admin/users/42/block']));
+  });
+});
+
+describe('AdminUserSheet: refund retry', () => {
+  it('a refund_pending payment offers a retry through AdminConfirm', async () => {
+    const calls = stubApi(withPayments([PENDING]));
+    renderSheet();
+    const payments = await block('Платежі');
+    const [row] = within(payments).getAllByRole('listitem');
+    fireEvent.click(within(row!).getByRole('button', { name: 'Повторити повернення' }));
+    expect(sent(calls, 'POST')).toEqual([]);
+    const dialog = await screen.findByRole('alertdialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Повторити повернення' }));
+    await waitFor(() => expect(sent(calls, 'POST')).toEqual(['/api/admin/payments/pay_3/refund']));
+  });
+});
+
+describe('AdminUserSheet: grant access', () => {
+  it('the expiry date cannot be set earlier than tomorrow', async () => {
+    stubApi();
+    renderSheet();
+    const input = (await screen.findByLabelText("Діє до (необов'язково)")) as HTMLInputElement;
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    expect(input.min).toBe(
+      `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}`,
     );
   });
 });

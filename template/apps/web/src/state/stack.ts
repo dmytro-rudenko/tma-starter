@@ -33,8 +33,15 @@ export function pop(): void {
   if (entries.length) set(entries.slice(0, -1));
 }
 
-export function replaceTop(entry: Entry): void {
-  set(entries.length ? [...entries.slice(0, -1), entry] : [entry]);
+const isTop = (entry: Entry | undefined): entry is Entry =>
+  !!entry && entries[entries.length - 1] === entry;
+
+export function popEntry(entry: Entry | undefined): void {
+  if (isTop(entry)) set(entries.slice(0, -1));
+}
+
+export function replaceEntry(entry: Entry | undefined, next: Entry): void {
+  if (isTop(entry)) set([...entries.slice(0, -1), next]);
 }
 
 export function reset(): void {
@@ -57,6 +64,7 @@ export function useStack(): readonly Entry[] {
 export interface LayerInfo {
   index: number;
   isTop: boolean;
+  entry?: Entry;
 }
 
 export const LayerContext = createContext<LayerInfo>({ index: 0, isTop: true });

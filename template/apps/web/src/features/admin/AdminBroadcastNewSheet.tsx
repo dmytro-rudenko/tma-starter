@@ -8,7 +8,7 @@ import { useErrorMessage } from '../../api/errorText';
 import { Sheet } from '../../components/sheet/Sheet';
 import { toast } from '../../components/Toast';
 import { useDebounced } from '../../components/useDebounced';
-import { pop, replaceTop } from '../../state/stack';
+import { pop, replaceEntry, useLayer } from '../../state/stack';
 import s from './Admin.module.css';
 import { AdminConfirm } from './AdminConfirm';
 
@@ -23,6 +23,7 @@ export function AdminBroadcastNewSheet() {
   const errorMessage = useErrorMessage();
   const products = useProducts();
   const filters = useAudienceFilters();
+  const { entry } = useLayer();
   const [text, setText] = useState('');
   const [buttonText, setButtonText] = useState('');
   const [startParam, setStartParam] = useState('');
@@ -81,7 +82,7 @@ export function AdminBroadcastNewSheet() {
       const created = await api.admin.broadcasts.create({ ...payload, audience });
       void qc.invalidateQueries({ queryKey: adminKeys.broadcasts });
       tg.haptic.notify('success');
-      replaceTop({ kind: 'adminBroadcast', props: { id: created.id } });
+      replaceEntry(entry, { kind: 'adminBroadcast', props: { id: created.id } });
     } catch (e) {
       tg.haptic.notify('error');
       toast(errorMessage(e));
@@ -92,72 +93,78 @@ export function AdminBroadcastNewSheet() {
 
   return (
     <Sheet open onClose={pop} title={t('admin.broadcastNewTitle')}>
-      <p className={s.label}>{t('admin.broadcastText')}</p>
-      <textarea
-        className={`${s.field} ${s.json}`}
-        rows={6}
-        maxLength={TEXT_MAX}
-        placeholder={t('admin.broadcastTextHint')}
-        aria-label={t('admin.broadcastText')}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
-
-      <p className={s.label}>{t('admin.broadcastButtonLabel')}</p>
-      <input
-        className={s.field}
-        type="text"
-        placeholder={t('admin.broadcastButtonText')}
-        aria-label={t('admin.broadcastButtonText')}
-        value={buttonText}
-        onChange={(e) => setButtonText(e.target.value)}
-      />
-      {trimmedButton && (
-        <input
-          className={`${s.field} ${s.gap}`}
-          type="text"
-          maxLength={64}
-          placeholder={t('admin.broadcastStartParam')}
-          aria-label={t('admin.broadcastStartParam')}
-          value={startParam}
-          onChange={(e) => setStartParam(e.target.value)}
+      <fieldset className={s.fieldset} disabled={asking}>
+        <p className={s.label}>{t('admin.broadcastText')}</p>
+        <textarea
+          className={`${s.field} ${s.json}`}
+          rows={6}
+          maxLength={TEXT_MAX}
+          placeholder={t('admin.broadcastTextHint')}
+          aria-label={t('admin.broadcastText')}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
         />
-      )}
 
-      <p className={s.label}>{t('admin.audience')}</p>
-      {LANGS.map((lang) => (
-        <label key={lang} className={s.check}>
-          <input type="checkbox" checked={langs.includes(lang)} onChange={() => toggleLang(lang)} />
-          {t(`admin.lang.${lang}`)}
-        </label>
-      ))}
-      {filters.data?.map((f) => (
-        <div key={f.key}>
-          <label className={s.check}>
+        <p className={s.label}>{t('admin.broadcastButtonLabel')}</p>
+        <input
+          className={s.field}
+          type="text"
+          placeholder={t('admin.broadcastButtonText')}
+          aria-label={t('admin.broadcastButtonText')}
+          value={buttonText}
+          onChange={(e) => setButtonText(e.target.value)}
+        />
+        {trimmedButton && (
+          <input
+            className={`${s.field} ${s.gap}`}
+            type="text"
+            maxLength={64}
+            placeholder={t('admin.broadcastStartParam')}
+            aria-label={t('admin.broadcastStartParam')}
+            value={startParam}
+            onChange={(e) => setStartParam(e.target.value)}
+          />
+        )}
+
+        <p className={s.label}>{t('admin.audience')}</p>
+        {LANGS.map((lang) => (
+          <label key={lang} className={s.check}>
             <input
               type="checkbox"
-              checked={!!enabled[f.key]}
-              onChange={(e) => setEnabled((cur) => ({ ...cur, [f.key]: e.target.checked }))}
+              checked={langs.includes(lang)}
+              onChange={() => toggleLang(lang)}
             />
-            {t(`admin.filters.${f.key}`, { defaultValue: f.label })}
+            {t(`admin.lang.${lang}`)}
           </label>
-          {f.key === 'entitlement' && enabled[f.key] && (
-            <select
-              className={`${s.field} ${s.gap}`}
-              aria-label={t('admin.grantProduct')}
-              value={productId}
-              onChange={(e) => setProductId(e.target.value)}
-            >
-              <option value="">{t('admin.chooseProduct')}</option>
-              {products.data?.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.title}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-      ))}
+        ))}
+        {filters.data?.map((f) => (
+          <div key={f.key}>
+            <label className={s.check}>
+              <input
+                type="checkbox"
+                checked={!!enabled[f.key]}
+                onChange={(e) => setEnabled((cur) => ({ ...cur, [f.key]: e.target.checked }))}
+              />
+              {t(`admin.filters.${f.key}`, { defaultValue: f.label })}
+            </label>
+            {f.key === 'entitlement' && enabled[f.key] && (
+              <select
+                className={`${s.field} ${s.gap}`}
+                aria-label={t('admin.grantProduct')}
+                value={productId}
+                onChange={(e) => setProductId(e.target.value)}
+              >
+                <option value="">{t('admin.chooseProduct')}</option>
+                {products.data?.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.title}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        ))}
+      </fieldset>
 
       <p className={s.recipients} aria-live="polite">
         {audienceValid && settled && total !== undefined

@@ -3,7 +3,7 @@ import { TmaProvider, createQueryClient } from '@dmytro-rudenko/tma-web/react';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { i18n } from '../../i18n';
-import { getStack, push, reset } from '../../state/stack';
+import { getStack, LayerContext, pop, push, reset, type Entry } from '../../state/stack';
 import { PaywallSheet } from './PaywallSheet';
 import { PremiumBlock } from './PremiumBlock';
 
@@ -68,6 +68,17 @@ function renderUi(ui: React.ReactNode) {
       {ui}
     </TmaProvider>,
   );
+}
+
+function renderPaywall(): Entry {
+  const self: Entry = { kind: 'paywall', props: {} };
+  push(self);
+  renderUi(
+    <LayerContext.Provider value={{ index: 0, isTop: true, entry: self }}>
+      <PaywallSheet />
+    </LayerContext.Provider>,
+  );
+  return self;
 }
 
 const hit = (calls: Call[], path: string) => calls.filter((c) => c.path === path);
@@ -138,8 +149,7 @@ describe('PaywallSheet', () => {
 
   it('«Оформити» buys the premium product and closes the paywall once paid', async () => {
     const calls = stubApi([]);
-    push({ kind: 'paywall', props: {} });
-    renderUi(<PaywallSheet />);
+    renderPaywall();
 
     await screen.findByText(/250 ⭐/);
     fireEvent.click(screen.getByRole('button', { name: 'Оформити' }));
@@ -150,5 +160,25 @@ describe('PaywallSheet', () => {
       ]),
     );
     await waitFor(() => expect(getStack()).toEqual([]));
+  });
+
+  it('a payment that lands after the paywall was dismissed leaves the next layer open', async () => {
+    const calls = stubApi([]);
+    const other: Entry = { kind: 'adminUsers', props: {} };
+    installFakeWebApp(window, {
+      openInvoice: (_url: string, cb: (status: string) => void) => {
+        pop();
+        push(other);
+        setTimeout(() => cb('paid'), 0);
+      },
+    });
+    renderPaywall();
+    await screen.findByText(/250 ⭐/);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Оформити' }));
+
+    await waitFor(() => expect(hit(calls, '/api/payments/invoice')).toHaveLength(1));
+    await new Promise((r) => setTimeout(r, 20));
+    expect(getStack()).toEqual([other]);
   });
 });

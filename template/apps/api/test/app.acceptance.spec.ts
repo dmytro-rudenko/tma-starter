@@ -185,6 +185,26 @@ describe('shop: premium', () => {
 
     const res = await get('/api/premium/content', BUYER);
     expect(res.status).toBe(200);
+    expect(res.body.items).toEqual([
+      'Exclusive guide',
+      'Private collection',
+      'Early access to new releases',
+    ]);
+  });
+
+  it('GET /api/premium/content follows the language stored in the profile', async () => {
+    const patched = await t.http
+      .patch('/api/me')
+      .set('Authorization', auth(BUYER))
+      .send({ language: 'uk' });
+    expect(patched.status).toBe(200);
+    const res = await get('/api/premium/content', BUYER);
+    expect(res.status).toBe(200);
+    expect(res.body.items).toEqual([
+      'Ексклюзивний гайд',
+      'Закрита добірка',
+      'Ранній доступ до новинок',
+    ]);
   });
 
   it('a payment by one user does not unlock premium for another', async () => {

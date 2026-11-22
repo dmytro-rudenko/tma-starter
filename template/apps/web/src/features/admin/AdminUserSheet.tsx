@@ -26,6 +26,13 @@ const closeAdminSheets = () => {
   for (let st = getStack(); st[st.length - 1]?.kind.startsWith('admin'); st = getStack()) pop();
 };
 
+const tomorrow = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
 const isActive = (e: EntitlementDto) =>
   !e.expiresAt || new Date(e.expiresAt).getTime() > Date.now();
 
@@ -61,7 +68,7 @@ export function AdminUserSheet({ id }: { id: number }) {
   const errorMessage = useErrorMessage();
   const user = useAdminUser(id);
   const { busy, run } = useAction();
-  const [asking, setAsking] = useState<'block' | 'grant' | 'revoke' | null>(null);
+  const [asking, setAsking] = useState<'block' | 'unblock' | 'grant' | 'revoke' | null>(null);
   const u = user.data;
 
   const confirmed = (fn: () => Promise<unknown>, done: string) =>
@@ -114,7 +121,7 @@ export function AdminUserSheet({ id }: { id: number }) {
                 type="button"
                 className={s.act}
                 disabled={busy}
-                onClick={() => void run(() => api.admin.users.unblock(u.id), t('admin.unblocked'))}
+                onClick={() => setAsking('unblock')}
               >
                 {t('admin.unblock')}
               </button>
@@ -157,6 +164,15 @@ export function AdminUserSheet({ id }: { id: number }) {
               pending={busy}
               onCancel={() => setAsking(null)}
               onYes={() => confirmed(() => api.admin.users.block(u.id), t('admin.blocked'))}
+            />
+          )}
+          {asking === 'unblock' && (
+            <AdminConfirm
+              text={t('admin.unblockConfirm', { name: u.firstName })}
+              yes={t('admin.unblock')}
+              pending={busy}
+              onCancel={() => setAsking(null)}
+              onYes={() => confirmed(() => api.admin.users.unblock(u.id), t('admin.unblocked'))}
             />
           )}
           {asking === 'grant' && (
@@ -213,6 +229,8 @@ function PaymentsBlock({ payments }: { payments: PaymentDto[] }) {
   const { api } = useTma();
   const { busy, run } = useAction();
   const [asking, setAsking] = useState<PaymentDto | null>(null);
+  const refundLabel = (p: PaymentDto) =>
+    t(p.status === 'refund_pending' ? 'admin.refundRetry' : 'admin.refund');
 
   return (
     <section className={s.block}>
@@ -233,14 +251,14 @@ function PaymentsBlock({ payments }: { payments: PaymentDto[] }) {
                   {day(p.createdAt)} · {t(`admin.payStatus.${p.status}`)}
                 </span>
               </div>
-              {p.status === 'paid' && (
+              {p.status !== 'refunded' && (
                 <button
                   type="button"
                   className={s.rowAction}
                   disabled={busy}
                   onClick={() => setAsking(p)}
                 >
-                  {t('admin.refund')}
+                  {refundLabel(p)}
                 </button>
               )}
             </li>
@@ -251,7 +269,7 @@ function PaymentsBlock({ payments }: { payments: PaymentDto[] }) {
         <AdminConfirm
           danger
           text={t('admin.refundConfirm', { count: asking.amountStars })}
-          yes={t('admin.refund')}
+          yes={refundLabel(asking)}
           pending={busy}
           onCancel={() => setAsking(null)}
           onYes={() =>
@@ -355,6 +373,7 @@ function AccessBlock({ userId, entitlements }: { userId: number; entitlements: E
           <input
             className={s.field}
             type="date"
+            min={tomorrow()}
             aria-label={t('admin.grantUntil')}
             value={until}
             onChange={(e) => setUntil(e.target.value)}

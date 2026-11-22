@@ -20,6 +20,12 @@ function baseKeys(obj: Dict): string[] {
 
 const shop = import.meta.glob<{ default: Dict }>('./shop.*.json', { eager: true });
 
+const sources = import.meta.glob<string>(['../**/*.{ts,tsx}', '!../**/*.test.{ts,tsx}'], {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+
 describe('i18n dictionaries', () => {
   it('uk.json is not empty', () => {
     expect(baseKeys(uk as Dict).length).toBeGreaterThan(0);
@@ -64,5 +70,14 @@ describe('i18n dictionaries', () => {
       }
       expect(i18n.getResource(lang, 'translation', 'common.loading')).toBeTruthy();
     }
+  });
+
+  it.each(['uk', 'en'] as const)('every literal t() key in the sources exists in %s', (lang) => {
+    const keys = Object.values(sources).flatMap((src) =>
+      [...src.matchAll(/\bt\(\s*'([\w.]+)'/g)].map((m) => m[1]!),
+    );
+    expect(keys.length).toBeGreaterThan(0);
+    const missing = [...new Set(keys)].filter((key) => !i18n.exists(key, { lng: lang, count: 1 }));
+    expect(missing).toEqual([]);
   });
 });

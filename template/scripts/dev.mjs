@@ -1,4 +1,4 @@
-import { spawn, spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -8,7 +8,6 @@ const { devUrl, startFakeBotApi } = testing;
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const API_DIR = fileURLToPath(new URL('../apps/api', import.meta.url));
-const API = '@__APP_SLUG__/api';
 const WEB = '@__APP_SLUG__/web';
 const FAKE_BOT_PORT = 3199;
 const API_PORT = 3100;
@@ -67,13 +66,24 @@ let stopping = false;
 async function stop(code) {
   if (stopping) return;
   stopping = true;
-  for (const child of children) if (child.exitCode === null) child.kill('SIGTERM');
+  for (const child of children) {
+    try {
+      process.kill(-child.pid, 'SIGTERM');
+    } catch {}
+  }
   await fakeBot.close();
   process.exit(code);
 }
 
 function run(name, cmd, args, opts = {}) {
-  const child = spawn(cmd, args, { stdio: 'inherit', ...opts });
+  // Each child leads its own process group so stop() also reaches the grandchildren
+  // (nest start's app process); stdin stays closed because a background group reading
+  // the terminal would be stopped by SIGTTIN.
+  const child = spawn(cmd, args, {
+    stdio: ['ignore', 'inherit', 'inherit'],
+    detached: true,
+    ...opts,
+  });
   child.on('exit', (code) => {
     if (stopping) return;
     console.error(`${name} exited with code ${code}`);
@@ -86,18 +96,7 @@ function run(name, cmd, args, opts = {}) {
 process.on('SIGINT', () => void stop(0));
 process.on('SIGTERM', () => void stop(0));
 
-const initial = spawnSync('pnpm', ['--filter', API, 'build'], { cwd: ROOT, stdio: 'inherit' });
-if (initial.status !== 0) await stop(initial.status ?? 1);
-
-run(
-  'nest build',
-  'pnpm',
-  ['--filter', API, 'exec', 'nest', 'build', '--watch', '--preserveWatchOutput'],
-  {
-    cwd: ROOT,
-  },
-);
-run('api', process.execPath, ['--watch', 'dist/main.js'], {
+run('api', 'pnpm', ['exec', 'nest', 'start', '--watch', '--preserveWatchOutput'], {
   cwd: API_DIR,
   env: { ...process.env, BOT_API_ROOT: fakeBot.url, PORT: String(API_PORT) },
 });

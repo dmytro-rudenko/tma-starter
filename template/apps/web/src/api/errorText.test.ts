@@ -31,3 +31,15 @@ describe('errorMessage', () => {
     expect(errorMessage('weird', 'en')).toBe(generic);
   });
 });
+
+describe('errorText for codes an admin grant shares with a purchase', () => {
+  it('ALREADY_OWNED does not address the reader as the owner', () => {
+    expect(errorText.uk.ALREADY_OWNED).not.toMatch(/у вас/i);
+    expect(errorText.en.ALREADY_OWNED).not.toMatch(/\byou\b/i);
+  });
+
+  it('ENTITLEMENT_HELD_BY_SUBSCRIPTION does not promise that cancelling unblocks the grant', () => {
+    expect(errorText.uk.ENTITLEMENT_HELD_BY_SUBSCRIPTION).not.toMatch(/скасуйте/i);
+    expect(errorText.en.ENTITLEMENT_HELD_BY_SUBSCRIPTION).not.toMatch(/cancel/i);
+  });
+});

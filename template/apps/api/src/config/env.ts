@@ -51,7 +51,9 @@ export class Env {
   // Implicit conversion would turn the string 'false' into true, so read the raw value.
   @Transform(({ obj, key }) => {
     const raw = obj[key];
-    return typeof raw === 'string' ? raw.trim().toLowerCase() === 'true' : raw;
+    if (typeof raw !== 'string') return raw;
+    const value = raw.trim().toLowerCase();
+    return value === 'true' ? true : value === 'false' ? false : raw;
   })
   @IsBoolean()
   RUN_WORKER: boolean = true;

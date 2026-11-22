@@ -22,6 +22,7 @@ const PATH_TOKEN = 'refund-path-token-01';
 const SECRET = 'refund-secret-0123456789';
 const HOOK = { pathToken: PATH_TOKEN, secret: SECRET };
 const ADMIN: TgUser = { id: 8001, first_name: 'Admin' };
+const ADMIN_B: TgUser = { id: 8002, first_name: 'AdminB' };
 const PERIOD = 2_592_000;
 const PREMIUM_PRICE = 50;
 const VIP_PRICE = 100;
@@ -74,8 +75,8 @@ let seq = 0;
 const auth = (u: TgUser) => 'tma ' + t.tokenFor(u);
 const nowSec = () => Math.floor(Date.now() / 1000);
 
-const adminRefund = (paymentId: string) =>
-  t.http.post(`/api/admin/payments/${paymentId}/refund`).set('Authorization', auth(ADMIN));
+const adminRefund = (paymentId: string, admin: TgUser = ADMIN) =>
+  t.http.post(`/api/admin/payments/${paymentId}/refund`).set('Authorization', auth(admin));
 
 const paymentRow = (id: string) => t.knex('payments').where({ id }).first();
 
@@ -126,7 +127,7 @@ beforeAll(async () => {
       TmaCoreModule.forRoot({
         knex: ctx.knex,
         botToken: ctx.botToken,
-        adminUserIds: [ADMIN.id],
+        adminUserIds: [ADMIN.id, ADMIN_B.id],
         runWorker: false,
         throttle: { ttlMs: 60_000, limit: 100_000 },
       }),
@@ -327,6 +328,45 @@ describe('admin refund', () => {
     expect(rows).toHaveLength(1);
     expect(Number(rows[0].actor_id)).toBe(ADMIN.id);
     expect(rows[0].meta).toMatchObject({ payerId: buyer.id, productId: 'premium', amountStars: PREMIUM_PRICE });
+  });
+
+  it('a manual retry by another admin that fails again leaves the retry to the worker under that admin', async () => {
+    const buyer: TgUser = { id: 8115, first_name: 'RetryFail' };
+    const { paymentId } = await buy(buyer, 'premium');
+    const audits = () =>
+      t.knex('audit_events').where({ action: 'payment.refund', target_type: 'payment', target_id: paymentId });
+    t.fakeBot.respond('refundStarPayment', PROVIDER_DOWN, { times: 2 });
+
+    expect((await adminRefund(paymentId)).status).toBe(502);
+    expect((await adminRefund(paymentId, ADMIN_B)).status).toBe(502);
+    expect(Number((await paymentRow(paymentId)).refund_requested_by)).toBe(ADMIN_B.id);
+
+    await t
+      .knex('payments')
+      .where({ id: paymentId })
+      .update({ refund_attempted_at: t.knex.raw("now() - interval '2 days'") });
+    await t.app.get(PaymentsService).retryPendingRefunds();
+
+    expect((await paymentRow(paymentId)).status).toBe('refunded');
+    const rows = await audits();
+    expect(rows.map((r) => Number(r.actor_id))).toEqual([ADMIN_B.id]);
+  });
+
+  it('a manual retry by another admin that succeeds records and audits that admin', async () => {
+    const buyer: TgUser = { id: 8116, first_name: 'RetryOk' };
+    const { paymentId } = await buy(buyer, 'premium');
+    t.fakeBot.respond('refundStarPayment', PROVIDER_DOWN, { times: 1 });
+
+    expect((await adminRefund(paymentId)).status).toBe(502);
+    expect((await adminRefund(paymentId, ADMIN_B)).status).toBe(200);
+
+    const done = await paymentRow(paymentId);
+    expect(done.status).toBe('refunded');
+    expect(Number(done.refund_requested_by)).toBe(ADMIN_B.id);
+    const rows = await t
+      .knex('audit_events')
+      .where({ action: 'payment.refund', target_type: 'payment', target_id: paymentId });
+    expect(rows.map((r) => Number(r.actor_id))).toEqual([ADMIN_B.id]);
   });
 
   it('unknown payment id → 404 PAYMENT_NOT_FOUND without calling Telegram', async () => {

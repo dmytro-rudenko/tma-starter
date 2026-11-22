@@ -18,27 +18,34 @@ const pluginJson = {
   repository: 'https://github.com/dmytro-rudenko/tma-starter',
 };
 
+const skill = `---
+name: new
+description: Scaffold a Telegram Mini App
+version: 0.4.2
+---
+
+# Body
+version: 9.9.9
+`;
+
 function makeFixture() {
   const dir = mkdtempSync(path.join(tmpdir(), 'sync-plugin-version-'));
   mkdirSync(path.join(dir, 'packages/nest-core'), { recursive: true });
   mkdirSync(path.join(dir, '.claude-plugin'), { recursive: true });
   mkdirSync(path.join(dir, 'skills/new'), { recursive: true });
 
-  const corePkg = JSON.parse(readFileSync(path.join(root, 'packages/nest-core/package.json'), 'utf8'));
-  corePkg.version = '1.2.3';
-  const corePkgText = JSON.stringify(corePkg, null, 2) + '\n';
+  const corePkgText = JSON.stringify({ name: '@dmytro-rudenko/tma-nest-core', version: '1.2.3' }, null, 2) + '\n';
   writeFileSync(path.join(dir, 'packages/nest-core/package.json'), corePkgText);
 
   writeFileSync(path.join(dir, '.claude-plugin/plugin.json'), JSON.stringify(pluginJson, null, 2) + '\n');
 
-  const skill = readFileSync(path.join(root, 'skills/new/SKILL.md'), 'utf8');
   writeFileSync(path.join(dir, 'skills/new/SKILL.md'), skill);
 
-  return { dir, corePkgText, skill };
+  return { dir, corePkgText };
 }
 
 test('copies the nest-core version into plugin.json and SKILL.md frontmatter', (t) => {
-  const { dir, corePkgText, skill } = makeFixture();
+  const { dir, corePkgText } = makeFixture();
   t.after(() => rmSync(dir, { recursive: true, force: true }));
 
   execFileSync(process.execPath, [script, dir], { stdio: 'pipe' });
@@ -48,8 +55,7 @@ test('copies the nest-core version into plugin.json and SKILL.md frontmatter', (
     version: '1.2.3',
   });
 
-  const expectedSkill = skill.replace(/^version: 0\.0\.0$/m, 'version: 1.2.3');
-  assert.notEqual(expectedSkill, skill);
+  const expectedSkill = skill.replace('version: 0.4.2', 'version: 1.2.3');
   assert.equal(readFileSync(path.join(dir, 'skills/new/SKILL.md'), 'utf8'), expectedSkill);
 
   assert.equal(readFileSync(path.join(dir, 'packages/nest-core/package.json'), 'utf8'), corePkgText);

@@ -64,8 +64,8 @@ bash scripts/smoke-template.sh shop
 
 Далі реліз іде через `.github/workflows/release.yml`:
 
-1. Після merge у `main` `changesets/action` відкриває PR «Version Packages»: піднімає версії всіх п'яти пакетів, а `scripts/sync-plugin-version.mjs` переписує `version` у `.claude-plugin/plugin.json` і `skills/new/SKILL.md`.
-2. Merge цього PR запускає `pnpm -r build` і `changeset publish --provenance` з `NPM_TOKEN`.
+1. Після merge у `main` `changesets/action` запускає `pnpm run version-packages` і відкриває PR «Version Packages»: піднімає версії всіх п'яти пакетів, а `scripts/sync-plugin-version.mjs` переписує `version` у `.claude-plugin/plugin.json` і `skills/new/SKILL.md`.
+2. Merge цього PR запускає `pnpm run release` (`pnpm -r build` і `changeset publish`) з `NPM_TOKEN` і `NPM_CONFIG_PROVENANCE=true`, тож пакети публікуються з provenance.
 3. Перевірка: `npm view @dmytro-rudenko/tma-nest-core@<версія>` показує версію, ліцензію MIT і provenance; те саме для решти чотирьох пакетів.
 
 Першу версію `0.1.0` дає `.changeset/initial-release.md`.

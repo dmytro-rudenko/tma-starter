@@ -627,7 +627,7 @@ template/
   5. секрети GitHub;
   6. push у `main`.
 
-**Версії пакетів у проєкті (рішення білдера).** Усі п'ять `@dmytro-rudenko/tma-*` запінені точною версією `__TMA_VERSION__`. Оновлення однією командою, вона описана в `README.md` і `CLAUDE.md`: `pnpm up -r '@dmytro-rudenko/tma-*@latest'`, потім `pnpm db:migrate`.
+**Версії пакетів у проєкті (рішення білдера).** Усі п'ять `@dmytro-rudenko/tma-*` запінені точною версією `__TMA_VERSION__`. Оновлення однією командою, вона описана в `README.md` і `CLAUDE.md`: `pnpm tma:upgrade [version]` (оновлює і залежності, і `pnpm.overrides`, бо `pnpm up` overrides не змінює), потім `pnpm db:migrate`.
 
 **Мова документації (рішення білдера):** `CLAUDE.md`, rules, README і діалог skill-а — українською, як у plivka. Ідентифікатори, коміти й коментарі в коді — англійською.
 

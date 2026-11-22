@@ -8,6 +8,7 @@
     "cancel": "Cancel",
     "save": "Save",
     "loading": "Loading…",
+    "you": "You",
     "more": "Show more",
     "stars": "{{count}} ⭐"
   },
@@ -54,6 +55,7 @@
     "grantAdmin": "Make admin",
     "revokeAdmin": "Revoke admin",
     "blockConfirm": "Block {{name}}? They will lose access to the app.",
+    "unblockConfirm": "Unblock {{name}}? They will get access to the app again.",
     "grantConfirm": "Make {{name}} an administrator?",
     "revokeConfirm": "Revoke administrator rights from {{name}}?",
     "blocked": "User blocked",
@@ -71,6 +73,7 @@
       "refunded": "Refunded"
     },
     "refund": "Refund",
+    "refundRetry": "Retry refund",
     "refundConfirm": "Refund {{count}} ⭐? The stars go back to the user.",
     "refunded": "Payment refunded",
     "access": "Access",

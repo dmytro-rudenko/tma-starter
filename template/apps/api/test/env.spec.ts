@@ -78,6 +78,16 @@ describe('validateEnv', () => {
     expect(env.INIT_DATA_MAX_AGE_SEC).toBe(600);
   });
 
+  it.each(['TRUE', ' true ', 'False', 'FALSE'])('accepts RUN_WORKER=%p in any case', (raw) => {
+    expect(validateEnv({ ...VALID, RUN_WORKER: raw }).RUN_WORKER).toBe(
+      raw.trim().toLowerCase() === 'true',
+    );
+  });
+
+  it.each(['treu', '1', 'yes', 'off'])('rejects RUN_WORKER=%p', (raw) => {
+    expect(errorOf(() => validateEnv({ ...VALID, RUN_WORKER: raw }))).toContain('RUN_WORKER');
+  });
+
   it('parses ADMIN_USER_IDS into numbers', () => {
     expect(validateEnv({ ...VALID, ADMIN_USER_IDS: '1001, 2002,3003' }).ADMIN_USER_IDS).toEqual([
       1001, 2002, 3003,

@@ -40,6 +40,15 @@ function parseExpiresAt(v: unknown): Date | null {
   return d;
 }
 
+function assertGrantable(r: EntitlementRow): void {
+  if (r.source === 'subscription' && isActive(r)) {
+    throw apiError(HttpStatus.CONFLICT, 'ENTITLEMENT_HELD_BY_SUBSCRIPTION');
+  }
+  if (r.source === 'one_time' && isActive(r)) {
+    throw apiError(HttpStatus.CONFLICT, 'ALREADY_OWNED');
+  }
+}
+
 @Controller('api/admin/users/:id/entitlements')
 @UseGuards(AdminGuard)
 export class AdminEntitlementsController {
@@ -72,12 +81,7 @@ export class AdminEntitlementsController {
         .where({ user_id: userId, product_id: productId })
         .forUpdate()
         .first();
-      if (held && held.source === 'subscription' && isActive(held)) {
-        throw apiError(HttpStatus.CONFLICT, 'ENTITLEMENT_HELD_BY_SUBSCRIPTION');
-      }
-      if (held && held.source === 'one_time' && isActive(held)) {
-        throw apiError(HttpStatus.CONFLICT, 'ALREADY_OWNED');
-      }
+      if (held) assertGrantable(held);
       const fields = {
         source: 'grant',
         expires_at: expiresAt,
@@ -89,7 +93,19 @@ export class AdminEntitlementsController {
         .insert({ user_id: userId, product_id: productId, ...fields })
         .onConflict(['user_id', 'product_id'])
         .merge(fields)
+        .where((q) =>
+          q
+            .where('entitlements.source', 'grant')
+            .orWhere('entitlements.expires_at', '<=', trx.fn.now()),
+        )
         .returning('*');
+      if (!saved) {
+        const current: EntitlementRow = await trx('entitlements')
+          .where({ user_id: userId, product_id: productId })
+          .first();
+        assertGrantable(current);
+        throw apiError(HttpStatus.CONFLICT, 'ALREADY_OWNED');
+      }
       await this.audit.record(trx, {
         actorId: admin.id,
         action: 'entitlement.grant',

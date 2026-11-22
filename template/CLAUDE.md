@@ -26,6 +26,7 @@ pnpm db:start                        # Postgres 16 для розробки й т
 pnpm db:stop
 pnpm db:create                       # створює БД з DATABASE_URL, якщо її ще немає
 pnpm db:migrate                      # міграції пакетів і застосунку
+pnpm tma:upgrade                     # оновлює всі @dmytro-rudenko/tma-* разом з overrides
 ```
 
 Один тест:
@@ -43,10 +44,10 @@ pnpm --filter @__APP_SLUG__/api build && pnpm db:migrate
 
 ## Оновлення пакетів
 
-Усі п'ять `@dmytro-rudenko/tma-*` закріплені точною версією. Оновлення однією командою, а потім міграції, бо нова версія пакета може додати власні:
+Усі п'ять `@dmytro-rudenko/tma-*` закріплені однією точною версією в залежностях і в `pnpm.overrides` кореневого `package.json`. `pnpm up` не змінює overrides, тому оновлюй лише через `pnpm tma:upgrade` (версія аргументом, за замовчуванням остання), а потім застосуй міграції, бо нова версія пакета може додати власні:
 
 ```bash
-pnpm up -r '@dmytro-rudenko/tma-*@latest'
+pnpm tma:upgrade
 pnpm db:migrate
 ```
 

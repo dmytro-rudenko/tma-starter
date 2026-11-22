@@ -52,7 +52,7 @@ function Shell() {
       {stack.map((entry, i) => {
         const Component = registry[entry.kind];
         return (
-          <LayerContext.Provider key={i} value={{ index: i, isTop: i === topIndex }}>
+          <LayerContext.Provider key={i} value={{ index: i, isTop: i === topIndex, entry }}>
             <Component {...entry.props} />
           </LayerContext.Provider>
         );

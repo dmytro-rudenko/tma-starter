@@ -11,6 +11,7 @@
     "db:stop": "tma-test-pg stop",
     "db:create": "node scripts/db-create.mjs",
     "db:migrate": "pnpm --filter @__APP_SLUG__/api migrate",
+    "tma:upgrade": "node scripts/tma-upgrade.mjs",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test"
