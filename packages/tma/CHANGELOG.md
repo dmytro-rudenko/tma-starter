@@ -1,5 +1,11 @@
 # tma-starter
 
+## 0.1.2
+
+### Patch Changes
+
+- b4ff546: The generated project docs (README, CLAUDE.md, .claude/rules) and the /tma-starter:new skill are now in English.
+
 ## 0.1.1
 
 ### Patch Changes

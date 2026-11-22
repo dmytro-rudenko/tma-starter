@@ -1,6 +1,6 @@
 {
   "name": "tma-starter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Building blocks for Telegram Mini Apps: NestJS auth, users, admin rights, grammY bot, Telegram Stars payments, React client and test utilities",
   "license": "MIT",
   "homepage": "https://github.com/dmytro-rudenko/tma-starter#readme",
