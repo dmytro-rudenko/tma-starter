@@ -1,7 +1,7 @@
 ---
 name: new
 description: Use when the user asks to create a new Telegram Mini App, start a TMA project, or scaffold a mini app with users, admin rights and Telegram Stars payments. Interviews for the variant (empty or shop) and parameters, generates the project from the tma-starter template and brings it to locally green tests
-version: 0.0.0
+version: 0.1.0
 ---
 
 # Новий Telegram Mini App
