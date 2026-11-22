@@ -11,8 +11,7 @@
     "test": "pnpm -r test",
     "db:start": "node packages/tma/dist/cjs/testing/bin/tma-test-pg.js start",
     "db:stop": "node packages/tma/dist/cjs/testing/bin/tma-test-pg.js stop",
-    "version-packages": "changeset version && node scripts/sync-plugin-version.mjs && pnpm install --lockfile-only",
-    "release": "pnpm -r build && changeset publish"
+    "version-packages": "changeset version && node scripts/sync-plugin-version.mjs && pnpm install --lockfile-only"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",

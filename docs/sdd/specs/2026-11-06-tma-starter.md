@@ -770,3 +770,7 @@ Job `scaffold-macos` (`macos-latest`) запускає лише `scaffold.test.s
 ### 7.1 2026-11-22: один пакет `tma-starter` з підшляхами
 
 Замість п'яти пакетів `@pctea/tma-nest-core`, `@pctea/tma-nest-bot`, `@pctea/tma-nest-payments`, `@pctea/tma-web` і `@pctea/tma-testing` публікується один пакет `tma-starter` з підшляхами `./nest-core`, `./nest-bot`, `./nest-payments`, `./testing`, `./testing/dom`, `./web` і `./web/react`. Причина — одна версія: шаблону не потрібні `pnpm.overrides` і скрипт `pnpm tma:upgrade`, а оновлення проєкту — `pnpm up -r tma-starter@latest`. Нове ім'я починає з `0.1.0`. Уже опубліковані `0.1.0` п'яти пакетів `@pctea/tma-*` буде позначено deprecated. Пакет названо `tma-starter` без скоупу, як репозиторій і плагін: назва `tma` на npm зайнята.
+
+### 7.2 2026-11-22: ручна публікація в npm
+
+`release.yml` лише відкриває PR «Version Packages». Публікує власник локально: `pnpm --filter tma-starter publish --access public --otp=<код>`. Секрету `NPM_TOKEN` у репозиторії немає, тому пакети виходять без provenance. Пункти §2 про `changeset publish` з `NPM_TOKEN` і provenance в CI цим скасовано.
