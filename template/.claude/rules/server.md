@@ -6,10 +6,10 @@ paths:
 
 ## Загальне
 
-- БД — PostgreSQL через Knex. Той самий екземпляр `DatabaseModule` передано в `TmaCoreModule.forRoot`; не створюй друге з'єднання.
+- БД — PostgreSQL через Knex. Єдиний екземпляр knex створює `createKnexConnection` із `database/knex.ts` і передає в `TmaCoreModule.forRoot`; не створюй друге з'єднання.
 - Схему змінюй лише новою міграцією в `database/migrations/`; застосовану міграцію не редагуй — на проді вона вже виконана. Порядок міграцій задає `composeMigrations(core, bot, payments, appMigrations)` у `database/migrate.ts`: спершу пакети, потім застосунок. Пакети припускають, що схема вже змігрована.
 - **Міграції йдуть до старту нового API.** `deploy.sh` виконує `node dist/database/migrate.js latest` в одноразовому контейнері, а потім `up -d api`. Поки міграція виконується, а потім до перезапуску, стара версія коду працює на новій схемі: пиши міграції зворотно сумісними (додавай колонки, не перейменовуй і не видаляй у тому ж деплої).
-- `process.env` читає лише `config/env.ts`; решта коду бере значення з `ConfigService`. Логуй через Nest `Logger`, не `console.*`. Виняток для обох правил — CLI `database/migrate.ts`.
+- `process.env` перевіряє `validateEnv` із `config/env.ts`: його викликають лише `main.ts` і `appImports` в `app.module.ts`. Решта коду `process.env` не читає й отримує значення як опції `forRoot(...)`, які `appImports` збирає з перевіреного `Env`. Нова змінна — це поле в класі `Env` і передача значення в потрібний модуль через `appImports`. Логуй через Nest `Logger`, не `console.*`. Виняток для обох правил — CLI `database/migrate.ts`.
 - Не пиши в логи `BOT_TOKEN`, `WEBHOOK_SECRET`, `WEBHOOK_PATH_TOKEN`, `initData` і заголовок `Authorization`.
 - Нові ендпоінти, що приймають великі тіла чи шлють повідомлення, отримують власний `@Throttle` і ліміт розміру.
 - Виклики Telegram не робимо всередині транзакції: лише після коміту, сповіщення — fire-and-forget (`NotificationsService.send` не кидає винятків).
@@ -25,9 +25,9 @@ paths:
 
 ## Платежі
 
-- Платежі, відшкодування й entitlements веде `@dmytro-rudenko/tma-nest-payments`; застосунок лише описує продукти. Ідемпотентність за `telegram_payment_charge_id` забезпечує пакет.
+- Платежі, відшкодування й entitlements веде `tma-starter/nest-payments`; застосунок лише описує продукти. Ідемпотентність за `telegram_payment_charge_id` забезпечує пакет.
 - Доступ за покупкою перевіряй через `EntitlementGuard('<productId>')` або `EntitlementsService.has`, а не власними запитами до таблиць.
 
 ## Тести
 
-- `createTestApp` з `@dmytro-rudenko/tma-testing` піднімає `AppModule` на новій базі з фейковим Bot API. Підміняй лише зовнішнє (`overrides`), не сервіси й не БД.
+- `createTestApp` з `tma-starter/testing` піднімає `AppModule` на новій базі з фейковим Bot API. Підміняй лише зовнішнє (`overrides`), не сервіси й не БД.

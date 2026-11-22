@@ -1,0 +1,28 @@
+{
+  "shop": {
+    "tab": "Shop",
+    "title": "Shop",
+    "empty": "There is nothing here yet.",
+    "buy": "Buy",
+    "subscribe": "Subscribe",
+    "active": "Active",
+    "activeUntil": "Active until {{date}}",
+    "failed": "The payment failed. Try again.",
+    "premium": {
+      "title": "Premium content",
+      "locked": "This content comes with the Premium subscription.",
+      "unlock": "Unlock access"
+    },
+    "paywall": {
+      "title": "Premium",
+      "text": "A 30-day subscription gives you all the premium content. You can cancel it any time in Settings."
+    },
+    "subscription": {
+      "title": "Subscription",
+      "nextCharge": "Next charge: {{date}}",
+      "canceledUntil": "Subscription canceled. Access until {{date}}",
+      "cancel": "Cancel",
+      "resume": "Resume"
+    }
+  }
+}

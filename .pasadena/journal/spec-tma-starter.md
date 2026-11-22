@@ -14,10 +14,7 @@ started: 2026-11-06
 який проходить свої тести й стартує локально.
 
 ## Now
-Хвилі 0–7 закриті (8a5cc63): усі 5 пакетів зелені разом з acceptance. Хвиля 8: Tasks 13 (template root+api), 14 (template web), 16 (repo CI/manifest).
-GROUP_BASE: 5ba6476
-Шаблон тестується через scaffold у тимчасову теку з TMA_PLUGIN_ROOT (plugin.json з'являється в Task 16 цієї ж хвилі).
-Контекст Task 13: pnpm.overrides для tma-* у template/package.json, template/.dockerignore. На Finish: prettier --write.
+Опубліковано tma-starter@0.1.0 (один пакет із підшляхами, 8ba80fc); п'ять @pctea/tma-*@0.1.0 позначено deprecated. Scaffold з npm зелений, CI PR #2 зелений. Лишилось: merge PR #2 (з підтвердження власника) і ручна перевірка /tma-starter:new (Task 17 Step 6).
 
 ## Timeline
 
@@ -76,3 +73,25 @@ GROUP_BASE: 5ba6476
 - 22:35 ● f59f5aa feat(nest-payments): refunds, subscription cancel, admin API and reconcile
 - 22:35 ● 8a5cc63 docs(plan): tick wave 7
 - 22:35 ✎ Хвиля 7: nest-payments B, усі пакети та їхні acceptance зелені
+- 22:35 ● 9afaa01 chore(journal): wave 7 closed
+
+### 2026-11-07
+- 08:56 ⏸ pause · exit · HEAD=9afaa01 · dirty: scripts/error-codes.test.mjs,scripts/sync-plugin-version.test.mjs,template/.dockerignore
+
+### 2026-11-22
+- 11:45 ✎ Відновлено після передчасного merge PR #1; гілку fast-forward до main d06397e
+- 11:45 ● 66c444a feat(template): workspace root and apps/api on tma-* packages
+- 11:45 ● 564e72f feat(template): apps/web base screens and admin sheets
+- 11:45 ● 8ac81d5 ci: plugin manifest, CI and release workflows, pack-check
+- 11:45 ✎ Хвиля 8: smoke empty зелений, pack-check OK, error-codes 5/5. Ruling: template/.dockerignore → Task 13, scripts/sync-plugin-version.test.mjs → Task 16 — не були в Writes — ціна помилки нульова. mutator: skipped (код хвилі вже існував; тести перевірені ручними мутаціями агентів)
+- 12:30 ● f024fa2 feat(template): shop variant with Stars purchases and premium
+- 12:30 ✎ Хвиля 9: smoke shop і scaffold.test зелені. Ruling: ShopModule реєструє ^shop$ через push у TMA_BOT_OPTIONS.startParams — app.module.ts поза Writes Task 15 — тепер закріплено webhook-тестом
+- 12:30 ● 3642f0f fix(nest-payments): guard grants over one_time, audit retried admin refunds
+- 12:30 ● 6c97c8b fix(template): drop dead config tokens, pin /start shop route
+- 12:30 ● 4986b67 fix(ci): smoke database url, run script tests, build before db:start
+- 12:30 ✎ Групове рев'ю 7–9: 2 раунди, 11 знахідок. Parked: #8 reconcile у UI лише останні 100 (спека: limit 100), #10 назва RefundsService.notify. Ruling: ConfigModule/DatabaseModule прибрано як мертві — спека §3.9 називала їх лише в порядку модулів — ціна: розбіжність тексту спеки
+- 13:50 ● b1e510a test(nest-payments): mutator survivors
+- 13:50 ● eb17607 fix(release): whole-branch and security review findings
+- 13:50 ✎ Finish: whole-branch + Codex + security review; реліз-воркфлоу був непрацездатний (&& без shell, --provenance), pnpm dev зламаний — виправлено. crapper: лише template (0% покриття з кореня). mutator: 9 еквівалентних survivors. Ruling: фікс-хвиля двома агентами з неперетинними файлами — обсяг
+- 13:50 ✎ PR #2 https://github.com/dmytro-rudenko/tma-starter/pull/2
+- Реліз: п'ять @pctea/tma-*@0.1.0 опубліковано вручну (npm publish, акаунт pctea), потім об'єднано в один пакет; назва tma на npm зайнята, тож tma-starter. ✎ tma-starter@0.1.0 опубліковано, старі п'ять deprecated; scaffold з реєстру: api 43, web 111.

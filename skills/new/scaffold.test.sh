@@ -123,4 +123,25 @@ grep -q 'leftover.md' "$T/out.log" || {
   fail "exit 3 message does not list the file with the leftover placeholder"
 }
 
+TMA_VERSION="$(node -p 'require(process.argv[1]).version' "$PLUGIN_ROOT/.claude-plugin/plugin.json")"
+mkdir -p "$T/tarballs"
+TARBALL="$(cd "$T/tarballs" && pwd)/tma-starter-$TMA_VERSION.tgz"
+expect_exit 0 --dir "$T/from-source" "${COMMON[@]}" --variant shop --tma-source "$T/tarballs"
+for pkg in package.json apps/api/package.json apps/web/package.json; do
+  node -e '
+    const [file, tarball] = process.argv.slice(1);
+    const pkg = require(file);
+    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+    const tma = Object.keys(deps).filter((name) => name === "tma-starter" || name.startsWith("@pctea/"));
+    if (tma.join() !== "tma-starter") throw new Error(`${file}: expected only tma-starter, got ${tma.join(", ")}`);
+    if (deps["tma-starter"] !== `file:${tarball}`) throw new Error(`${file}: tma-starter is ${deps["tma-starter"]}`);
+    if (pkg.pnpm?.overrides) throw new Error(`${file}: has pnpm.overrides`);
+    if (pkg.scripts?.["tma:upgrade"]) throw new Error(`${file}: has the tma:upgrade script`);
+  ' "$T/from-source/$pkg" "$TARBALL" || fail "(--tma-source) $pkg does not depend on the single tarball"
+done
+[ ! -e "$T/from-source/scripts/tma-upgrade.mjs" ] || fail "scripts/tma-upgrade.mjs must not exist"
+if grep -rnF '@pctea' "$T/from-source"; then
+  fail "generated project still references @pctea packages"
+fi
+
 echo "All checks passed."

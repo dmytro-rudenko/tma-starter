@@ -1,10 +1,10 @@
-# tma-starter: пакети `@dmytro-rudenko/tma-*` і плагін-шаблон Telegram Mini App — design
+# tma-starter: пакет `tma-starter` і плагін-шаблон Telegram Mini App — design
 
 **Date:** 2026-11-06
 **Status:** agreed
 **Prototype:** — (без прототипу за рішенням користувача: нові екрани частини B будуються на перевірених патернах адмінки plivka й описані функціонально)
 
-Spec має дві частини. **Частина A** (3.1–3.7) — npm-пакети. **Частина B** (3.8–3.12) — шаблон застосунку, `scaffold.sh` і skill плагіна `tma-starter`. Частину B будують після A, бо вона залежить від A.
+Spec має дві частини. **Частина A** (3.1–3.7) — npm-пакет `tma-starter`. **Частина B** (3.8–3.12) — шаблон застосунку, `scaffold.sh` і skill плагіна `tma-starter`. Частину B будують після A, бо вона залежить від A.
 
 ## 1. Problem
 
@@ -36,14 +36,14 @@ Spec має дві частини. **Частина A** (3.1–3.7) — npm-па
 skills/                           # частина B
 template/                         # частина B; НЕ в pnpm workspace
 packages/
-  nest-core/  nest-bot/  nest-payments/  web/  testing/
+  tma/                            # src/{nest-core,nest-bot,nest-payments,web,testing}, test/<те саме>
 .changeset/config.json
 .github/workflows/ci.yml  release.yml
 package.json  pnpm-workspace.yaml  tsconfig.base.json  .nvmrc  .prettierrc  .editorconfig
 ```
 
-- Імена npm-пакетів: `@dmytro-rudenko/tma-nest-core`, `-tma-nest-bot`, `-tma-nest-payments`, `-tma-web`, `-tma-testing`. Усі мають `publishConfig.access: public`.
-- `pnpm-workspace.yaml` містить лише `packages/*`. Залежності між пакетами оголошені як `workspace:*`.
+- Один npm-пакет `tma-starter` з підшляхами `./nest-core`, `./nest-bot`, `./nest-payments`, `./testing`, `./testing/dom`, `./web`, `./web/react` (рішення 7.1). `publishConfig.access: public`.
+- `pnpm-workspace.yaml` містить лише `packages/*`. Модулі всередині пакета імпортують один одного відносними шляхами, тож `nest-bot` і `nest-payments` під час виконання ділять один екземпляр `nest-core`.
 - Тулчейн:
   - Node `26.13.0`: `.nvmrc`, `engines: >=26.13.0`;
   - `packageManager: pnpm@10.28.0`;
@@ -51,41 +51,41 @@ package.json  pnpm-workspace.yaml  tsconfig.base.json  .nvmrc  .prettierrc  .edi
   - `tsconfig.base.json` скопійований з plivka;
   - Prettier `^3.3.3`.
 - Збірка:
-  - `nest-core`, `nest-bot`, `nest-payments` і `testing` збираються в CJS через `tsc -p tsconfig.build.json` у `dist/` разом із `.d.ts`;
-  - `web` збирається в ESM через `tsc` (entry `src/index.ts` і `src/react/index.ts`, `sideEffects: false`);
-  - кожен пакет має `files: ["dist"]` і `exports` з `types`/`default`.
+  - `nest-core`, `nest-bot`, `nest-payments` і `testing` збираються в CJS через `tsc -p tsconfig.cjs.json` у `dist/cjs/` разом із `.d.ts`;
+  - `web` збирається в ESM через `tsc -p tsconfig.esm.json` у `dist/esm/` (entry `src/web/index.ts` і `src/web/react/index.ts`); `dist/esm/package.json` містить `"type": "module"`, а `sideEffects` перелічує лише `./dist/cjs/**`, тож web-частина tree-shake-иться;
+  - пакет має `files: ["dist"]`, `exports` з `types`/`default` для кожного підшляху і bin-и `tma-bot` і `tma-test-pg`.
 - peerDependencies:
   - `@nestjs/common` і `@nestjs/core` `^10.4`, `@nestjs/platform-socket.io` `^10.4`, `@nestjs/websockets` `^10.4`, `@nestjs/throttler` (версія з plivka);
   - `knex` `^3.1`, `pg` `^8`, `grammy` `^1.30`, `socket.io` `^4.8`;
-  - web: `react` `^18.3`, `@tanstack/react-query` `^5`, `socket.io-client` `^4.8`, `i18next` `^23`, `react-i18next` `^15`, усі позначені `optional` у `peerDependenciesMeta`, крім `i18next`.
-- Порядок збірки: `pnpm -r build` іде за топологією core → bot → payments; web і testing незалежні.
+  - web: `react` `^18.3`, `@tanstack/react-query` `^5`, `socket.io-client` `^4.8`, `i18next` `^23`, `react-i18next` `^15`, усі peer-залежності, серверні й web, позначені `optional` у `peerDependenciesMeta`: серверному застосунку не потрібні React чи i18next, а web-застосунку — Nest чи knex.
+- Збірка — `node scripts/build.mjs` у `packages/tma`: очищає `dist/`, проганяє обидва `tsc` і пише `dist/esm/package.json`. `pnpm test` у пакеті запускає jest (серверні підшляхи) і vitest (`web`).
 - **Схема до трафіку (рішення білдера).** Код пакетів вважає, що всі міграції вже застосовані, і перевірок `hasColumn` не робить. Деплой частини B спершу запускає міграції і лише потім стартує API. Порядок у plivka інший: API стартує до `migrate` (`plivka deploy/deploy.test.sh:75`), і шаблон цей порядок не переймає.
 - `ci.yml` запускається на PR і push у main:
   - сервіс `postgres:16` (як у `plivka/.github/workflows/deploy.yml:24-41`), `DATABASE_ADMIN_URL=postgres://postgres:postgres@localhost:5432/postgres`;
   - кроки `pnpm install --frozen-lockfile`, далі `pnpm -r build`, `pnpm -r test`, `pnpm -r typecheck`;
-  - крок `pack-check`: `pnpm -r pack` у тимчасову теку, далі fixture-проєкт `scripts/pack-check/` ставить tarball-и і компілює імпорт кожного `exports`-шляху.
+  - крок `pack-check`: `pnpm -r pack` у тимчасову теку, далі fixture-проєкт `scripts/pack-check/` ставить єдиний tarball, компілює імпорт кожного `exports`-шляху й імпортує кожен у Node.
 - `release.yml`:
   - `changesets/action` відкриває PR «Version packages»;
   - після merge виконуються `pnpm -r build` і `changeset publish` з `NPM_TOKEN`, `--provenance` і `permissions: id-token: write`;
-  - режим `fixed` для всіх п'яти пакетів: будь-яка зміна бампить і публікує всі п'ять з однією версією. Перша версія `0.1.0`. Внутрішні залежності оголошені як `workspace:*`, тож у npm вони публікуються з точною версією, і пакети з різних релізів не змішуються. Шаблон пінить одну версію для всіх (рішення білдера: `linked` бампить лише змінені пакети, а `^0.x` в semver покриває тільки один minor).
-- Ліцензія MIT: файл `LICENSE` у корені та в кожному пакеті, `"license": "MIT"`. `repository` має вигляд `{ type: "git", url: "git+https://github.com/dmytro-rudenko/tma-starter.git", directory: "packages/<name>" }` — без цього `--provenance` не спрацює.
+  - пакет один, тож версія одна, і режим `fixed` не потрібен. Перша версія `tma-starter` — `0.1.0`. Шаблон пінить точну версію, бо `^0.x` в semver покриває тільки один minor.
+- Ліцензія MIT: файл `LICENSE` у корені та в `packages/tma`, `"license": "MIT"`. `repository` має вигляд `{ type: "git", url: "git+https://github.com/dmytro-rudenko/tma-starter.git", directory: "packages/tma" }` — без цього `--provenance` не спрацює.
 - Перший реліз входить у частину A:
   - публічний GitHub-репо `dmytro-rudenko/tma-starter` створюється через `gh`;
-  - npm scope `@dmytro-rudenko` і секрет `NPM_TOKEN` у репо налаштовує власник;
+  - npm-акаунт з правом публікації `tma-starter` і секрет `NPM_TOKEN` у репо налаштовує власник;
   - реліз — `0.1.0`, опублікований через `release.yml`.
   - Кроки для власника описані в `README.md`, розділ «Release».
-- `version` у `plugin.json` бампиться в кожному PR, що змінює `skills/` або `template/`. Версіями npm-пакетів керують changesets.
+- `version` у `plugin.json` бампиться в кожному PR, що змінює `skills/` або `template/`. Версією `tma-starter` керують changesets.
 
 ### 3.2 Міграції: спільний контракт
 
-- Кожен nest-пакет експортує `migrations: Knex.MigrationSource<Migration>`. Модулі міграцій імпортуються статично, а не через `directory`, тож шлях `dist` після встановлення ролі не грає.
+- Кожен nest-підшлях експортує `migrations: Knex.MigrationSource<Migration>`. Модулі міграцій імпортуються статично, а не через `directory`, тож шлях `dist` після встановлення ролі не грає.
 - Імена мають вигляд `tma_<pkg>_<NNN>_<what>`, наприклад `tma_core_001_init`.
-- `@dmytro-rudenko/tma-nest-core` експортує `composeMigrations(...sources)`. Він повертає одне `MigrationSource`, у якому порядок міграцій такий: core → bot → payments → міграції застосунку. Порядок задається порядком аргументів, а не сортуванням імен.
+- `tma-starter/nest-core` експортує `composeMigrations(...sources)`. Він повертає одне `MigrationSource`, у якому порядок міграцій такий: core → bot → payments → міграції застосунку. Порядок задається порядком аргументів, а не сортуванням імен.
 - Таблиці мають імена без префікса: `users`, `audit_events`, `app_settings`, `broadcasts`, `broadcast_deliveries`, `payments`, `entitlements`.
 
-### 3.3 `@dmytro-rudenko/tma-nest-core`
+### 3.3 `tma-starter/nest-core`
 
-Залежності між пакетами: немає. Інші nest-пакети залежать від core.
+Залежності від інших підшляхів: немає. Інші nest-підшляхи залежать від core.
 
 **Підключення.**
 ```ts
@@ -193,7 +193,7 @@ TmaCoreModule.forRoot({
 
 Заблокований користувач отримує 403 `USER_BLOCKED` на всі `/api/*`, зокрема на `/api/me`. Клієнт показує `BlockedScreen` (частина B), коли бачить цей код.
 
-### 3.4 `@dmytro-rudenko/tma-nest-bot`
+### 3.4 `tma-starter/nest-bot`
 
 Залежить від core.
 
@@ -279,7 +279,7 @@ TmaBotModule.forRoot({
 
 **`PreparedMessagesService.save(userId, result: InlineQueryResultArticle): Promise<string>`** викликає `savePreparedInlineMessage` (прапорці як у `retro-game-bot bot/prepared-messages.ts:24-31`).
 
-### 3.5 `@dmytro-rudenko/tma-nest-payments`
+### 3.5 `tma-starter/nest-payments`
 
 Залежить від core і bot. Валюта лише `XTR` (Telegram Stars).
 
@@ -386,7 +386,7 @@ interface Product {
 
 Коди помилок пакета: `NO_ENTITLEMENT`, `PRODUCT_NOT_FOUND`, `PRODUCT_UNAVAILABLE`, `ALREADY_SUBSCRIBED`, `ALREADY_OWNED`, `ENTITLEMENT_HELD_BY_SUBSCRIPTION`, `NO_SUBSCRIPTION`, `PAYMENT_NOT_FOUND`, `ALREADY_REFUNDED`, `PAYMENT_PROVIDER_UNAVAILABLE`.
 
-### 3.6 `@dmytro-rudenko/tma-web`
+### 3.6 `tma-starter/web`
 
 ESM. Пакет не містить жодного UI-компонента. Екрани, адмінка, навігація (`stack`/`tabs`), `tokens.css` і словники живуть у шаблоні (частина B).
 
@@ -405,7 +405,7 @@ ESM. Пакет не містить жодного UI-компонента. Ек
   - `applyThemeParams()` (opt-in) мапить `themeParams` у `--tg-theme-*`;
   - `createPrefsCache(key)` повертає `{ read, write, restore }`. Недоступний localStorage мовчки ігнорується.
 - `createI18n({ resources, supported, fallback })` повертає `{ i18n, setLanguage, applyLanguagePref, langFromCode }`. `langFromCode` працює за тим самим правилом, що й бот.
-- `TMA_ERROR_CODES` — масив усіх кодів помилок core, bot і payments, плюс тип `TmaApiErrorCode`. Тест у корені репо звіряє цей масив з enum'ами nest-пакетів, тож розбіжність ламає CI (рішення білдера: `apps/web` не може імпортувати nest-пакети). `errorText.ts` шаблону має тип `Record<TmaApiErrorCode | AppErrorCode, string>`.
+- `TMA_ERROR_CODES` — масив усіх кодів помилок core, bot і payments, плюс тип `TmaApiErrorCode`. Тест у корені репо звіряє цей масив з масивами кодів nest-підшляхів, тож розбіжність ламає CI (рішення білдера: `apps/web` не може імпортувати nest-пакети). `errorText.ts` шаблону має тип `Record<TmaApiErrorCode | AppErrorCode, string>`.
 - `createApiClient({ baseUrl = '' })` повертає `{ request<T>(path, { method, json, body, headers }) }`:
   - додає заголовок `Authorization: tma <initData>`;
   - помилка → `ApiError { status, code: string, message }`.
@@ -428,11 +428,11 @@ ESM. Пакет не містить жодного UI-компонента. Ек
   - на кожен результат викликає haptic notify.
 - `useRealtimeEvent(event, handler)` тримає одне з'єднання на провайдер і після reconnect інвалідує `me` та `entitlements`.
 
-### 3.7 `@dmytro-rudenko/tma-testing`
+### 3.7 `tma-starter/testing`
 
 Хелпери не імпортують jest.
 
-**`.` (Node)**
+**`./testing` (Node)**
 - `signInitData(user, botToken, { authDate?, startParam?, extra? })` і `tmaAuth(user, botToken)`.
 - `updates.message`, `updates.command(cmd, payload?)`, `updates.preCheckoutQuery({ payload, totalAmount, from, currency? })`, `updates.successfulPayment({ payload, chargeId, totalAmount, from, subscriptionExpirationDate?, isRecurring?, isFirstRecurring? })`.
 - `postWebhook(http, update, { pathToken, secret })`.
@@ -450,16 +450,16 @@ ESM. Пакет не містить жодного UI-компонента. Ек
 - `waitFor(fn, timeoutMs)`.
 
 **Підшляхи**
-- `devUrl({ baseUrl, user, botToken, startParam? }) → string` (корінь пакета, Node): URL виду `<baseUrl>/#tgWebAppData=<signed>&tgWebAppVersion=8.0&tgWebAppPlatform=tdesktop`. Справжній `telegram-web-app.js` сам читає ці hash-параметри, тож застосунок відкривається у звичайному браузері з валідним initData.
+- `devUrl({ baseUrl, user, botToken, startParam? }) → string` (`./testing`, Node): URL виду `<baseUrl>/#tgWebAppData=<signed>&tgWebAppVersion=8.0&tgWebAppPlatform=tdesktop`. Справжній `telegram-web-app.js` сам читає ці hash-параметри, тож застосунок відкривається у звичайному браузері з валідним initData.
 - Playwright-заглушки немає: e2e-тестів шаблон не має (рішення користувача).
-- `./dom`: `installFakeWebApp(window, overrides)` для vitest + jsdom.
+- `./testing/dom`: `installFakeWebApp(window, overrides)` для vitest + jsdom.
 
 **bin `tma-test-pg start|stop|status`** — перенесений `plivka scripts/test-pg.sh`: PG 16 без Docker на `127.0.0.1:54329`, `fsync=off`. Шукає `pg_ctl` також у Homebrew-шляхах `postgresql@16`. На macOS використовує локаль `en_US.UTF-8` замість `C.UTF-8`.
 
 ### 3.8 Плагін `tma-starter`: структура і версія
 
 ```
-.claude-plugin/plugin.json          # name: tma-starter, version = версія пакетів (fixed)
+.claude-plugin/plugin.json          # name: tma-starter, version = версія `tma-starter`
 .claude-plugin/marketplace.json     # marketplace "tma-starter" з одним плагіном
 skills/new/SKILL.md                 # /tma-starter:new
 skills/new/scaffold.sh
@@ -468,8 +468,8 @@ template/                           # 3.9
 ```
 
 - **Один реліз на весь spec (рішення білдера).** Частини A і B будуються на одній гілці й виходять одним релізом `0.1.0`. Публікація — останній крок плану, після зеленого `template-smoke`. Поки реліз не відбувся, частина B може правити пакети A. `changeset-check` не перевіряє гілки `changeset-release/*`.
-- `version` у `plugin.json` дорівнює версії пакетів. Скрипт `scripts/sync-plugin-version.mjs` переписує її на кроці `changeset version` у `release.yml`. CI-крок `changeset-check` вимагає changeset у кожному PR, який змінює `skills/`, `template/` або `packages/`. Так виконується правило «кожна зміна skill бампить версію»: changeset бампить пакети, а за ними й плагін.
-- `scaffold.sh` визначає версію пакетів, на яку підставити `__TMA_VERSION__`, з `version` у `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`. Тому встановлена версія плагіна завжди генерує проєкт з пакетами тієї самої версії.
+- `version` у `plugin.json` дорівнює версії `tma-starter`. Скрипт `scripts/sync-plugin-version.mjs` переписує її на кроці `changeset version` у `release.yml`. CI-крок `changeset-check` вимагає changeset у кожному PR, який змінює `skills/`, `template/` або `packages/`. Так виконується правило «кожна зміна skill бампить версію»: changeset бампить пакети, а за ними й плагін.
+- `scaffold.sh` визначає версію `tma-starter`, на яку підставити `__TMA_VERSION__`, з `version` у `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`. Тому встановлена версія плагіна завжди генерує проєкт з пакетами тієї самої версії.
 
 ### 3.9 Шаблон `template/`
 
@@ -496,7 +496,7 @@ template/
 | `__DOMAIN__` | домен без схеми | `coffee.example.com` |
 | `__DEFAULT_LANG__` | `uk` або `en` | `uk` |
 | `__ACCENT__` | `#rrggbb` | `#2f80ed` |
-| `__TMA_VERSION__` | точна версія пакетів | `0.1.0` |
+| `__TMA_VERSION__` | точна версія `tma-starter` | `0.1.0` |
 | `__API_PORT__` | порт API на хості (compose, nginx `proxy_pass`, `check.sh`), за замовчуванням `3200` | `3201` |
 
 **Маркери варіанту.**
@@ -533,7 +533,7 @@ template/
   - `features/registry.tsx` мапить `kind` на компонент.
 - **Компоненти з plivka без змін:** `components/sheet/*` (`Sheet`, `FullscreenLayer`), `Toast`, `Avatar`, `AdminConfirm`, `BlockedScreen`, `useDebounced`.
 - **Тема:** `theme/tokens.css` з нейтральною палітрою (світла й темна) і `--accent: __ACCENT__`, без доменних токенів plivka; `global.css` з plivka.
-- **i18n:** `createI18n` з `tma-web`, словники `i18n/uk.json` і `en.json`, `api/errorText.ts` мапить коди помилок усіх пакетів на тексти.
+- **i18n:** `createI18n` з `tma-starter/web`, словники `i18n/uk.json` і `en.json`, `api/errorText.ts` мапить коди помилок усіх пакетів на тексти.
 - `__DEFAULT_LANG__` впливає лише на web: `<html lang>` і `fallback` у `createI18n` (рішення білдера). Мова бота за замовчуванням лишається `en` за правилом `langOf`.
 - `index.html`: `lang="__DEFAULT_LANG__"`, `<title>__APP_TITLE__</title>`, `telegram-web-app.js`, без зовнішніх шрифтів.
 - `vite.config.ts`: proxy `/api` і `/api/socket.io` (ws) на `127.0.0.1:3100`, а також `/bot` для локального fake-бота; vitest із jsdom.
@@ -627,16 +627,16 @@ template/
   5. секрети GitHub;
   6. push у `main`.
 
-**Версії пакетів у проєкті (рішення білдера).** Усі п'ять `@dmytro-rudenko/tma-*` запінені точною версією `__TMA_VERSION__`. Оновлення однією командою, вона описана в `README.md` і `CLAUDE.md`: `pnpm up -r '@dmytro-rudenko/tma-*@latest'`, потім `pnpm db:migrate`.
+**Версія пакета в проєкті (рішення білдера, 7.1).** `tma-starter` запінений точною версією `__TMA_VERSION__` у кореневому `package.json` і в обох застосунках; `pnpm.overrides` немає. Оновлення описане в `README.md` і `CLAUDE.md`: `pnpm up -r tma-starter@latest`, потім `pnpm db:migrate`.
 
 **Мова документації (рішення білдера):** `CLAUDE.md`, rules, README і діалог skill-а — українською, як у plivka. Ідентифікатори, коміти й коментарі в коді — англійською.
 
 **`CLAUDE.md` і `.claude/rules/`**
 - `CLAUDE.md` з plivka узагальнено: опис `__APP_TITLE__`, стек, команди, умови тестів (`pnpm db:start`), локальний запуск (`pnpm dev`, порти 3100/3199/5173), попередження «push у main деплоїть у production».
-- Правило для агентів: інфраструктура (auth, адмінка, платежі, бот) живе в пакетах `@dmytro-rudenko/tma-*`; її не копіюють у застосунок, а розширюють через `forRoot`, реєстри та `copy`.
+- Правило для агентів: інфраструктура (auth, адмінка, платежі, бот) живе в пакеті `tma-starter`; її не копіюють у застосунок, а розширюють через `forRoot`, реєстри та `copy`.
 - `.claude/rules/*` з plivka:
   - `server.md`: migrate-before-start, без `MEDIA_SIGNING_SECRET`;
-  - `web.md`: `tg`, теми й префи — з `tma-web`;
+  - `web.md`: `tg`, теми й префи — з `tma-starter/web`;
   - `deploy.md`: `tma-bot setup` замість `set-webhook.sh`.
 
 ### 3.10 `scaffold.sh`
@@ -654,7 +654,7 @@ scaffold.sh --dir <path> --slug <slug> --title <title> --bot-username <name> --d
 2. **Копіювання.** `template/` копіюється в `--dir` без `node_modules`, `dist` і `.env`.
 3. **Варіант:** обробка маркерів і тек магазину (3.9). Для `shop` вміст `--products` генерується в `products.ts`, і кожен рядок проходить JSON-енкодер (`JSON.stringify` через `node -e`). Якщо файл не передано, лишаються продукти за замовчуванням із шаблону.
 4. **Плейсхолдери.** Заміна у вмісті всіх текстових файлів (за `file --mime-encoding`, крім binary) і перейменування файлів та тек з плейсхолдерами в імені.
-5. **`--tma-source`** (CI плагіна): залежності `@dmytro-rudenko/tma-*` переписуються на `file:<tarball>`.
+5. **`--tma-source`** (CI плагіна): залежність `tma-starter` переписується на `file:<dir>/tma-starter-<version>.tgz`.
 6. **`.env`** з `.env.example`:
    - `WEBHOOK_SECRET` і `WEBHOOK_PATH_TOKEN` — `openssl rand -hex 32`;
    - `BOT_TOKEN=000000:dev-local-token`, `BOT_API_ROOT=http://127.0.0.1:3199`;
@@ -733,13 +733,13 @@ Job `scaffold-macos` (`macos-latest`) запускає лише `scaffold.test.s
 ## 5. Trade-offs accepted
 
 - **Пакети замість копії.** Тепер треба підтримувати пакети: semver, changesets, peerDependencies. Breaking change у пакеті змушує мігрувати кожен проєкт. Ціна прийнятна, бо виправлення безпеки й платежів інакше не доходять до проєктів.
-- **Fixed-версії.** Зміна в одному пакеті бампить і публікує всі п'ять. Зате шаблон і плагін завжди посилаються на один узгоджений набір.
+- **Один пакет.** Зміна в будь-якому підшляху публікує нову версію всього `tma-starter`. Зате шаблон і плагін посилаються на одну версію, а оновлення проєкту — одна команда.
 - **Таблиці без префікса.** Застосунок не може мати власну таблицю `users` чи `payments`. Ці імена стають частиною контракту пакетів.
 - **Бінарні адмін-права.** Модератора з обмеженим доступом не зробити без розширення пакета.
 - **Підписка без крону.** Якщо користувач скасував підписку в самому Telegram, бот про це не дізнається, і доступ триває до `expires_at`. Це очікувана поведінка Stars-підписок.
 - **`tma-bot setup` окремим кроком.** Його легко забути після зміни профілю. Пом'якшення: `deploy.sh` у шаблоні викликає його завжди.
 - **Окрема БД на кожен тест.** На CI тести повільніші, ніж із truncate, зате стабільні з фоновими worker-ами.
-- **Без e2e.** Зв'язку «браузер → Telegram SDK → API» автоматично ніхто не перевіряє. Вона покрита лише unit-тестами `tma-web` і ручною перевіркою через `pnpm dev`. Рішення користувача: менше залежностей і швидший CI.
+- **Без e2e.** Зв'язку «браузер → Telegram SDK → API» автоматично ніхто не перевіряє. Вона покрита лише unit-тестами `tma-starter/web` і ручною перевіркою через `pnpm dev`. Рішення користувача: менше залежностей і швидший CI.
 - **Без прототипу.** Нові екрани (розсилки, аудит, налаштування, платежі, магазин) можуть потребувати візуальних правок після реалізації. Пом'якшення: їх зібрано з уже перевірених компонентів plivka.
 - **Маркери варіанту у спільних файлах.** У шаблоні вони виглядають як шум, а помилка в маркері дає зламаний `empty`. Пом'якшення: самоперевірка `scaffold.sh` і `template-smoke` в CI для обох варіантів.
 - **Модуль payments завжди підключений**, навіть у `empty` з порожнім `products`. Адмінка платежів і таблиці існують без продуктів, зате додати перший продукт можна без зміни структури застосунку.
@@ -753,7 +753,7 @@ Job `scaffold-macos` (`macos-latest`) запускає лише `scaffold.test.s
   - **payments:** разова оплата end-to-end (`settle` рівно один раз); refund разової оплати викликає `onRefund` і відкликає entitlement; `ALREADY_OWNED` / `ALREADY_SUBSCRIBED` на invoice і в `pre_checkout`; grant поверх активної підписки → 409; admin-DELETE підписки скасовує її в Telegram; неправильна сума → відмова; дубль charge → no-op; повторна оплата того самого invoice → refund; перша оплата підписки → entitlement; продовження з тим самим payload → новий рядок і зсув `expires_at`; дубль продовження → no-op; cancel і resume викликають `editUserStarSubscription`; `has()` після `expires_at` → false; refund підписки відкликає доступ; падіння `refundStarPayment` → `refund_pending` → retry; test mode; admin refund і grant з аудитом; reconcile;
   - **web** (vitest + jsdom): `tg` без WebApp; Android inset; `openInvoice`, коли SDK кидає виняток; api-клієнт (заголовок і `ApiError`); `langFromCode`; `usePurchase` на всіх гілках статусів; `useMe` застосовує префи; `useRealtimeEvent` інвалідує після reconnect;
   - **testing:** правила `FakeBotApi.respond`/`times`; клонування шаблонної БД.
-- Крок `pack-check` у CI: tarball-и з `pnpm pack` ставляться в чистий fixture-проєкт, і кожен шлях з `exports` імпортується та компілюється.
+- Крок `pack-check` у CI: tarball з `pnpm pack` ставиться в чистий fixture-проєкт, і кожен шлях з `exports` компілюється та імпортується в Node.
 - **Частина B:**
   - `scaffold.test.sh` зелений;
   - `template-smoke` у CI зелений для `empty` і `shop`;
@@ -763,4 +763,10 @@ Job `scaffold-macos` (`macos-latest`) запускає лише `scaffold.test.s
     - `pnpm dev` друкує `devUrl`, який відкриває застосунок у браузері;
     - адмін із `ADMIN_USER_IDS` бачить секцію «Адмін»;
     - у shop покупка через `payments.test_users` відкриває Premium-блок.
-- Після релізу `npm view @dmytro-rudenko/tma-nest-core@0.1.0` (і для решти чотирьох пакетів) показує версію, ліцензію MIT і provenance. У чистій теці `pnpm add @dmytro-rudenko/tma-nest-core@0.1.0` разом із peer-залежностями встановлюється без помилок.
+- Після релізу `npm view tma-starter@0.1.0` показує версію, ліцензію MIT і provenance. У чистій теці `pnpm add tma-starter@0.1.0` разом із peer-залежностями встановлюється без помилок.
+
+## 7. Рішення після узгодження
+
+### 7.1 2026-11-22: один пакет `tma-starter` з підшляхами
+
+Замість п'яти пакетів `@pctea/tma-nest-core`, `@pctea/tma-nest-bot`, `@pctea/tma-nest-payments`, `@pctea/tma-web` і `@pctea/tma-testing` публікується один пакет `tma-starter` з підшляхами `./nest-core`, `./nest-bot`, `./nest-payments`, `./testing`, `./testing/dom`, `./web` і `./web/react`. Причина — одна версія: шаблону не потрібні `pnpm.overrides` і скрипт `pnpm tma:upgrade`, а оновлення проєкту — `pnpm up -r tma-starter@latest`. Нове ім'я починає з `0.1.0`. Уже опубліковані `0.1.0` п'яти пакетів `@pctea/tma-*` буде позначено deprecated. Пакет названо `tma-starter` без скоупу, як репозиторій і плагін: назва `tma` на npm зайнята.

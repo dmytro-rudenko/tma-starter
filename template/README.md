@@ -1,6 +1,6 @@
 # __APP_TITLE__
 
-Telegram Mini App на `@dmytro-rudenko/tma-*`: вхід через Telegram, адмінка, бот із розсилками, платежі Telegram Stars і realtime вже підключені. Свій код живе в `apps/api/src/features/` і `apps/web/src/features/`, приклад — модуль `example`.
+Telegram Mini App на `tma-starter`: вхід через Telegram, адмінка, бот із розсилками, платежі Telegram Stars і realtime вже підключені. Свій код живе в `apps/api/src/features/` і `apps/web/src/features/`, приклад — модуль `example`.
 
 - `apps/api` — NestJS 10, Knex, PostgreSQL 16, grammY.
 - `apps/web` — React 18, Vite 5, TanStack Query 5, i18next.
@@ -37,13 +37,13 @@ pnpm dev                 # фейковий Bot API :3199, API :3100, Vite :5173
 5. Секрети GitHub (середовище `production`): `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS`, `DEPLOY_HOST`, `DEPLOY_USER`, `BOT_TOKEN`. Що в кожному, описано в `deploy/README.md`.
 6. Push у `main`: workflow проганяє тести, `deploy/check.sh` і `deploy/deploy.sh`, який наприкінці запускає `tma-bot setup` (webhook і профіль бота з `apps/api/bot/profile.json`).
 
-## Оновлення пакетів
+## Оновлення tma-starter
 
-Усі `@dmytro-rudenko/tma-*` закріплені точною версією. Щоб оновити їх, виконайте:
+`tma-starter` закріплений однією точною версією в кореневому `package.json` і в залежностях застосунків. Оновлюйте так:
 
 ```bash
-pnpm up -r '@dmytro-rudenko/tma-*@latest'
+pnpm up -r tma-starter@latest
 pnpm db:migrate
 ```
 
-Друга команда застосовує міграції, які нова версія пакетів могла додати.
+Перша команда ставить останню версію `tma-starter` в усі `package.json` workspace, конкретну версію задає `pnpm up -r tma-starter@1.4.0`. Друга застосовує міграції, які нова версія пакета могла додати.

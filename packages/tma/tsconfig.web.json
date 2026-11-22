@@ -1,0 +1,26 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "isolatedModules": true,
+    "noEmit": true,
+    "paths": {
+      "tma-starter/*": ["./src/*"]
+    },
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "src/web",
+    "test/web",
+    "vitest.config.ts"
+  ]
+}

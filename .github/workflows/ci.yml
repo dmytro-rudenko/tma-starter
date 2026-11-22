@@ -1,0 +1,130 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  packages:
+    name: Packages
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_ADMIN_URL: postgres://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26.13.0
+
+      - name: Install pnpm
+        run: npm i -g pnpm@10.28.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm -r build
+
+      - name: Typecheck
+        run: pnpm -r typecheck
+
+      - name: Test
+        run: pnpm -r test
+
+      - name: Script tests
+        run: node --test scripts/error-codes.test.mjs scripts/sync-plugin-version.test.mjs scripts/changeset-check.test.mjs
+
+      - name: Pack check
+        run: bash scripts/pack-check/run.sh
+
+  changeset-check:
+    name: Changeset required
+    if: github.event_name == 'pull_request' && !startsWith(github.head_ref, 'changeset-release/')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require a changeset for package, skill and template changes
+        run: bash scripts/changeset-check.sh origin/main
+
+  template-smoke:
+    name: Template smoke (${{ matrix.variant }})
+    needs: packages
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [empty, shop]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_ADMIN_URL: postgres://postgres:postgres@localhost:5432/postgres
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/smoke_app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26.13.0
+
+      - name: Install pnpm
+        run: npm i -g pnpm@10.28.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Scaffold script tests
+        run: bash skills/new/scaffold.test.sh
+
+      - name: Template smoke
+        run: bash scripts/smoke-template.sh ${{ matrix.variant }}
+
+  scaffold-macos:
+    name: Scaffold script (macOS)
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26.13.0
+
+      - name: Scaffold script tests
+        run: bash skills/new/scaffold.test.sh

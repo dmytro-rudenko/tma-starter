@@ -1,0 +1,31 @@
+{
+  "name": "__APP_SLUG__",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=26.13.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "db:start": "tma-test-pg start",
+    "db:stop": "tma-test-pg stop",
+    "db:create": "node scripts/db-create.mjs",
+    "db:migrate": "pnpm --filter @__APP_SLUG__/api migrate",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "tma-starter": "__TMA_VERSION__",
+    "@types/node": "^26",
+    "pg": "^8.13.0",
+    "prettier": "^3.3.3",
+    "typescript": "~5.6.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "esbuild"
+    ]
+  }
+}
