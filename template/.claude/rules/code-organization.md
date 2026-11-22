@@ -1,27 +1,27 @@
-# Організація коду
+# Code organization
 
-## Модулі
+## Modules
 
-- Не створюй тек `utils/`, `helpers/` у `src/`: код живе в модулі, якому належить.
-- Файл понад ~300 рядків — сигнал розділити.
-- Одна тека на Nest-модуль у `apps/api/src/features/<тема>/`, контролер живе у своєму модулі, DTO запитів — у `<модуль>/dto/*.dto.ts`.
-- Не дублюй те, що вже є в `tma-starter`: спершу перевір експорти його підшляхів.
+- Do not create `utils/` or `helpers/` directories in `src/`: code lives in the module it belongs to.
+- A file over ~300 lines is a signal to split it.
+- One directory per Nest module in `apps/api/src/features/<topic>/`. The controller lives in its own module. Request DTOs go in `<module>/dto/*.dto.ts`.
+- Do not duplicate what `tma-starter` already has: check the exports of its subpaths first.
 
-## Куди класти новий код
+## Where to put new code
 
-| Що | Куди |
+| What | Where |
 |---|---|
-| HTTP-ендпоінт | `apps/api/src/features/<тема>/*.controller.ts` + сервіс |
-| таблиця чи колонка | нова міграція в `apps/api/src/database/migrations/` + інтерфейс `*Row` поруч із запитами |
-| змінна середовища | `apps/api/src/config/env.ts` + `.env.example` |
-| продукт чи підписка | `apps/api/src/products.ts` |
-| команда чи параметр `/start` бота | `StartParamRoute` у `TmaBotModule.forRoot` в `app.module.ts` |
-| текст бота | `apps/api/src/bot/copy.ts` (`copy` у `TmaBotModule.forRoot`) |
-| профіль бота: кнопка меню, описи, команди | `apps/api/bot/profile.json`; застосовується `tma-bot setup` під час деплою |
-| екран, аркуш | `apps/web/src/features/<тема>/` + `EntryKind` у `state/stack.ts` + `features/registry.tsx` |
-| код помилки застосунку | `apiError(status, code)` на сервері + текст у `apps/web/src/api/errorText.ts` |
-| текст UI | `apps/web/src/i18n/uk.json` + `en.json` |
-| виклик API з Mini App | клієнт `createApiClient` і `tmaApi` з `tma-starter/web`, свої виклики — в `apps/web/src/api/` |
-| виклик Telegram WebApp | `tg` з `tma-starter/web` |
-| колір чи токен теми | `apps/web/src/theme/tokens.css` |
-| деплой | `deploy/` |
+| HTTP endpoint | `apps/api/src/features/<topic>/*.controller.ts` + service |
+| table or column | new migration in `apps/api/src/database/migrations/` + a `*Row` interface next to the queries |
+| environment variable | `apps/api/src/config/env.ts` + `.env.example` |
+| product or subscription | `apps/api/src/products.ts` |
+| bot command or `/start` parameter | `StartParamRoute` in `TmaBotModule.forRoot` in `app.module.ts` |
+| bot text | `apps/api/src/bot/copy.ts` (`copy` in `TmaBotModule.forRoot`) |
+| bot profile: menu button, descriptions, commands | `apps/api/bot/profile.json`; applied by `tma-bot setup` during deploy |
+| screen, sheet | `apps/web/src/features/<topic>/` + `EntryKind` in `state/stack.ts` + `features/registry.tsx` |
+| app error code | `apiError(status, code)` on the server + text in `apps/web/src/api/errorText.ts` |
+| UI text | `apps/web/src/i18n/uk.json` + `en.json` |
+| API call from the Mini App | the `createApiClient` client and `tmaApi` from `tma-starter/web`; your own calls go in `apps/web/src/api/` |
+| Telegram WebApp call | `tg` from `tma-starter/web` |
+| theme color or token | `apps/web/src/theme/tokens.css` |
+| deploy | `deploy/` |
