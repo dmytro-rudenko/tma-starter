@@ -59,18 +59,12 @@ bash scripts/smoke-template.sh shop
 
 ## Release
 
-Одноразове налаштування власником:
+Публікація в npm ручна: власник пакета `tma-starter` запускає її локально з одноразовим кодом npm (OTP).
 
-1. Мати npm-акаунт з правом публікації пакета `tma-starter`.
-2. Створити npm-токен з правом публікації і додати його в репозиторій як секрет `NPM_TOKEN` (Settings, Secrets and variables, Actions).
-
-Далі реліз іде через `.github/workflows/release.yml`:
-
-1. Після merge у `main` `changesets/action` запускає `pnpm run version-packages` і відкриває PR «Version Packages»: піднімає версію `tma-starter`, а `scripts/sync-plugin-version.mjs` переписує `version` у `.claude-plugin/plugin.json` і `skills/new/SKILL.md`.
-2. Merge цього PR запускає `pnpm run release` (`pnpm -r build` і `changeset publish`) з `NPM_TOKEN` і `NPM_CONFIG_PROVENANCE=true`, тож пакет публікується з provenance.
-3. Перевірка: `npm view tma-starter@<версія>` показує версію, ліцензію MIT і provenance.
-
-Перша версія `tma-starter` — `0.1.0`: вона вже стоїть у `packages/tma/package.json`, а changesets цього релізу порожні, тож `version-packages` її не піднімає, і `changeset publish` публікує саме `0.1.0`.
+1. Кожна зміна в `packages/`, `skills/` чи `template/` приходить із changeset (`pnpm changeset`).
+2. Після merge у `main` `.github/workflows/release.yml` запускає `pnpm run version-packages` і відкриває PR «Version Packages»: піднімає версію `tma-starter`, а `scripts/sync-plugin-version.mjs` переписує `version` у `.claude-plugin/plugin.json` і `skills/new/SKILL.md`.
+3. Після merge цього PR з оновленого `main`: `pnpm install && pnpm -r build && pnpm --filter tma-starter publish --access public --otp=<код>`.
+4. Перевірка: `npm view tma-starter@<версія> version license` показує нову версію і MIT.
 
 ## Ліцензія
 
