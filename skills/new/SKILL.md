@@ -4,45 +4,45 @@ description: Use when the user asks to create a new Telegram Mini App, start a T
 version: 0.1.1
 ---
 
-# Новий Telegram Mini App
+# New Telegram Mini App
 
-Створи проєкт із шаблону `tma-starter`, доведи його до зелених тестів і зроби перший коміт. Спілкуйся мовою користувача. Деплой, GitHub-репозиторій і секрети не чіпай.
+Create a project from the `tma-starter` template, bring it to green tests and make the first commit. Talk to the user in their language. Do not touch deploy, the GitHub repository or secrets.
 
 ## Preflight
 
-Перед опитуванням перевір у Bash:
+Before the interview, check in Bash:
 
-- `node -v` — не нижче 26.13.0;
-- `pnpm -v` — версія 10;
-- `perl -v` і `openssl version`;
-- `pg_ctl` — у `PATH`, `/usr/lib/postgresql/16/bin`, `/opt/homebrew/opt/postgresql@16/bin`, `/usr/local/opt/postgresql@16/bin`.
+- `node -v` — at least 26.13.0;
+- `pnpm -v` — version 10;
+- `perl -v` and `openssl version`;
+- `pg_ctl` — in `PATH`, `/usr/lib/postgresql/16/bin`, `/opt/homebrew/opt/postgresql@16/bin`, `/usr/local/opt/postgresql@16/bin`.
 
-Якщо бракує Node, pnpm, `perl` чи `openssl`, назви, що саме, і зупинися, доки користувач не встановить. Якщо немає Postgres 16, запропонуй через `AskUserQuestion` або команду встановлення для його ОС (`apt install postgresql-16` або `brew install postgresql@16`), або вказати наявний `DATABASE_ADMIN_URL`. У другому випадку `pnpm db:start` пізніше пропусти.
+If Node, pnpm, `perl` or `openssl` is missing, name what is missing and stop until the user installs it. If there is no Postgres 16, use `AskUserQuestion` to offer either the install command for their OS (`apt install postgresql-16` or `brew install postgresql@16`) or an existing `DATABASE_ADMIN_URL`. In the second case, skip `pnpm db:start` later.
 
-## Опитування
+## Interview
 
-Кожне питання задай окремим `AskUserQuestion`. Те, що користувач уже назвав у запиті, не перепитуй.
+Ask each question in its own `AskUserQuestion`. Do not re-ask what the user already stated in the request.
 
-1. **Варіант.** `AskUserQuestion` з варіантами «Порожній каркас» (Home, Settings, адмінка) і «Демо-магазин» (те саме плюс Shop, Premium, paywall, керування підпискою). Значення прапорця: `empty` або `shop`.
-2. **Назва застосунку** (`--title`). `AskUserQuestion` із 2 запропонованими назвами; свою користувач вводить через Other. Назва: 2–32 символи, лише літери (зокрема кирилиця), цифри, пробіл і `. , - ! ? : ’`. Апостроф лише `’` (U+2019), ASCII `'` заміни. Виведи `slug` транслітерацією в kebab-case (`^[a-z][a-z0-9-]{1,30}$`) і підтверди його окремим `AskUserQuestion`: «Так» або правка через Other.
-3. **Username бота** і **домен**: два окремі `AskUserQuestion`, у кожному є варіант «Ще немає».
-   - Бот: `^[A-Za-z0-9_]{5,32}$`, без `@`. «Ще немає» дає `<slug з _ замість ->_bot`; якщо довше за 32 символи, скороти slug перед `_bot`.
-   - Домен: без схеми й без `/`. «Ще немає» дає `<slug>.example.com`.
-   - Запам'ятай, що саме підставлено за замовчуванням: це піде у фінальне повідомлення.
-4. **Мова за замовчуванням** (`uk` або `en`) і **акцентний колір**: два окремі `AskUserQuestion`. Кольори: `#2f80ed`, `#e5484d`, `#30a46c`; свій `#rrggbb` через Other.
-5. **Telegram id адмінів.** `AskUserQuestion` з варіантом «Пропустити»; id через кому вводяться через Other. Підкажи, що id показує `@userinfobot`. Якщо пропущено, прапорець `--admin-ids` не передавай і запам'ятай це для фінального повідомлення.
-6. **Продукти** (лише для `shop`). `AskUserQuestion` з варіантами «Прийняти стандартні» (`premium`: subscription, 250 ⭐; `coffee`: one_time, repeatable, 50 ⭐) і «Задати свої».
-   - «Задати свої»: для кожного продукту збери `id`, `kind` (`one_time` або `subscription`), `priceStars` (ціле 1–10000), `repeatable` (необов'язково), `title` і `description` українською та англійською.
-   - Обов'язково один продукт з `id` `premium` і `kind` `subscription`: від нього залежать Premium-блок і paywall. Якщо користувач відмовляється, поверни стандартні.
-7. **Директорія.** `AskUserQuestion` з варіантом `./<slug>` від поточної теки; свою через Other. Тека має не існувати або бути порожньою.
+1. **Variant.** `AskUserQuestion` with the options "Empty skeleton" (Home, Settings, admin panel) and "Demo shop" (the same plus Shop, Premium, paywall, subscription management). Flag value: `empty` or `shop`.
+2. **App name** (`--title`). `AskUserQuestion` with 2 suggested names; the user types their own through Other. The name: 2–32 characters, only letters (Cyrillic included), digits, space and `. , - ! ? : ’`. The apostrophe is only `’` (U+2019); replace ASCII `'`. Derive the `slug` by transliteration into kebab-case (`^[a-z][a-z0-9-]{1,30}$`) and confirm it in a separate `AskUserQuestion`: "Yes" or an edit through Other.
+3. **Bot username** and **domain**: two separate `AskUserQuestion`s, each with a "Not yet" option.
+   - Bot: `^[A-Za-z0-9_]{5,32}$`, without `@`. "Not yet" gives `<slug with _ instead of ->_bot`; if that is longer than 32 characters, shorten the slug before `_bot`.
+   - Domain: no scheme and no `/`. "Not yet" gives `<slug>.example.com`.
+   - Remember exactly what was filled in by default: it goes into the final message.
+4. **Default language** (`uk` or `en`) and **accent color**: two separate `AskUserQuestion`s. Colors: `#2f80ed`, `#e5484d`, `#30a46c`; a custom `#rrggbb` through Other.
+5. **Admin Telegram ids.** `AskUserQuestion` with a "Skip" option; the user enters comma-separated ids through Other. Mention that `@userinfobot` shows the id. If skipped, do not pass the `--admin-ids` flag and remember this for the final message.
+6. **Products** (`shop` only). `AskUserQuestion` with the options "Accept defaults" (`premium`: subscription, 250 ⭐; `coffee`: one_time, repeatable, 50 ⭐) and "Set my own".
+   - "Set my own": for each product collect `id`, `kind` (`one_time` or `subscription`), `priceStars` (integer 1–10000), `repeatable` (optional), `title` and `description` in Ukrainian and English.
+   - One product with `id` `premium` and `kind` `subscription` is required: the Premium block and the paywall depend on it. If the user refuses, restore the defaults.
+7. **Directory.** `AskUserQuestion` with the option `./<slug>` in the current directory; a custom one through Other. The directory must not exist or must be empty.
 
-## Підсумок
+## Summary
 
-Покажи всі параметри одним повідомленням: варіант, title, slug, бот, домен, мова, колір, адміни, продукти (для shop), директорія. Познач значення, підставлені за замовчуванням. Далі переходь до генерації; перепитувати потрібно, лише якщо користувач поправить щось у відповідь.
+Show all parameters in one message: variant, title, slug, bot, domain, language, color, admins, products (for shop), directory. Mark the values filled in by default. Then go on to generation; ask again only if the user corrects something in reply.
 
-## Генерація
+## Generation
 
-Shell не зберігається між викликами Bash, тому запис JSON продуктів, запуск скрипта й видалення файла роби одним викликом. Для `shop` це такий блок (стандартні продукти):
+The shell does not persist between Bash calls, so write the products JSON, run the script and delete the file in one call. For `shop` this is the block (default products):
 
 ```bash
 PRODUCTS="$(mktemp "${TMPDIR:-/tmp}/tma-products.XXXXXX")"
@@ -66,8 +66,8 @@ rm -f "$PRODUCTS"
 exit $status
 ```
 
-- Для власних продуктів заміни рядок з масивом усередині heredoc на свій масив, екрануючи лапки за правилами JSON.
-- Для `empty` файл продуктів не потрібен:
+- For custom products, replace the array line inside the heredoc with your own array, escaping quotes per JSON rules.
+- For `empty` no products file is needed:
 
   ```bash
   bash "${CLAUDE_PLUGIN_ROOT}/skills/new/scaffold.sh" \
@@ -83,45 +83,45 @@ exit $status
     --api-port 3200
   ```
 
-- `--admin-ids` пропусти, якщо користувач не назвав id. `--tma-source` не використовуй: це прапорець для CI плагіна.
-- Успіх друкує `scaffolded <dir> (<variant>)`.
-- Exit 2: невалідний аргумент. Покажи повідомлення скрипта, перепитай лише проблемне значення через `AskUserQuestion` і запусти знову. Якщо проблема в `--dir`, це непорожня тека.
-- Exit 3: у згенерованому проєкті лишились плейсхолдери чи маркери магазину. Це баг плагіна: покажи вивід, нічого не латай, запропонуй повідомити на `https://github.com/dmytro-rudenko/tma-starter/issues`.
-- Інший код: покажи вивід і зупинися.
+- Skip `--admin-ids` if the user did not give any ids. Do not use `--tma-source`: it is a flag for the plugin's CI.
+- Success prints `scaffolded <dir> (<variant>)`.
+- Exit 2: invalid argument. Show the script's message, re-ask only the problem value through `AskUserQuestion` and run again. If the problem is `--dir`, the directory is not empty.
+- Exit 3: the generated project still has placeholders or shop markers. This is a plugin bug: show the output, patch nothing, and suggest reporting it at `https://github.com/dmytro-rudenko/tma-starter/issues`.
+- Any other code: show the output and stop.
 
-## Перевірка в проєкті
+## Checks in the project
 
-З теки проєкту виконуй команди по черзі. Вони довгі, тож став timeout до 10 хвилин.
+Run the commands one after another from the project directory. They are long, so set the timeout to 10 minutes.
 
 1. `pnpm install`
-2. `pnpm db:start` (пропусти, якщо користувач вказав `DATABASE_ADMIN_URL`; тоді передавай його в середовище наступних команд і, якщо сервер не `127.0.0.1:54329`, узгодь з користувачем `DATABASE_URL` у локальному `.env`)
+2. `pnpm db:start` (skip if the user gave `DATABASE_ADMIN_URL`; then pass it in the environment of the next commands and, if the server is not `127.0.0.1:54329`, agree with the user on `DATABASE_URL` in the local `.env`)
 3. `pnpm db:create`
 4. `pnpm db:migrate`
 5. `pnpm -r typecheck`
 6. `pnpm -r test`
 7. `pnpm -r build`
 
-Якщо команда падає, зупинися на ній. Покажи її вивід, не запускай наступні команди й нічого в шаблоні не змінюй. Запропонуй повідомити про баг на `https://github.com/dmytro-rudenko/tma-starter/issues`, додавши команду та вивід.
+If a command fails, stop at it. Show its output, do not run the next commands and change nothing in the template. Suggest reporting the bug at `https://github.com/dmytro-rudenko/tma-starter/issues`, attaching the command and its output.
 
-## Коміт
+## Commit
 
-Версію візьми з `version` у `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`. З теки проєкту:
+Take the version from `version` in `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`. From the project directory:
 
 ```bash
 git init -b main && git add -A && git commit -m "chore: scaffold from tma-starter <version>"
 ```
 
-Перед комітом переконайся, що `.env` не потрапив в індекс (`git ls-files .env` порожній). У повідомлення коміту не додавай жодних трейлерів авторства.
+Before committing, make sure `.env` did not get into the index (`git ls-files .env` is empty). Do not add any authorship trailers to the commit message.
 
-## Фінальне повідомлення
+## Final message
 
-Напиши користувачу:
+Write to the user:
 
-- Як запустити: `pnpm dev` піднімає застосунок без Telegram і без справжнього бота та друкує `devUrl` для першого id з `ADMIN_USER_IDS`. Відкрий цей URL у браузері. Потрібна запущена БД (`pnpm db:start`).
-- Чекліст деплою з розділу «Deploy» файла `README.md` проєкту: прочитай його й перелічи пункти.
-- Позначки, де лишились значення за замовчуванням, лише з тих, що справді підставлено:
-  - бот `<slug>_bot` не існує: створи його в BotFather й підстав справжній username;
-  - домен `<slug>.example.com` — заглушка: підстав справжній;
-  - адміни: локально `ADMIN_USER_IDS=1`, а у `.env.example` для production значення порожнє, тож додай свої id у `/etc/<slug>/.env`.
-- Мова бота: українською бот відповідає лише користувачам із мовою `uk`, усім іншим англійською.
-- Нагадай, що push у `main` деплоїть у production, а скрипти деплою, GitHub-репозиторій і секрети ти не налаштовував.
+- How to run: `pnpm dev` brings up the app without Telegram and without a real bot, and prints `devUrl` for the first id in `ADMIN_USER_IDS`. Open this URL in a browser. A running DB is required (`pnpm db:start`).
+- The deploy checklist from the "Deploy" section of the project's `README.md`: read it and list the items.
+- Notes on where default values remain, only for those actually filled in:
+  - bot `<slug>_bot` does not exist: create it in BotFather and fill in the real username;
+  - domain `<slug>.example.com` is a placeholder: fill in the real one;
+  - admins: locally `ADMIN_USER_IDS=1`, and in `.env.example` the production value is empty, so add their ids to `/etc/<slug>/.env`.
+- Bot language: the bot replies in Ukrainian only to users whose language is `uk`, and in English to everyone else.
+- Remind them that a push to `main` deploys to production, and that you did not set up the deploy scripts, the GitHub repository or the secrets.

@@ -1,31 +1,31 @@
-# Архітектура
+# Architecture
 
-## Залежності
+## Dependencies
 
-- Інфраструктура (auth, користувачі, права адмінів, адмінка, налаштування, аудит, realtime, бот, розсилки, платежі, entitlements) живе в пакеті `tma-starter`. Не копіюй її код у застосунок: розширюй через `forRoot`, реєстри й `copy`.
-- `apps/web` і `apps/api` не імпортують один одного. `apps/web` не імпортує nest-підшляхи: клієнт API, типи й коди помилок бере з `tma-starter/web`.
-- Модуль API — одна відповідальність і власний `*.module.ts`; залежності приходять через конструктор і DI-контейнер Nest.
+- Infrastructure (auth, users, admin rights, admin panel, settings, audit, realtime, bot, broadcasts, payments, entitlements) lives in the `tma-starter` package. Do not copy its code into the app: extend it through `forRoot`, registries and `copy`.
+- `apps/web` and `apps/api` do not import each other. `apps/web` does not import nest subpaths: it takes the API client, types and error codes from `tma-starter/web`.
+- An API module has one responsibility and its own `*.module.ts`; dependencies arrive through the constructor and the Nest DI container.
 
-## Точки розширення
+## Extension points
 
-| Потрібно | Як |
+| Need | How |
 |---|---|
-| власне налаштування в адмінці | `defineSetting` + `AppSettingsRegistry.register` в `onModuleInit` |
-| блок у картці користувача | `AdminUserCardRegistry.register(key, userId => …)` |
-| фільтр аудиторії розсилки | `BroadcastAudienceRegistry.register({ key, label, apply })` |
-| параметр `/start <param>` | `StartParamRoute` у `TmaBotModule.forRoot({ startParams })` |
-| тексти бота | `copy` у `TmaBotModule.forRoot` |
-| продукти й підписки | `apps/api/src/products.ts` → `TmaPaymentsModule.forRoot({ products })` |
-| доступ за покупкою | `@UseGuards(EntitlementGuard('<productId>'))` |
-| власні таблиці | міграція в `apps/api/src/database/migrations/` |
+| your own setting in the admin panel | `defineSetting` + `AppSettingsRegistry.register` in `onModuleInit` |
+| block in the user card | `AdminUserCardRegistry.register(key, userId => …)` |
+| broadcast audience filter | `BroadcastAudienceRegistry.register({ key, label, apply })` |
+| `/start <param>` parameter | `StartParamRoute` in `TmaBotModule.forRoot({ startParams })` |
+| bot texts | `copy` in `TmaBotModule.forRoot` |
+| products and subscriptions | `apps/api/src/products.ts` → `TmaPaymentsModule.forRoot({ products })` |
+| access by purchase | `@UseGuards(EntitlementGuard('<productId>'))` |
+| your own tables | migration in `apps/api/src/database/migrations/` |
 
-## Сервер — джерело правди
+## The server is the source of truth
 
-- Довіряти можна лише серверу. Перевірка в Mini App — лише підказка в UI. Користувача бери з `@CurrentUser()`, ніколи з тіла чи query.
-- Адмін — Telegram ID з `ADMIN_USER_IDS` (права не знімаються) або користувач із `users.admin_granted_at`, якому права надали в адмінці. Перевіряй через `AdminRightsService.isAdmin`.
-- Дія адміна пише аудит у тій самій транзакції (`AuditService.record`): якщо аудит падає, дія відкочується.
+- Trust only the server. Validation in the Mini App is only a UI hint. Take the user from `@CurrentUser()`, never from the body or query.
+- An admin is a Telegram ID from `ADMIN_USER_IDS` (these rights cannot be revoked) or a user with `users.admin_granted_at` who was granted rights in the admin panel. Check through `AdminRightsService.isAdmin`.
+- An admin action writes an audit record in the same transaction (`AuditService.record`): if the audit fails, the action is rolled back.
 
-## Помилки
+## Errors
 
-- Очікувану відмову кидай через `apiError(status, code)`; клієнт отримує `{ statusCode, message, error, code }`.
-- На порушений інваріант кидай звичайний `Error`.
+- Throw an expected failure through `apiError(status, code)`; the client receives `{ statusCode, message, error, code }`.
+- Throw a plain `Error` on a violated invariant.

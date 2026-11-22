@@ -1,37 +1,37 @@
-# Стиль коду
+# Code style
 
 ## TypeScript
 
-- `strict: true` з `tsconfig.base.json`; не послаблюй його в пакетних tsconfig.
-- Зовнішні дані приймай через DTO з `class-validator` (тіло запиту) або як `unknown` зі звуженням перевірками.
-- Замість `enum` пиши union рядкових літералів або `as const`.
-- Експортуй іменовано; default export — лише там, де його вимагає інструмент (`vite.config.ts`).
-- Не залишай плаваючих промісів: `await`, `return`, `.catch(...)` або `void`, якщо виклик навмисно fire-and-forget і сам не кидає винятків.
-- Коментар пиши лише для обмеження, яке код не показує: особливість протоколу, неочевидний інваріант, обхід із тікетом. Не розповідай, що робить наступний рядок.
+- `strict: true` from `tsconfig.base.json`; do not weaken it in package tsconfigs.
+- Accept external data through `class-validator` DTOs (request body) or as `unknown` narrowed with checks.
+- Instead of `enum`, use a union of string literals or `as const`.
+- Use named exports; default export only where a tool requires it (`vite.config.ts`).
+- Leave no floating promises: `await`, `return`, `.catch(...)` or `void` if the call is intentionally fire-and-forget and never throws itself.
+- Write a comment only for a constraint the code does not show: a protocol quirk, a non-obvious invariant, a workaround with a ticket. Do not narrate what the next line does.
 
-## Імена
+## Naming
 
-- `apps/api`: `kebab-case.ts` з Nest-суфіксом за роллю — `*.module.ts`, `*.service.ts`, `*.controller.ts`, `*.guard.ts`, `*.decorator.ts`.
-- `apps/web`: компоненти — `PascalCase.tsx` зі стилями `PascalCase.module.css`, решта — `camelCase.ts`.
-- Класи й типи — `PascalCase`, константи модуля — `UPPER_SNAKE`.
-- Одиниця виміру — в імені: `INIT_DATA_MAX_AGE_SEC`, `amount_stars`.
+- `apps/api`: `kebab-case.ts` with a Nest suffix for the role — `*.module.ts`, `*.service.ts`, `*.controller.ts`, `*.guard.ts`, `*.decorator.ts`.
+- `apps/web`: components are `PascalCase.tsx` with styles in `PascalCase.module.css`, everything else is `camelCase.ts`.
+- Classes and types are `PascalCase`, module constants are `UPPER_SNAKE`.
+- Put the unit in the name: `INIT_DATA_MAX_AGE_SEC`, `amount_stars`.
 
-## Тести
+## Tests
 
-| Пакет | Поруч із кодом | Окремо |
+| Package | Next to the code | Separate |
 |---|---|---|
 | `apps/api` | jest, `*.spec.ts` | `test/*.spec.ts`, `test/*.acceptance.spec.ts` |
 | `apps/web` | vitest, `*.test.ts(x)` | — |
 
-Лише unit- і модульні тести: e2e і Playwright немає. API-тести піднімають `AppModule` через `createTestApp` з `tma-starter/testing` на реальному Postgres (`pnpm db:start`).
+Unit and module tests only: there are no e2e or Playwright tests. API tests bring up `AppModule` through `createTestApp` from `tma-starter/testing` on a real Postgres (`pnpm db:start`).
 
-## Інструменти
+## Tooling
 
-- Форматує Prettier (`.prettierrc`: одинарні лапки, trailing commas, ширина 100).
-- Лінтера немає: типи перевіряє `pnpm typecheck`.
+- Prettier formats (`.prettierrc`: single quotes, trailing commas, width 100).
+- There is no linter: `pnpm typecheck` checks types.
 
-## Мова
+## Language
 
-- Код, коментарі, логи й коміти (Conventional Commits) — англійською.
-- Тексти для користувача — лише через i18n, обома мовами (`uk`, `en`).
-- `CLAUDE.md`, ці правила й README — українською.
+- Code, comments, logs and commits (Conventional Commits) are in English.
+- User-facing text goes only through i18n, in both languages (`uk`, `en`).
+- `CLAUDE.md`, these rules and the README are in English.
