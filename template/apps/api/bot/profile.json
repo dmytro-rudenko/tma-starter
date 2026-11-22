@@ -1,0 +1,19 @@
+{
+  "menuButtonText": "__APP_TITLE__",
+  "uk": {
+    "short_description": "__APP_TITLE__ — міні-застосунок у Telegram.",
+    "description": "__APP_TITLE__ відкривається прямо в Telegram. Натисніть «Відкрити», щоб почати.",
+    "commands": [
+      { "command": "start", "description": "Відкрити __APP_TITLE__" },
+      { "command": "help", "description": "Довідка" }
+    ]
+  },
+  "en": {
+    "short_description": "__APP_TITLE__ is a Telegram Mini App.",
+    "description": "__APP_TITLE__ opens right inside Telegram. Tap Open to get started.",
+    "commands": [
+      { "command": "start", "description": "Open __APP_TITLE__" },
+      { "command": "help", "description": "Help" }
+    ]
+  }
+}
