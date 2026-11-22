@@ -14,8 +14,7 @@ started: 2026-11-06
 який проходить свої тести й стартує локально.
 
 ## Now
-Хвилі 0–9 і Finish закриті (eb17607), PR #2 відкрито (PR #1 змержено передчасно). Лишився Task 17: реліз 0.1.0 — потрібен доступ до публікації в npm (scope @dmytro-rudenko + NPM_TOKEN або trusted publishing), merge PR #2 і Version Packages — лише з підтвердження власника.
-Postgres 16 для тестів: Docker-контейнер tma-test-pg-docker на 127.0.0.1:54329 (на хості лише PG 13).
+Опубліковано tma-starter@0.1.0 (один пакет із підшляхами, 8ba80fc); п'ять @pctea/tma-*@0.1.0 позначено deprecated. Scaffold з npm зелений, CI PR #2 зелений. Лишилось: merge PR #2 (з підтвердження власника) і ручна перевірка /tma-starter:new (Task 17 Step 6).
 
 ## Timeline
 
@@ -95,3 +94,4 @@ Postgres 16 для тестів: Docker-контейнер tma-test-pg-docker н
 - 13:50 ● eb17607 fix(release): whole-branch and security review findings
 - 13:50 ✎ Finish: whole-branch + Codex + security review; реліз-воркфлоу був непрацездатний (&& без shell, --provenance), pnpm dev зламаний — виправлено. crapper: лише template (0% покриття з кореня). mutator: 9 еквівалентних survivors. Ruling: фікс-хвиля двома агентами з неперетинними файлами — обсяг
 - 13:50 ✎ PR #2 https://github.com/dmytro-rudenko/tma-starter/pull/2
+- Реліз: п'ять @pctea/tma-*@0.1.0 опубліковано вручну (npm publish, акаунт pctea), потім об'єднано в один пакет; назва tma на npm зайнята, тож tma-starter. ✎ tma-starter@0.1.0 опубліковано, старі п'ять deprecated; scaffold з реєстру: api 43, web 111.

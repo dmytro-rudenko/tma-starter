@@ -636,9 +636,9 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
 **Executor:** claude
 **Complexity:** complex
 **Satisfies:** spec §6 «Після релізу `npm view …`» and the manual check of `/tma-starter:new`
-- [ ] Step 1: `gh secret list -R dmytro-rudenko/tma-starter` shows `NPM_TOKEN`. If it is missing, stop and ask the owner to register the `@pctea` scope and add the secret (README «Release»).
+- [x] Step 1: `gh secret list -R dmytro-rudenko/tma-starter` shows `NPM_TOKEN`. If it is missing, stop and ask the owner to register the `@pctea` scope and add the secret (README «Release»). Ruling 2026-11-22: owner chose a manual `npm publish` from the pctea account instead of `NPM_TOKEN`.
 - [ ] Step 2: CI on PR #1 is green (`gh pr checks 1`). The PR becomes ready (journal close via `raj`), then merge with the owner's confirmation.
-- [ ] Step 3: `release.yml` opens «Version packages». After its CI is green, merge it with the owner's confirmation.
-- [ ] Step 4: `npm view tma-starter@0.1.0 version license` → `0.1.0` and `MIT`; `npm view … dist.attestations` is not empty.
-- [ ] Step 5: in a clean directory, `pnpm add tma-starter@0.1.0 @nestjs/common@^10.4 @nestjs/core@^10.4 knex pg reflect-metadata rxjs` → exit 0.
+- [x] Step 3: `release.yml` opens «Version packages». After its CI is green, merge it with the owner's confirmation. Ruling 2026-11-22: 0.1.0 set in commit 51f575f, no Version Packages PR for the first release.
+- [x] Step 4: `npm view tma-starter@0.1.0 version license` → `0.1.0` and `MIT`; `npm view … dist.attestations` is not empty. Done: 0.1.0, MIT; no attestations, because the publish was manual, not from CI.
+- [x] Step 5: in a clean directory, `pnpm add tma-starter@0.1.0 @nestjs/common@^10.4 @nestjs/core@^10.4 knex pg reflect-metadata rxjs` → exit 0. Done as a registry scaffold of shop: install, migrate, typecheck, api 43 and web 111 tests, build.
 - [ ] Step 6: `/plugin marketplace add dmytro-rudenko/tma-starter` → `/tma-starter:new` for both variants, following the spec §6 checklist (interview → green → commit → `pnpm dev` → `devUrl` → the «Адмін» section → in shop, test-mode purchase opens Premium).
