@@ -597,10 +597,10 @@ Each nest spec builds the application with `createTestApp({ imports: ctx => [...
   - The web pieces `ShopTab`, `PaywallSheet`, `PremiumBlock` and `SubscriptionSection`, as described in the spec.
   - `routeStartParam('shop')` opens the `shop` tab.
 - Consumes: `useProducts`, `usePurchase`, `useEntitlement`, `tmaApi.cancelSubscription/resumeSubscription` (Task 9), `EntitlementGuard` (Task 7).
-- [ ] Step 1: write `ShopTab.test.tsx` (the `usePurchase` states with a mock client) and `PremiumBlock.test.tsx` (switches on `useEntitlement`).
-- [ ] Step 2: `bash scripts/smoke-template.sh shop` → red.
-- [ ] Step 3: implement.
-- [ ] Step 4: `bash skills/new/scaffold.test.sh` → `All checks passed.`; `bash scripts/smoke-template.sh shop` → `smoke OK: shop`.
+- [x] Step 1: write `ShopTab.test.tsx` (the `usePurchase` states with a mock client) and `PremiumBlock.test.tsx` (switches on `useEntitlement`).
+- [x] Step 2: `bash scripts/smoke-template.sh shop` → red.
+- [x] Step 3: implement.
+- [x] Step 4: `bash skills/new/scaffold.test.sh` → `All checks passed.`; `bash scripts/smoke-template.sh shop` → `smoke OK: shop`.
 
 ### Task 16: repository CI, release, plugin manifest, pack-check, error-code sync
 **Writes:** `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.github/workflows/{ci.yml,release.yml}`, `scripts/sync-plugin-version.mjs`, `scripts/pack-check/{package.json,check.ts,run.sh}`, `scripts/error-codes.test.mjs`, `.changeset/initial-release.md`, `README.md`
