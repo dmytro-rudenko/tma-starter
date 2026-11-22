@@ -1,0 +1,23 @@
+.screen {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg2);
+  color: var(--fg);
+  transform-origin: 50% 0;
+  transition:
+    transform 0.36s var(--ease),
+    border-radius 0.36s,
+    filter 0.36s;
+  padding-top: calc(var(--safe-top) + 8px);
+}
+.under {
+  transform: scale(0.93) translateY(6px);
+  border-radius: 14px;
+  filter: brightness(0.82);
+  overflow: hidden;
+}
+.bottomSpace {
+  height: calc(64px + 16px + 16px + var(--safe-bottom));
+}

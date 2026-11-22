@@ -1,0 +1,66 @@
+.largeTitle {
+  padding: 14px 16px 2px;
+}
+.largeTitle h1 {
+  margin: 0;
+  font: 700 34px/1.1 var(--display);
+  letter-spacing: -0.02em;
+}
+.sec {
+  margin: 22px 16px 0;
+}
+.sec h3 {
+  margin: 0 0 7px 16px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--hint);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.seg {
+  display: flex;
+  background: var(--card);
+  border-radius: 12px;
+  padding: 3px;
+}
+.seg button {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 4px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.seg button[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-weight: 600;
+}
+.list {
+  background: var(--card);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 13px 16px;
+  font-size: 16px;
+  text-align: left;
+}
+.row + .row {
+  border-top: 0.5px solid var(--sep);
+}
+.row:active {
+  background: var(--bg2);
+}
+.chev {
+  margin-left: auto;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--hint);
+}

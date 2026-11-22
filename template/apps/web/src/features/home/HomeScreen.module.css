@@ -1,0 +1,23 @@
+.largeTitle {
+  padding: 14px 16px 2px;
+}
+.largeTitle h1 {
+  margin: 0;
+  font: 700 34px/1.1 var(--display);
+  letter-spacing: -0.02em;
+}
+.card {
+  margin: 22px 16px 0;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--card);
+}
+.card h2 {
+  margin: 0 0 6px;
+  font: 600 19px/1.25 var(--display);
+}
+.card p {
+  margin: 0;
+  color: var(--hint);
+  line-height: 1.45;
+}

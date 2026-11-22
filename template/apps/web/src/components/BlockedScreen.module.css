@@ -1,0 +1,20 @@
+.blocked {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  padding: 24px;
+  background: var(--bg);
+  text-align: center;
+}
+.blocked h1 {
+  margin: 0;
+  font: 700 26px/1.2 var(--display);
+}
+.blocked p {
+  margin: 0;
+  color: var(--hint);
+  line-height: 1.45;
+}

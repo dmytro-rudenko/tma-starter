@@ -1,0 +1,59 @@
+:root {
+  --bg: #ffffff;
+  --bg2: #f2f2f7;
+  --card: #ffffff;
+  --fg: #000000;
+  --hint: #6c6c70;
+  --sep: rgba(0, 0, 0, 0.12);
+  --scrim: rgba(0, 0, 0, 0.32);
+  --accent: __ACCENT__;
+  --accent-fg: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, transparent);
+  --danger: #d1293d;
+  --danger-soft: rgba(209, 41, 61, 0.12);
+  --font:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --display:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --safe-top: calc(
+    var(--tg-safe-area-inset-top, env(safe-area-inset-top, 0px)) +
+      var(--tg-content-safe-area-inset-top, 0px)
+  );
+  --safe-bottom: calc(
+    var(--tg-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)) +
+      var(--tg-content-safe-area-inset-bottom, 0px)
+  );
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #000000;
+    --bg2: #141416;
+    --card: #1c1c1e;
+    --fg: #ffffff;
+    --hint: #8e8e93;
+    --sep: rgba(255, 255, 255, 0.14);
+    --scrim: rgba(0, 0, 0, 0.6);
+    --danger: #ff6b5e;
+    --danger-soft: rgba(255, 107, 94, 0.16);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #000000;
+  --bg2: #141416;
+  --card: #1c1c1e;
+  --fg: #ffffff;
+  --hint: #8e8e93;
+  --sep: rgba(255, 255, 255, 0.14);
+  --scrim: rgba(0, 0, 0, 0.6);
+  --danger: #ff6b5e;
+  --danger-soft: rgba(255, 107, 94, 0.16);
+  color-scheme: dark;
+}
