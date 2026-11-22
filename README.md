@@ -35,8 +35,9 @@ Skill опитує про варіант (`empty` або `shop`), назву, us
 
 ```
 pnpm install
+pnpm -r build
 pnpm db:start
-pnpm -r build && pnpm -r typecheck && pnpm -r test
+pnpm -r typecheck && pnpm -r test
 ```
 
 `pnpm db:start` піднімає `tma-test-pg` на `127.0.0.1:54329`; `pnpm db:stop` зупиняє. Інша база задається через `DATABASE_ADMIN_URL`.

@@ -53,8 +53,8 @@ jobs:
       - name: Test
         run: pnpm -r test
 
-      - name: Error codes in sync
-        run: node --test scripts/error-codes.test.mjs
+      - name: Script tests
+        run: node --test scripts/error-codes.test.mjs scripts/sync-plugin-version.test.mjs
 
       - name: Pack check
         run: bash scripts/pack-check/run.sh
@@ -103,6 +103,7 @@ jobs:
           --health-retries 20
     env:
       DATABASE_ADMIN_URL: postgres://postgres:postgres@localhost:5432/postgres
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/smoke_app
     steps:
       - uses: actions/checkout@v4
 

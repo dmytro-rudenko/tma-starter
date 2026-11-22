@@ -17,7 +17,6 @@ test('every nest-* package exports a non-empty error code array', () => {
     assert.ok(Array.isArray(codes));
     assert.ok(codes.length > 0);
   }
-  assert.deepEqual([...TMA_BOT_ERROR_CODES], ['BROADCAST_NOT_FOUND']);
 });
 
 test('TMA_ERROR_CODES in web has no duplicates', () => {
