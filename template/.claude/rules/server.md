@@ -25,9 +25,9 @@ paths:
 
 ## Платежі
 
-- Платежі, відшкодування й entitlements веде `@pctea/tma/nest-payments`; застосунок лише описує продукти. Ідемпотентність за `telegram_payment_charge_id` забезпечує пакет.
+- Платежі, відшкодування й entitlements веде `tma-starter/nest-payments`; застосунок лише описує продукти. Ідемпотентність за `telegram_payment_charge_id` забезпечує пакет.
 - Доступ за покупкою перевіряй через `EntitlementGuard('<productId>')` або `EntitlementsService.has`, а не власними запитами до таблиць.
 
 ## Тести
 
-- `createTestApp` з `@pctea/tma/testing` піднімає `AppModule` на новій базі з фейковим Bot API. Підміняй лише зовнішнє (`overrides`), не сервіси й не БД.
+- `createTestApp` з `tma-starter/testing` піднімає `AppModule` на новій базі з фейковим Bot API. Підміняй лише зовнішнє (`overrides`), не сервіси й не БД.

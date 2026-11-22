@@ -24,7 +24,7 @@ const specifiers = [];
 
 for (const dir of readdirSync(path.join(ROOT, 'packages'))) {
   const pkg = JSON.parse(readFileSync(path.join(ROOT, 'packages', dir, 'package.json'), 'utf8'));
-  const tarball = `${pkg.name.slice(1).replace('/', '-')}-${pkg.version}.tgz`;
+  const tarball = `${pkg.name.replace(/^@/, '').replace('/', '-')}-${pkg.version}.tgz`;
   if (!tarballs.includes(tarball)) throw new Error(`pack-check: ${tarball} was not packed`);
   const spec = `file:${path.join(TMP, 'tarballs', tarball)}`;
   fixture.dependencies[pkg.name] = spec;

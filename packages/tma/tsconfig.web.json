@@ -12,7 +12,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "paths": {
-      "@pctea/tma/*": ["./src/*"]
+      "tma-starter/*": ["./src/*"]
     },
     "types": [
       "node"

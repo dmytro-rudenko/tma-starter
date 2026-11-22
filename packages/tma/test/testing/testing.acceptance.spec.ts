@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from 'crypto';
 import type { Knex } from 'knex';
 import { knex as createKnex } from 'knex';
-import { createTestDatabase, devUrl, startFakeBotApi } from '@pctea/tma/testing';
+import { createTestDatabase, devUrl, startFakeBotApi } from 'tma-starter/testing';
 
 jest.setTimeout(60_000);
 
@@ -35,7 +35,7 @@ async function callBot(url: string, method: string, body: object = {}) {
   return { status: res.status, json: (await res.json()) as any };
 }
 
-describe('@pctea/tma/testing acceptance', () => {
+describe('tma-starter/testing acceptance', () => {
   it('FakeBotApi.respond with times', async () => {
     const fake = await startFakeBotApi();
     try {

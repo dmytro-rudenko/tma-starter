@@ -1,5 +1,5 @@
-import { tg } from '@pctea/tma/web';
-import { useTma } from '@pctea/tma/web/react';
+import { tg } from 'tma-starter/web';
+import { useTma } from 'tma-starter/web/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

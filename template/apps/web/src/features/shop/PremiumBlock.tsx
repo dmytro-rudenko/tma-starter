@@ -1,4 +1,4 @@
-import { useEntitlement, useTma } from '@pctea/tma/web/react';
+import { useEntitlement, useTma } from 'tma-starter/web/react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useErrorMessage } from '../../api/errorText';

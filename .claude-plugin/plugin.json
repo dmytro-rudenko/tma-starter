@@ -1,7 +1,7 @@
 {
   "name": "tma-starter",
   "version": "0.1.0",
-  "description": "Scaffold Telegram Mini Apps on the @pctea/tma package",
+  "description": "Scaffold Telegram Mini Apps on the tma-starter package",
   "author": {
     "name": "Dmytro Rudenko"
   },

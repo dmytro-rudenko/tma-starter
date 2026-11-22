@@ -1,4 +1,4 @@
-import { createI18n, type Lang } from '@pctea/tma/web';
+import { createI18n, type Lang } from 'tma-starter/web';
 import en from './en.json';
 import uk from './uk.json';
 // tma:shop:start

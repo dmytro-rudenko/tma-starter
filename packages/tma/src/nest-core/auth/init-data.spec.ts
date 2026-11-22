@@ -1,4 +1,4 @@
-import { signInitData } from '@pctea/tma/testing';
+import { signInitData } from 'tma-starter/testing';
 import { validateInitData } from './init-data';
 
 const BOT = '123:TEST';

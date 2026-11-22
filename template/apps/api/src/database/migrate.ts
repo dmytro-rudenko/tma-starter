@@ -1,9 +1,9 @@
 import { readdirSync } from 'fs';
 import { join } from 'path';
 import type { Knex } from 'knex';
-import { migrations as botMigrations } from '@pctea/tma/nest-bot';
-import { composeMigrations, migrations as coreMigrations } from '@pctea/tma/nest-core';
-import { migrations as paymentsMigrations } from '@pctea/tma/nest-payments';
+import { migrations as botMigrations } from 'tma-starter/nest-bot';
+import { composeMigrations, migrations as coreMigrations } from 'tma-starter/nest-core';
+import { migrations as paymentsMigrations } from 'tma-starter/nest-payments';
 import { createKnexConnection } from './knex';
 
 const MIGRATIONS_DIR = join(__dirname, 'migrations');

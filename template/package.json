@@ -16,7 +16,7 @@
     "test": "pnpm -r test"
   },
   "devDependencies": {
-    "@pctea/tma": "__TMA_VERSION__",
+    "tma-starter": "__TMA_VERSION__",
     "@types/node": "^26",
     "pg": "^8.13.0",
     "prettier": "^3.3.3",

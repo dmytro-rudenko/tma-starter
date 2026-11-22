@@ -2,10 +2,10 @@ import {
   TmaCoreModule,
   composeMigrations,
   migrations as coreMigrations,
-} from '@pctea/tma/nest-core';
-import { TmaBotModule, migrations as botMigrations } from '@pctea/tma/nest-bot';
+} from 'tma-starter/nest-core';
+import { TmaBotModule, migrations as botMigrations } from 'tma-starter/nest-bot';
 import { Logger } from '@nestjs/common';
-import { createTestApp, postWebhook, updates, waitFor } from '@pctea/tma/testing';
+import { createTestApp, postWebhook, updates, waitFor } from 'tma-starter/testing';
 import { EntitlementsService } from './entitlements.service';
 import { migrations as paymentsMigrations } from './migrations';
 import { TmaPaymentsModule } from './payments.module';

@@ -1,5 +1,5 @@
-import { tg, type PaymentStatus } from '@pctea/tma/web';
-import { useTma } from '@pctea/tma/web/react';
+import { tg, type PaymentStatus } from 'tma-starter/web';
+import { useTma } from 'tma-starter/web/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAdminPayments } from '../../api/adminHooks';

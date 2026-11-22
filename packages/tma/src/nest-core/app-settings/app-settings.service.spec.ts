@@ -1,6 +1,6 @@
 import { HttpException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createTestDatabase, TestDatabase } from '@pctea/tma/testing';
+import { createTestDatabase, TestDatabase } from 'tma-starter/testing';
 import {
   APP_SETTINGS_CLOCK,
   AppSettingsRegistry,

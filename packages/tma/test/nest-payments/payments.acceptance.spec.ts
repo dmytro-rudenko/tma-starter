@@ -5,8 +5,8 @@ import {
   TmaCoreModule,
   composeMigrations,
   migrations as coreMigrations,
-} from '@pctea/tma/nest-core';
-import { TmaBotModule, migrations as botMigrations } from '@pctea/tma/nest-bot';
+} from 'tma-starter/nest-core';
+import { TmaBotModule, migrations as botMigrations } from 'tma-starter/nest-bot';
 import {
   EntitlementGuard,
   EntitlementsService,
@@ -14,14 +14,14 @@ import {
   Product,
   TmaPaymentsModule,
   migrations as paymentsMigrations,
-} from '@pctea/tma/nest-payments';
+} from 'tma-starter/nest-payments';
 import {
   createTestApp,
   postWebhook,
   signInitData,
   updates,
   waitFor,
-} from '@pctea/tma/testing';
+} from 'tma-starter/testing';
 
 jest.setTimeout(60_000);
 
@@ -206,7 +206,7 @@ beforeEach(() => {
   t.fakeBot.reset();
 });
 
-describe('@pctea/tma/nest-payments acceptance', () => {
+describe('tma-starter/nest-payments acceptance', () => {
   it('one_time end-to-end: invoice → pre_checkout ok → successful_payment → settle once', async () => {
     const u: TgUser = { id: 3001, first_name: 'Olia', language_code: 'uk' };
     const payload = await invoicePayload(u, 'premium');

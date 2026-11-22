@@ -7,9 +7,9 @@ export default defineConfig({
   esbuild: { jsx: 'automatic' },
   resolve: {
     alias: [
-      { find: '@pctea/tma/web/react', replacement: here('./src/web/react/index.ts') },
-      { find: '@pctea/tma/web', replacement: here('./src/web/index.ts') },
-      { find: '@pctea/tma/testing/dom', replacement: here('./src/testing/dom/index.ts') },
+      { find: 'tma-starter/web/react', replacement: here('./src/web/react/index.ts') },
+      { find: 'tma-starter/web', replacement: here('./src/web/index.ts') },
+      { find: 'tma-starter/testing/dom', replacement: here('./src/testing/dom/index.ts') },
     ],
   },
   test: {

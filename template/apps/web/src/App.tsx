@@ -1,10 +1,10 @@
-import { tg } from '@pctea/tma/web';
+import { tg } from 'tma-starter/web';
 import {
   TmaProvider,
   createQueryClient,
   useMe,
   useRealtimeEvent,
-} from '@pctea/tma/web/react';
+} from 'tma-starter/web/react';
 import type { QueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

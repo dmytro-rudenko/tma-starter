@@ -8,14 +8,14 @@ import {
   TmaCoreModule,
   composeMigrations,
   migrations as coreMigrations,
-} from '@pctea/tma/nest-core';
+} from 'tma-starter/nest-core';
 import {
   BotService,
   BroadcastAudienceRegistry,
   NotificationsService,
   TmaBotModule,
   migrations as botMigrations,
-} from '@pctea/tma/nest-bot';
+} from 'tma-starter/nest-bot';
 import {
   createTestApp,
   createTestDatabase,
@@ -23,7 +23,7 @@ import {
   startFakeBotApi,
   updates,
   waitFor,
-} from '@pctea/tma/testing';
+} from 'tma-starter/testing';
 
 jest.setTimeout(120_000);
 
@@ -200,7 +200,7 @@ afterEach(async () => {
   t = undefined;
 });
 
-describe('@pctea/tma/nest-bot acceptance', () => {
+describe('tma-starter/nest-bot acceptance', () => {
   it('webhook rejects wrong path token or secret with 401', async () => {
     t = await boot(false);
     const user: TgUser = { id: 2001, first_name: 'Olia' };
@@ -546,7 +546,7 @@ describe('@pctea/tma/nest-bot acceptance', () => {
 
   it('tma-bot setup: calls setWebhook then profile methods; exit 1 when setWebhook fails, exit 2 when profile fails', async () => {
     const bin = join(
-      dirname(require.resolve('@pctea/tma/package.json')),
+      dirname(require.resolve('tma-starter/package.json')),
       'dist/cjs/nest-bot/bin/tma-bot.js',
     );
     const dir = mkdtempSync(join(tmpdir(), 'tma-bot-setup-'));

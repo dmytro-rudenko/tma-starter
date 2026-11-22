@@ -1,6 +1,6 @@
 import { HttpException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createTestDatabase, TestDatabase } from '@pctea/tma/testing';
+import { createTestDatabase, TestDatabase } from 'tma-starter/testing';
 import { TmaCoreModule } from '../core.module';
 import { migrations } from '../migrations';
 import { UsersService } from '../users/users.service';

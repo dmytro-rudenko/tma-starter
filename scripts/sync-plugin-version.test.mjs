@@ -12,7 +12,7 @@ const script = path.join(root, 'scripts/sync-plugin-version.mjs');
 const pluginJson = {
   name: 'tma-starter',
   version: '0.0.0',
-  description: 'Scaffold Telegram Mini Apps on @pctea/tma',
+  description: 'Scaffold Telegram Mini Apps on tma-starter',
   author: { name: 'Dmytro Rudenko' },
   license: 'MIT',
   repository: 'https://github.com/dmytro-rudenko/tma-starter',
@@ -34,7 +34,7 @@ function makeFixture() {
   mkdirSync(path.join(dir, '.claude-plugin'), { recursive: true });
   mkdirSync(path.join(dir, 'skills/new'), { recursive: true });
 
-  const corePkgText = JSON.stringify({ name: '@pctea/tma', version: '1.2.3' }, null, 2) + '\n';
+  const corePkgText = JSON.stringify({ name: 'tma-starter', version: '1.2.3' }, null, 2) + '\n';
   writeFileSync(path.join(dir, 'packages/tma/package.json'), corePkgText);
 
   writeFileSync(path.join(dir, '.claude-plugin/plugin.json'), JSON.stringify(pluginJson, null, 2) + '\n');
@@ -44,7 +44,7 @@ function makeFixture() {
   return { dir, corePkgText };
 }
 
-test('copies the @pctea/tma version into plugin.json and SKILL.md frontmatter', (t) => {
+test('copies the tma-starter version into plugin.json and SKILL.md frontmatter', (t) => {
   const { dir, corePkgText } = makeFixture();
   t.after(() => rmSync(dir, { recursive: true, force: true }));
 

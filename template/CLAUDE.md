@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-__APP_TITLE__ — Telegram Mini App (бот `@__BOT_USERNAME__`), створений зі `tma-starter`. Монорепо на pnpm: `apps/api` (NestJS 10, Knex, PostgreSQL 16, grammY) і `apps/web` (React 18, Vite 5, TanStack Query 5, i18next). Авторизація, користувачі, адмінка, бот, розсилки, платежі й realtime живуть у пакеті `@pctea/tma` (підшляхи `nest-core`, `nest-bot`, `nest-payments`, `web`, `testing`), який стоїть у залежностях. Версії Node і pnpm закріплені в `.nvmrc` і `packageManager`.
+__APP_TITLE__ — Telegram Mini App (бот `@__BOT_USERNAME__`), створений зі `tma-starter`. Монорепо на pnpm: `apps/api` (NestJS 10, Knex, PostgreSQL 16, grammY) і `apps/web` (React 18, Vite 5, TanStack Query 5, i18next). Авторизація, користувачі, адмінка, бот, розсилки, платежі й realtime живуть у пакеті `tma-starter` (підшляхи `nest-core`, `nest-bot`, `nest-payments`, `web`, `testing`), який стоїть у залежностях. Версії Node і pnpm закріплені в `.nvmrc` і `packageManager`.
 
 Архітектура, стиль і правила за пакетами — у `.claude/rules/`.
 
@@ -10,7 +10,7 @@ __APP_TITLE__ — Telegram Mini App (бот `@__BOT_USERNAME__`), створен
 
 ## Правило для агентів
 
-Інфраструктура (auth, користувачі й права адмінів, адмінка, налаштування, аудит, бот, розсилки, платежі, entitlements, realtime) живе в пакеті `@pctea/tma`. Не копіюй її код у застосунок і не переписуй: розширюй через `forRoot`, реєстри й `copy`. Якщо потрібної точки розширення немає, це питання до пакета, а не привід форкнути його код у `apps/`.
+Інфраструктура (auth, користувачі й права адмінів, адмінка, налаштування, аудит, бот, розсилки, платежі, entitlements, realtime) живе в пакеті `tma-starter`. Не копіюй її код у застосунок і не переписуй: розширюй через `forRoot`, реєстри й `copy`. Якщо потрібної точки розширення немає, це питання до пакета, а не привід форкнути його код у `apps/`.
 
 ## Команди
 
@@ -25,8 +25,8 @@ pnpm test                            # api + web
 pnpm db:start                        # Postgres 16 для розробки й тестів
 pnpm db:stop
 pnpm db:create                       # створює БД з DATABASE_URL, якщо її ще немає
-pnpm db:migrate                      # міграції @pctea/tma і застосунку
-pnpm up -r @pctea/tma@latest         # оновлює @pctea/tma в усьому workspace
+pnpm db:migrate                      # міграції tma-starter і застосунку
+pnpm up -r tma-starter@latest         # оновлює tma-starter в усьому workspace
 ```
 
 Один тест:
@@ -42,12 +42,12 @@ pnpm --filter @__APP_SLUG__/web exec vitest run <файл>
 pnpm --filter @__APP_SLUG__/api build && pnpm db:migrate
 ```
 
-## Оновлення @pctea/tma
+## Оновлення tma-starter
 
-`@pctea/tma` закріплений однією точною версією в кореневому `package.json` і в обох застосунках. Оновлюй його в усьому workspace однією командою, а потім застосуй міграції, бо нова версія пакета може додати власні:
+`tma-starter` закріплений однією точною версією в кореневому `package.json` і в обох застосунках. Оновлюй його в усьому workspace однією командою, а потім застосуй міграції, бо нова версія пакета може додати власні:
 
 ```bash
-pnpm up -r @pctea/tma@latest
+pnpm up -r tma-starter@latest
 pnpm db:migrate
 ```
 
@@ -55,7 +55,7 @@ pnpm db:migrate
 
 - **Postgres потрібен і для `pnpm test`:** `createTestApp` піднімає весь `AppModule` на новій базі. За замовчуванням тести підключаються до `postgres://postgres@127.0.0.1:54329/postgres`, адресу змінює `DATABASE_ADMIN_URL`.
 - Підняти БД: `pnpm db:start`, зупинити: `pnpm db:stop`.
-- Web-тести працюють у jsdom без браузера й без Telegram (`installFakeWebApp` з `@pctea/tma/testing/dom`).
+- Web-тести працюють у jsdom без браузера й без Telegram (`installFakeWebApp` з `tma-starter/testing/dom`).
 - Тестів e2e і Playwright немає.
 
 ## Локальний запуск

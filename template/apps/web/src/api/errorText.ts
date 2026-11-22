@@ -1,4 +1,4 @@
-import { ApiError, type TmaApiErrorCode } from '@pctea/tma/web';
+import { ApiError, type TmaApiErrorCode } from 'tma-starter/web';
 import { useTranslation } from 'react-i18next';
 
 export type AppErrorCode = never;

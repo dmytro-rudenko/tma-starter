@@ -1,4 +1,4 @@
-import { FakeBotApi, startFakeBotApi } from '@pctea/tma/testing';
+import { FakeBotApi, startFakeBotApi } from 'tma-starter/testing';
 import { Api } from 'grammy';
 import { syncBotProfile } from './sync-bot-profile';
 

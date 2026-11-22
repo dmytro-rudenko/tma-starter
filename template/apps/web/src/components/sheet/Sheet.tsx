@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
-import { tg } from '@pctea/tma/web';
+import { tg } from 'tma-starter/web';
 import { useTranslation } from 'react-i18next';
 import { FULLSCREEN_KINDS, useLayer, useStack } from '../../state/stack';
 import s from './Sheet.module.css';

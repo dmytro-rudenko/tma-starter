@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { installFakeWebApp } from '@pctea/tma/testing/dom';
-import { createI18n } from '@pctea/tma/web';
+import { installFakeWebApp } from 'tma-starter/testing/dom';
+import { createI18n } from 'tma-starter/web';
 
 const USER_UK = encodeURIComponent(JSON.stringify({ id: 42, first_name: 'Olia', language_code: 'uk' }));
 const USER_DE = encodeURIComponent(JSON.stringify({ id: 42, first_name: 'Olia', language_code: 'de' }));

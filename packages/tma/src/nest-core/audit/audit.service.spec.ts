@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { createTestDatabase, TestDatabase } from '@pctea/tma/testing';
+import { createTestDatabase, TestDatabase } from 'tma-starter/testing';
 import { AuditService, TmaCoreModule, TmaCoreOptions, migrations } from '../index';
 
 const ACTOR = 1001;

@@ -1,7 +1,7 @@
 import { DynamicModule, Module, ModuleMetadata } from '@nestjs/common';
-import { TmaBotModule } from '@pctea/tma/nest-bot';
-import { TmaCoreModule } from '@pctea/tma/nest-core';
-import { TmaPaymentsModule } from '@pctea/tma/nest-payments';
+import { TmaBotModule } from 'tma-starter/nest-bot';
+import { TmaCoreModule } from 'tma-starter/nest-core';
+import { TmaPaymentsModule } from 'tma-starter/nest-payments';
 import type { Knex } from 'knex';
 import { validateEnv } from './config/env';
 import { ExampleModule } from './features/example/example.module';

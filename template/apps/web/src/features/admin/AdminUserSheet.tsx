@@ -1,5 +1,5 @@
-import { tg, type EntitlementDto, type PaymentDto } from '@pctea/tma/web';
-import { tmaKeys, useProducts, useTma } from '@pctea/tma/web/react';
+import { tg, type EntitlementDto, type PaymentDto } from 'tma-starter/web';
+import { tmaKeys, useProducts, useTma } from 'tma-starter/web/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';

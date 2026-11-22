@@ -13,8 +13,8 @@ module.exports = {
     ],
   },
   moduleNameMapper: {
-    '^@pctea/tma/package\\.json$': '<rootDir>/package.json',
-    '^@pctea/tma/(nest-core|nest-bot|nest-payments|testing)$': '<rootDir>/src/$1/index.ts',
+    '^tma-starter/package\\.json$': '<rootDir>/package.json',
+    '^tma-starter/(nest-core|nest-bot|nest-payments|testing)$': '<rootDir>/src/$1/index.ts',
   },
   testTimeout: 30000,
   maxWorkers: 4,

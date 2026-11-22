@@ -38,9 +38,9 @@ vi.mock('socket.io-client', () => {
   return { io, default: io };
 });
 
-import { createI18n } from '@pctea/tma/web';
-import { TmaProvider, createQueryClient, tmaKeys, usePurchase } from '@pctea/tma/web/react';
-import { installFakeWebApp } from '@pctea/tma/testing/dom';
+import { createI18n } from 'tma-starter/web';
+import { TmaProvider, createQueryClient, tmaKeys, usePurchase } from 'tma-starter/web/react';
+import { installFakeWebApp } from 'tma-starter/testing/dom';
 
 const INIT_DATA = 'query_id=AAH1&user=%7B%22id%22%3A42%2C%22first_name%22%3A%22Olia%22%7D&auth_date=1700000000&hash=abc';
 

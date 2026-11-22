@@ -9,8 +9,8 @@ import {
   composeMigrations,
   defineSetting,
   migrations as coreMigrations,
-} from '@pctea/tma/nest-core';
-import { createTestApp, signInitData, waitFor } from '@pctea/tma/testing';
+} from 'tma-starter/nest-core';
+import { createTestApp, signInitData, waitFor } from 'tma-starter/testing';
 
 jest.setTimeout(60_000);
 
@@ -122,7 +122,7 @@ afterAll(async () => {
   await t?.close();
 });
 
-describe('@pctea/tma/nest-core acceptance', () => {
+describe('tma-starter/nest-core acceptance', () => {
   it('rejects missing / bad-hash / expired initData with 401 UNAUTHORIZED', async () => {
     const user: TgUser = { id: 2001, first_name: 'Olia' };
 

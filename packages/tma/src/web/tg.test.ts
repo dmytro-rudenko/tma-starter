@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { installFakeWebApp } from '@pctea/tma/testing/dom';
-import { createPrefsCache, tg } from '@pctea/tma/web';
+import { installFakeWebApp } from 'tma-starter/testing/dom';
+import { createPrefsCache, tg } from 'tma-starter/web';
 
 const zero = { top: 0, bottom: 0, left: 0, right: 0 };
 const root = () => document.documentElement.style;

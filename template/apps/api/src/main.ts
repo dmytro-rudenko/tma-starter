@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { createValidationPipe } from '@pctea/tma/nest-core';
+import { createValidationPipe } from 'tma-starter/nest-core';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { IoAdapter } from '@nestjs/platform-socket.io';

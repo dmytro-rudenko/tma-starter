@@ -56,7 +56,7 @@ const ioMock = vi.hoisted(() => vi.fn());
 
 vi.mock('socket.io-client', () => ({ io: ioMock, default: ioMock }));
 
-import { ApiError, createApiClient, createI18n, tg } from '@pctea/tma/web';
+import { ApiError, createApiClient, createI18n, tg } from 'tma-starter/web';
 import {
   TmaProvider,
   createQueryClient,
@@ -64,8 +64,8 @@ import {
   useMe,
   usePurchase,
   useRealtimeEvent,
-} from '@pctea/tma/web/react';
-import { installFakeWebApp } from '@pctea/tma/testing/dom';
+} from 'tma-starter/web/react';
+import { installFakeWebApp } from 'tma-starter/testing/dom';
 
 const INIT_DATA = 'query_id=AAH1&user=%7B%22id%22%3A42%2C%22first_name%22%3A%22Olia%22%7D&auth_date=1700000000&hash=abc';
 
@@ -121,7 +121,7 @@ afterEach(() => {
   document.documentElement.removeAttribute('data-theme');
 });
 
-describe('@pctea/tma/web acceptance', () => {
+describe('tma-starter/web acceptance', () => {
   it("tg works without WebApp: initDataRaw '' , openInvoice 'failed', no throw", async () => {
     delete (window as any).Telegram;
     expect(tg.initDataRaw()).toBe('');

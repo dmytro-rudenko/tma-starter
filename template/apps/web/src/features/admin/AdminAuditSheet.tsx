@@ -1,4 +1,4 @@
-import type { AuditEvent } from '@pctea/tma/web';
+import type { AuditEvent } from 'tma-starter/web';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAdminAudit } from '../../api/adminHooks';

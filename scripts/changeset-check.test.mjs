@@ -23,7 +23,7 @@ function makeRepo(t) {
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   git(dir, 'init', '-q', '-b', 'main');
   write(dir, '.changeset/README.md', '# Changesets\n');
-  write(dir, '.changeset/old-change.md', "---\n'@pctea/tma': patch\n---\n\nOld\n");
+  write(dir, '.changeset/old-change.md', "---\n'tma-starter': patch\n---\n\nOld\n");
   write(dir, 'packages/tma/src/nest-core/index.ts', 'export {};\n');
   git(dir, 'add', '-A');
   git(dir, 'commit', '-q', '-m', 'base');
@@ -59,7 +59,7 @@ test('fails when a package changed without a changeset', (t) => {
 test('passes when a package changed together with a new changeset', (t) => {
   const dir = makeRepo(t);
   write(dir, 'packages/tma/src/nest-core/index.ts', 'export const a = 1;\n');
-  write(dir, '.changeset/new-change.md', "---\n'@pctea/tma': patch\n---\n\nNew\n");
+  write(dir, '.changeset/new-change.md', "---\n'tma-starter': patch\n---\n\nNew\n");
   commitAll(dir);
   assert.equal(check(dir).status, 0);
 });
@@ -67,7 +67,7 @@ test('passes when a package changed together with a new changeset', (t) => {
 test('passes when a package changed together with an edited changeset', (t) => {
   const dir = makeRepo(t);
   write(dir, 'packages/tma/src/nest-core/index.ts', 'export const a = 1;\n');
-  write(dir, '.changeset/old-change.md', "---\n'@pctea/tma': minor\n---\n\nOld\n");
+  write(dir, '.changeset/old-change.md', "---\n'tma-starter': minor\n---\n\nOld\n");
   commitAll(dir);
   assert.equal(check(dir).status, 0);
 });
